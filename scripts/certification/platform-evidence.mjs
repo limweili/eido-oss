@@ -283,6 +283,8 @@ function allowedMacRuntimePath(value) {
     || value === 'Contents/Resources/bin/eido-profile-live-gateway-helper'
     || value === 'Contents/Resources/THIRD_PARTY_NOTICES.txt'
     || value === 'Contents/Resources/LICENSE'
+    || value === 'Contents/Resources/LICENSE.electron.txt'
+    || value === 'Contents/Resources/LICENSES.chromium.html'
     || value === 'Contents/Resources/icon.icns'
     || /^Contents\/Resources\/[^/]+\.lproj\/(?:locale\.pak|InfoPlist\.strings)$/.test(value)
     || value.startsWith('Contents/Frameworks/')

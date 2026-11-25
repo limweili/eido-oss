@@ -686,6 +686,8 @@ test('installed runtime inventory is a closed platform allowlist', () => {
     'Contents/Resources/certification-provenance.json',
     'Contents/Resources/THIRD_PARTY_NOTICES.txt',
     'Contents/Resources/LICENSE',
+    'Contents/Resources/LICENSE.electron.txt',
+    'Contents/Resources/LICENSES.chromium.html',
     'Contents/Resources/bin',
     'Contents/Resources/bin/eido',
     'Contents/Resources/bin/eido-profile-live-gateway-helper',
@@ -714,6 +716,10 @@ test('installed runtime inventory is a closed platform allowlist', () => {
   assert.equal(assertInstalledRuntimeInventory('win32', windows).entries, windows.length)
   assert.throws(
     () => assertInstalledRuntimeInventory('darwin', [...mac, 'Contents/Resources/docs/ADR.md']),
+    /installed runtime allowlist/,
+  )
+  assert.throws(
+    () => assertInstalledRuntimeInventory('darwin', [...mac, 'Contents/Resources/LICENSE.extra.txt']),
     /installed runtime allowlist/,
   )
   assert.throws(
