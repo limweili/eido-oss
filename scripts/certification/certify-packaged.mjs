@@ -1523,10 +1523,21 @@ async function runInstalledEidoPathCommand(context_, installation_, arguments_) 
         'Installed macOS PATH proof requires /usr/local/bin on the fresh shell PATH',
       )
       environment.PATH = inheritedPath
+      const resolved = await runCommand('/bin/sh', ['-c', 'command -v eido'], {
+        cwd: workingDirectory,
+        env: environment,
+        timeout: timeoutMs,
+      })
+      assert(resolved.code === 0, `Installed eido PATH resolution failed (${resolved.code})`)
       assert(
-        await realpath(path.join(commandRegistration.commandDirectory, 'eido'))
-          === await realpath(executable),
-        'Installed eido command name resolved to a different executable',
+        path.resolve(workingDirectory, resolved.stdout.trim()) === MAC_EIDO_COMMAND,
+        'Installed eido command name resolved to a different launcher',
+      )
+      const metadata = await lstat(MAC_EIDO_COMMAND)
+      assert(
+        metadata.isFile() && (metadata.mode & 0o111) !== 0
+          && (await readFile(MAC_EIDO_COMMAND, 'utf8')) === commandRegistration.launcher,
+        'Installed macOS PATH launcher did not target the installed package',
       )
     }
     const result = await runCommand('eido', arguments_, {
@@ -1563,26 +1574,15 @@ async function installedEidoCommandSearchPath(context_, installation_, executabl
     assert(await pathEntryIsAbsent(command), 'Installed macOS PATH target is already occupied')
     const source = await realpath(executable)
     const launcher = renderMacEidoCommandLauncher(source)
-    let owned = false
-    try {
-      await runChecked('/usr/bin/sudo', [
-        '/bin/sh', '-c', MAC_EIDO_COMMAND_INSTALL_SCRIPT, 'eido-install', command, source, launcher,
-      ], {
-        timeout: timeoutMs,
-      })
-      owned = true
-      assert(
-        (await lstat(command)).isFile() && (await readFile(command, 'utf8')) === launcher,
-        'Installed macOS PATH launcher did not target the installed package',
-      )
-      return {
-        commandDirectory,
-        searchPath: undefined,
-        cleanup: () => removeOwnedMacPathCanary(command, launcher),
-      }
-    } catch (error) {
-      if (owned) await removeOwnedMacPathCanary(command, launcher)
-      throw error
+    await runChecked('/usr/bin/sudo', [
+      '/bin/sh', '-c', MAC_EIDO_COMMAND_INSTALL_SCRIPT, 'eido-install', command, source, launcher,
+    ], {
+      timeout: timeoutMs,
+    })
+    return {
+      commandDirectory,
+      launcher,
+      cleanup: () => removeOwnedMacPathCanary(command, launcher),
     }
   }
   const registration = await readWindowsPathRegistration()
