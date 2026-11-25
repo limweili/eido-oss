@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Epic 570 — Bounded Rich-Card Renderer: Founder Review</title>
+  <style>
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1a1c1f;
+  --muted: #6b7280;
+  --surface: #f3f4f6;
+  --surface-strong: #e5e7eb;
+  --border: #d1d5db;
+  --accent: #1677ff;
+  --accent-soft: #e8f2ff;
+  --decision: #0f8a4b;
+  --decision-soft: #e8f7ef;
+  --warning: #d66b00;
+  --warning-soft: #fff1e5;
+  --danger: #c62828;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181818;
+    --fg: #f8fafc;
+    --muted: #a6adb8;
+    --surface: #25272b;
+    --surface-strong: #33363c;
+    --border: #454950;
+    --accent: #83c3ff;
+    --accent-soft: #18324b;
+    --decision: #5bd58e;
+    --decision-soft: #173a27;
+    --warning: #ffad63;
+    --warning-soft: #442b18;
+    --danger: #ff7b7b;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); }
+#founder-review { position: relative; width: 100%; padding: clamp(1rem, 2.5vw, 2.5rem); overflow-wrap: anywhere; }
+#founder-review h1, #founder-review h2, #founder-review h3, #founder-review h4 { line-height: 1.2; }
+#founder-review h1 { font-size: clamp(1.9rem, 3vw, 3rem); margin: .35rem 0 1rem; }
+#founder-review h2 { margin-top: 3rem; padding-top: 1.25rem; border-top: 2px solid var(--border); }
+#founder-review h3 { margin-top: 1.8rem; }
+#founder-review p, #founder-review li { max-width: 85ch; }
+#founder-review a { color: var(--accent); }
+#founder-review code { white-space: normal; word-break: break-all; }
+.report-header { padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.kicker, .section-label, .muted { color: var(--muted); }
+.section-label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.lede { font-size: 1.1rem; max-width: 75ch; }
+.toc { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.toc ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem 1.5rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0; }
+.two-col, .comment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+.card { background: var(--surface); border-radius: .9rem; padding: 1rem; }
+.stat { display: grid; gap: .25rem; }
+.stat strong { font-size: 1.4rem; }
+.plain-group { padding: .5rem 0 1rem; border-bottom: 1px solid var(--border); }
+.callout { margin: 1rem 0; padding: .8rem 1rem; border-left: 4px solid var(--accent); background: var(--accent-soft); }
+.callout.decision { border-color: var(--decision); background: var(--decision-soft); }
+.callout.warning { border-color: var(--warning); background: var(--warning-soft); }
+.area-intro { color: var(--muted); max-width: 80ch; }
+.impact-chain { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: .75rem; align-items: center; margin: 1.5rem 0; }
+.impact-node { min-height: 10rem; display: grid; align-content: center; gap: .5rem; padding: 1rem; border: 2px solid var(--decision); border-radius: .9rem; background: var(--decision-soft); text-align: center; }
+.impact-node.pending { border-color: var(--warning); background: var(--warning-soft); }
+.impact-node small { color: var(--muted); }
+.impact-arrow { color: var(--muted); font-size: 1.5rem; }
+.table-wrap { width: 100%; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 1rem 0; }
+th, td { padding: .75rem .6rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); }
+details { padding: .75rem 0; border-bottom: 1px solid var(--border); }
+summary { cursor: pointer; font-weight: 700; }
+.diagram-placeholder { min-height: 9rem; display: grid; place-items: center; padding: 1rem; border: 1px dashed var(--border); color: var(--muted); }
+button, select, textarea { font: inherit; color: inherit; }
+button { border: 1px solid var(--border); border-radius: .55rem; padding: .48rem .75rem; background: var(--bg); cursor: pointer; }
+button.primary { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+label { display: grid; gap: .3rem; margin-top: .7rem; font-weight: 600; }
+select, textarea { width: 100%; border: 1px solid var(--border); border-radius: .55rem; padding: .55rem .7rem; background: var(--bg); }
+textarea { min-height: 7rem; resize: vertical; }
+.actions, .annotation-tools, .comment-actions, .comment-label { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .6rem; }
+.annotation-tools { color: var(--muted); }
+.inline-comments, .comment-index { display: grid; gap: .75rem; margin-top: .75rem; }
+.inline-comments:empty { display: none; }
+.founder-comment[data-status="resolved"] { opacity: .7; }
+.founder-comment blockquote, #founder-comment-quote, .inline-composer blockquote { margin: .65rem 0; padding-left: .8rem; border-left: 3px solid var(--border); color: var(--muted); }
+.founder-comment-body { white-space: pre-wrap; }
+.badge { display: inline-block; padding: .12rem .5rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .85rem; }
+.selection-comment-trigger { position: absolute; z-index: 20; }
+.inline-composer { margin: .65rem 0 1rem; }
+.review-instructions, .comment-workbench { margin: 1.5rem 0; }
+footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); }
+[hidden] { display: none !important; }
+@media (max-width: 760px) {
+  .summary-grid, .two-col, .comment-grid, .toc ol { grid-template-columns: 1fr; }
+  .impact-chain { grid-template-columns: 1fr; }
+  .impact-arrow { transform: rotate(90deg); justify-self: center; }
+  table, thead, tbody, tr, th, td { display: block; }
+  thead { display: none; }
+  tr { padding: .6rem 0; border-bottom: 2px solid var(--border); }
+  td { display: grid; grid-template-columns: minmax(7rem, .8fr) minmax(0, 1.7fr); gap: .6rem; border: 0; padding: .3rem 0; }
+  td::before { content: attr(data-label); color: var(--muted); font-weight: 700; }
+}
+@media print {
+  .annotation-tools, .selection-comment-trigger, .inline-composer, .comment-actions, .comment-workbench .comment-grid { display: none !important; }
+  .founder-comment { break-inside: avoid; }
+}
+  </style>
+</head>
+<body>
+<main id="founder-review"
+      data-report-id="epic-570-s0-s8-renderer-train-issues-553-561-epic-570-bounded-rich-card-renderer"
+      data-comment-schema="founder-review-comments/v1">
+  <header id="executive-summary" class="report-header" data-review-anchor data-anchor-label="Executive summary">
+    <p class="kicker">Founder review · Epic #570 (S0–S8 renderer train, issues #553–#561) · 2026-07-22, origin/main f06a881, GitHub tracker limweili/eido · generated 2026-07-22</p>
+    <h1>Epic 570 — Bounded Rich-Card Renderer: Founder Review</h1>
+    <p class="section-label">Executive summary</p>
+    <p class="lede">The full S0–S8 renderer train landed on main on 2026-07-18 and the epic closed on 2026-07-19: Eido's Reading view now keeps rich Card DOM bounded to what is near your viewport (never more than 540 Cards), instead of keeping every rich Card on the whole Board resident. Fidelity survived — search, copy, keyboard access, long-Card editing, and saved-Board compatibility all shipped with direct tests. The critical honesty boundary: the performance benefit was proven <em>structurally</em> (bounded counters and set membership), never by a stopwatch — the train contains <strong>zero controlled timing measurements</strong>, by explicit recorded policy. And your own test — ~30 long-text Note Cards, all on screen — is a scenario this epic deliberately did <em>not</em> make cheaper; the train in fact removed an old cap that used to make exactly that scenario artificially cheap but unreadable.</p>
+    <div class="two-col">
+      <div class="plain-group">
+        <h3>What changed now</h3>
+        <p>Rich Card DOM no longer grows with whole-Board content. Offscreen Cards release their DOM once outside a 1,350&nbsp;px retention band; a lightweight painted safety layer guarantees no blank regions; live interactions (editing, selection, focus, media) pin their Cards independently so eviction can never interrupt you. Long Notes are now fully faithful at Reading zoom — a previous board-wide 300,000-character cap that silently demoted <em>everything</em> to the painted Overview on text-heavy Boards was removed (#580).</p>
+      </div>
+      <div class="plain-group">
+        <h3>What users or the business receive later</h3>
+        <p>The payoff scales with Board size: on Boards far larger than one screen, navigation cost stays flat instead of growing with total content. That claim is <strong>EXPECTED, not yet timed</strong> — the gate is a controlled-host timing run (or honest field feedback), which the train explicitly recorded as <code>not-measured</code>. Your 30-Card lag report (examined in its own section below) is the first field signal, and it points at a cost the epic never bounded: many long rich Cards <em>visible at once</em>.</p>
+      </div>
+    </div>
+    <div class="summary-grid" aria-label="Executive measures">
+      <div class="card stat"><span class="muted">Slices landed</span><strong>9 of 9</strong><span>S0–S8 all merged 2026-07-18 (UTC); each behind a hosted, SHA-bound Required gate. MEASURED.</span></div>
+      <div class="card stat"><span class="muted">Rich-DOM ceiling</span><strong>540 Cards</strong><span>The one production bound on resident rich Cards — enforced in the residency planner and by dense-viewport demotion. MEASURED (structural).</span></div>
+      <div class="card stat"><span class="muted">Controlled timing runs</span><strong>0</strong><span>All wall-clock performance claims recorded as <code>not-measured</code> per the epic's own testing policy. NOT YET PROVEN.</span></div>
+    </div>
+    <div class="callout decision"><strong>Most important boundary:</strong> this epic bounded <em>offscreen</em> residency. Cards that are <em>visible</em> all get full rich DOM, first in line, regardless of text length — up to 540 at once. A Board of ~30 long Notes that fit on one screen receives almost none of the epic's benefit, and after the #580 cap removal it renders <em>more</em> faithful content than before. "It got slower for my test" and "the epic worked as designed" can both be true.</div>
+    <div class="callout"><strong>Founder review focus:</strong> (1) Approve the tuning sequence in <a href="#infra-application">Applying the infrastructure</a> — a code-verified scan found the shipped machinery has unused protections (a dead 1,200-char truncation cap, an unconsulted text-weight signal, a gated-off painted motion path) that map directly onto your 30-Note lag. (2) Is the structural-proof-only performance case acceptable, or should one controlled timing run be funded? (3) Cross-vendor review degraded to Codex-reviewing-Codex mid-train after an auth failure — accept retroactively or tighten the rule?</div>
+  </header>
+
+  <nav class="toc" aria-label="Report contents">
+    <ol>
+      <li><a href="#executive-summary">Executive summary</a></li>
+      <li><a href="#lag-investigation">Your lag report, examined</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#infra-application">Applying the infrastructure</a></li>
+      <li><a href="#work-delivered">Work delivered</a></li>
+      <li><a href="#technical-teaching">Technical teaching</a></li>
+      <li><a href="#retro">Retro and collaboration</a></li>
+      <li><a href="#comment-workbench">Comment and return</a></li>
+    </ol>
+  </nav>
+
+  <section id="review-workflow" class="card review-instructions" data-review-anchor data-anchor-label="How to review and comment">
+    <h2>How to review and return comments</h2>
+    <ol>
+      <li>Skim the executive summary and impact first; open technical disclosures only when useful.</li>
+      <li>Highlight exact wording and press the nearby <strong>Comment here</strong> button, or comment on a whole section.</li>
+      <li>Add, edit, resolve, or delete comments. Each one is marked as founder feedback requiring an agent response.</li>
+      <li>Press <strong>Save commented HTML</strong> and return the downloaded file.</li>
+    </ol>
+  </section>
+
+  <section id="lag-investigation" data-review-anchor data-anchor-label="Your lag report, examined">
+    <h2>Your lag report, examined — "laggy after ~30 long Notes"</h2>
+    <p class="area-intro">You tested the delivered renderer expecting to place many large Note Cards on a Board without losing performance, and hit lag at roughly 30 long-text Notes. This section answers, from the shipped code and the train's own evidence record, whether that contradicts the epic — and what the honest diagnosis is.</p>
+
+    <article id="lag-what-epic-promised" data-review-anchor data-anchor-label="What the epic promised vs your test">
+      <h3>1. Your scenario is outside what the epic bounded — by design</h3>
+      <p>The delivered residency planner admits <strong>visible Cards first, with no cap short of 540</strong> (<code>src/canvas/cardResidency.ts</code>, <code>PASSIVE_CARD_LIMIT = 540</code>). The scene code even carries the comment "Text length never changes this decision." So ~30 long Notes visible at Reading zoom means all ~30 hold full rich DOM simultaneously — exactly as specified. The epic's promise was different: Cards <em>away from</em> your viewport stop costing you. On a Board where most content fits on or near one screen, there is nothing offscreen to bound, so the bounded renderer contributes approximately nothing to that test. <strong>DECIDED</strong> (spec: visible Cards under existing scene and LOD policy; residency bounds apply to the preload window <code>P</code>, not to <code>V</code>).</p>
+    </article>
+
+    <article id="lag-580-cap-removal" data-review-anchor data-anchor-label="The removed text cap (#580)">
+      <h3>2. The train removed the cap that used to make your exact test artificially fast</h3>
+      <p>Before this train, a board-wide <strong>300,000-character text cap</strong> demoted <em>every</em> Card to the cheap painted Overview once total Board text crossed it. A real save (the "Alphabet" Board, 307,964 text units) tripped it: one long Note pushed the whole Board out of Reading. Mid-train, <a href="https://github.com/limweili/eido/pull/580">#580</a> deliberately removed that cap so long Notes stay readable and unrelated Cards keep their detail. <strong>Consequence for your test:</strong> ~30 long Notes is right at the old threshold's scale — under the old behavior your Board would likely have collapsed to painted Overview (fast, but unreadable rich content); under the new behavior it renders everything faithfully and pays the real cost. The product got <em>more honest</em>, and in this one scenario likely <em>heavier</em>. That trade was made consciously for readability, but it was never presented as a performance trade, and no timing accompanied it (#580's browser perf suites were non-blocking and not run). <strong>MEASURED</strong> (cap removal and its cause), <strong>NOT YET PROVEN</strong> (its cost in your scenario).</p>
+    </article>
+
+    <article id="lag-where-cost-lives" data-review-anchor data-anchor-label="Where the cost most plausibly lives">
+      <h3>3. Where the lag most plausibly lives</h3>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>If the lag appeared…</th><th>Most plausible cost</th><th>Does the epic's design cover it?</th></tr></thead>
+        <tbody>
+          <tr><td data-label="If the lag appeared">While creating Cards / as each Note lands</td><td data-label="Most plausible cost">Initial mount, text layout, and style recalculation of long rich Cards — each body mounts its <em>complete</em> DOM tree: the shipped 1,200-char passive truncation cap is dead code, and no <code>content-visibility</code> exists (see <a href="#infra-application">Applying the infrastructure</a>)</td><td data-label="Covered?">No — mount cost of visible long Cards was never bounded or timed. The probes that measure it (<code>styleLayoutMs</code>, <code>detailedReadyMs</code>, <code>longTasks</code>) exist but ran only on synthetic fixtures in the evidence phase.</td></tr>
+          <tr><td data-label="If the lag appeared">While typing inside a Note</td><td data-label="Most plausible cost">Editor/document update path — but a code-verified check found the memoization seams hold: editing one Note does not re-render the other 29, and per-keystroke scene work is targeted, not whole-Board</td><td data-label="Covered?">Yes structurally — typing lag is <em>not</em> expected from residency; if you felt it here, it's a bug worth its own diagnosis, not a known cost.</td></tr>
+          <tr><td data-label="If the lag appeared">While panning/zooming with all Notes on screen</td><td data-label="Most plausible cost">Should be a single compositor transform per frame (<code>Board.tsx</code> applies one CSS transform; Cards are not re-rendered per frame)</td><td data-label="Covered?">Yes structurally — if you saw lag <em>here</em>, that is a genuine anomaly worth a bug, because the design says this path is flat.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p>A local diagnostic run reproducing your fixture shape (~30 long-text Notes at Reading zoom) is being captured against this exact head; per repo policy local timing is diagnostic only, never a release verdict. Its findings are recorded in the retro section's forensic disclosure once complete.</p>
+    </article>
+
+    <article id="lag-verdict" data-review-anchor data-anchor-label="Verdict on impact">
+      <h3>4. So — did the epic actually make an impact?</h3>
+      <p><strong>What is proven:</strong> the mechanism landed and its bounds hold structurally (resident-DOM plateaus below the ceiling, zero blank frames, image caches under 8&nbsp;MiB/2&nbsp;MiB budgets, owners bounded). <strong>What is not proven:</strong> that anyone's real session got faster. No wall-clock number exists on either side of the train — the spec itself reserved timing for three narrow claims and then an in-flight policy amendment (ADR 0028) removed even those unless a product decision depended on them. <strong>What your test shows:</strong> the one scenario the architecture concedes — many long rich Cards visible at once — behaves as the architecture predicts, and may be net-heavier than pre-train because of #580. The honest verdict is: <em>impact on large-Board navigation is ENABLED and EXPECTED; impact on dense visible text is NOT YET PROVEN and plausibly negative; your test measured the second thing, not the first.</em></p>
+      <div class="callout"><strong>Decision for you:</strong> should "many long Notes visible at Reading zoom stays fluid" become a named product claim with its own issue and a controlled measurement? The good news: the fixes don't require new architecture — <a href="#infra-application">Applying the infrastructure</a> shows the shipped machinery already contains the levers (an inert truncation cap, an unconsulted text-weight signal, a gated-off painted motion path); they need wiring, not invention.</div>
+    </article>
+  </section>
+
+  <section id="impact" data-review-anchor data-anchor-label="Impact">
+    <h2>Impact — what changed and why it matters</h2>
+    <p class="area-intro">The impact splits cleanly: delivered structural guarantees and fidelity protections now; expected navigation speed-ups on large Boards later, gated on real measurement; and one scenario (dense visible long text) where cost plausibly increased in exchange for readability.</p>
+    <div class="impact-chain" role="img" aria-label="Impact chain from evidence to user or business value">
+      <div class="impact-node"><strong>Evidence</strong><span>Epic #410 proved offscreen rich DOM stays resident, so navigation cost grew with whole-Board content; prototype residency peaked at 80 resident Cards vs 131 baseline.</span><small>MEASURED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Decision or delivery change</strong><span>One architecture selected (#406) and shipped as production (S0–S8): bounded preload window, independent live pins, painted safety layer, visibility-aware image renditions.</span><small>DECIDED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Enabled capability</strong><span>Boards can now grow far beyond one screen without rich DOM growing with them; resident DOM, owners, and image bytes all plateau under fixed ceilings.</span><small>ENABLED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node pending"><strong>User or business effect</strong><span>Faster, flatter navigation on large real Boards. Gate: a controlled timing run or credible field feedback — neither exists yet, and the first field report (yours) hit a different, unbounded cost.</span><small>EXPECTED / NOT YET PROVEN</small></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Impact layer</th><th>Improvement</th><th>Evidence</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Layer">Rendering cost model</td><td data-label="Improvement">Rich DOM bounded to viewport neighborhood (preload 900&nbsp;px, retention 1,350&nbsp;px, ceiling 540 Cards) instead of whole Board</td><td data-label="Evidence">src/canvas/cardResidency.ts constants; resident-DOM plateau assertions in the perf probes; PR #582</td><td data-label="Confidence">MEASURED (structural)</td></tr>
+          <tr><td data-label="Layer">Navigation continuity</td><td data-label="Improvement">Zero blank Board regions during any pan/zoom; painted safety layer always underneath</td><td data-label="Evidence"><code>blankBoardFrames = 0</code> / <code>missingRepresentationFrames</code> probe assertions; S1 journey tests</td><td data-label="Confidence">MEASURED (structural)</td></tr>
+          <tr><td data-label="Layer">Interaction safety</td><td data-label="Improvement">Editing, selection, focus, scroll, media each pin a Card independently — eviction can never interrupt live work; first click delivered exactly once even when it races activation</td><td data-label="Evidence">S2 (PR #583, 136 tests), S3 (PR #588, 18+3 journeys incl. mid-scroll editor re-entry)</td><td data-label="Confidence">MEASURED (tested)</td></tr>
+          <tr><td data-label="Layer">Fidelity under unmounting</td><td data-label="Improvement">Board-wide search, complete whole-Board copy, keyboard/accessibility continuity all work over Cards that hold no DOM</td><td data-label="Evidence">S4 (PR #586), S5 (PR #587); native browser Find over unmounted content documented as a limitation per pre-approved founder decision 2026-07-19</td><td data-label="Confidence">MEASURED (tested), with the Find limitation DECIDED</td></tr>
+          <tr><td data-label="Layer">Image memory</td><td data-label="Improvement">Decoded/derived image caches bounded (8&nbsp;MiB / 2&nbsp;MiB), last-reference-safe eviction; exports and AI always receive authoritative references, never thumbnails</td><td data-label="Evidence">S6/S7 (PRs #581, #585); evidence-phase plateau: 7.34&nbsp;MiB peak decoded, 52 reference-aware evictions</td><td data-label="Confidence">MEASURED (structural + evidence-phase)</td></tr>
+          <tr><td data-label="Layer">Long-Note readability</td><td data-label="Improvement">300k-character board-wide demotion cap removed; long Notes stay readable at Reading zoom</td><td data-label="Evidence">#580 (real save regression: 307,964 text units)</td><td data-label="Confidence">MEASURED (behavior); its performance cost NOT YET PROVEN</td></tr>
+          <tr><td data-label="Layer">Perceived speed</td><td data-label="Improvement">Faster navigation on large Boards; fluid dense-text Boards</td><td data-label="Evidence">None — zero controlled timing runs in the train; your field test reports lag at ~30 visible long Notes</td><td data-label="Confidence">NOT YET PROVEN</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warning"><strong>Honest impact boundary:</strong> no claim of the form "the app is now faster" is currently supportable with a number. The train proved the cost <em>model</em> changed (bounded instead of unbounded), not that any user-visible frame got cheaper. The one field data point available — yours — is negative, in the one scenario the bounds don't cover.</div>
+  </section>
+
+  <section id="infra-application" data-review-anchor data-anchor-label="Applying the infrastructure">
+    <h2>Applying the infrastructure — where the next user-felt gains live</h2>
+    <p class="area-intro">Founder directive for this pass: the foundation is accepted; make sure what was built is actually applied to impactful end-user performance. A code-verified scan of the shipped seams found that the infrastructure is real — and that three of its own protections are currently unused or gated off. These are tuning moves, not new architecture; each one reuses a seam this epic (or its evidence phase) already paid for.</p>
+
+    <article id="infra-op1" data-review-anchor data-anchor-label="Opportunity 1: bound long card bodies">
+      <h3>1. Bound long card bodies — the shipped truncation cap is dead code, and no <code>content-visibility</code> exists <span class="badge">Highest impact</span></h3>
+      <p><strong>What exists:</strong> a passive-preview truncation helper (<code>markdownPreviewText</code>, 1,200-char cap, <code>src/shared/markdownPreview.ts</code>) written explicitly to protect "auto-sized cards from painting unbounded text," plus <code>contain: layout paint style</code> on note/result bodies. <strong>The gap:</strong> the helper is called from exactly one place (<code>NoteCard.tsx:35</code>) and <em>both branches return the full text</em> — auto-height notes bypass it entirely, fixed-height notes short-circuit it. There is no <code>content-visibility: auto</code> anywhere in production CSS, and Result bodies even override their 320&nbsp;px height cap to unbounded. Net: 30 long Notes = 30 complete DOM trees, plus fully-mounted offscreen residents within the 900&nbsp;px preload window. <strong>The tweak:</strong> add <code>content-visibility: auto</code> with <code>contain-intrinsic-size</code> from the card's already-measured height to card body wrappers — geometry-stable, so it avoids the flash that originally led to bypassing the truncation cap. <strong>Expected user effect:</strong> the browser skips rendering work for offscreen-but-mounted bodies; directly attacks the 30-long-note scenario at mount and during navigation. <strong>ENABLED today, unapplied.</strong></p>
+    </article>
+
+    <article id="infra-op2" data-review-anchor data-anchor-label="Opportunity 2: wire the text-weight signal">
+      <h3>2. Wire the text-weight signal into a local demotion budget — the #580 successor already exists</h3>
+      <p><strong>What exists:</strong> the scene computes a per-card text weight and a board-wide <code>boardDetailTextWeight</code> on every derivation, incrementally and cheaply (<code>boardScene.ts</code>). This is precisely the signal the removed 300k-character global cap used — the removal (#580) deleted the <em>global</em> demotion but the measurement survived. <strong>The gap:</strong> the value is copied onto the scene and never consulted; every demotion decision keys off card <em>count</em> ("Text length never changes this decision"). <strong>The tweak:</strong> a per-viewport weight budget in the residency planner — stop admitting full detail once cumulative admitted weight crosses the budget, demoting overflow to the painted layer. Local, so one giant note can't dim an unrelated corner of the Board — fixing the exact flaw that justified removing the old cap, while restoring its protection. <strong>Expected user effect:</strong> bounded worst-case cost on text-heavy viewports; the "ton of large note cards" use case gets a real ceiling again. <strong>ENABLED today, unapplied.</strong></p>
+    </article>
+
+    <article id="infra-op3" data-review-anchor data-anchor-label="Opportunity 3: motion-scoped painted demotion">
+      <h3>3. Motion-scoped painted demotion — shipped, wired, gated off</h3>
+      <p><strong>What exists:</strong> a complete cached-passive presentation path that can show a captured raster instead of live DOM, already receives a <code>navigationActive</code> signal every frame, and already decides <code>'safety-net'</code> vs <code>'passive'</code> per card (<code>cachedPassiveCard.ts</code>, wired through <code>Board.tsx</code>). <strong>The gap:</strong> it only activates behind the build flags of the <em>rejected</em> always-on cached-passive renderer — production never enables it, so during fast pans all visible rich cards stay fully live. The rejection reasons (selection, clipboard, keyboard, accessibility) are all things a user cannot exercise mid-gesture. <strong>The tweak:</strong> honor the painted path only while <code>navigationActive</code> is true, reverting to live DOM the instant motion settles. This must be framed carefully: it reuses the shipped capture runtime for gestures only — it is not a revival of the rejected renderer, and the settle-back-to-live behavior keeps every fidelity guarantee at rest. <strong>Expected user effect:</strong> lighter frames during fast pan/zoom on heavy Boards. <strong>ENABLED today, gated off; needs a deliberate product decision because the seam was previously litigated.</strong></p>
+    </article>
+
+    <article id="infra-op-rest" data-review-anchor data-anchor-label="Further opportunities">
+      <h3>Further opportunities and one all-clear</h3>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>Opportunity</th><th>Existing seam</th><th>Gap</th><th>Expected effect</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Opportunity">4. Passive image renditions + idle prewarm</td><td data-label="Seam">Rendition resolver defines <code>'passive-card'</code> and <code>'card-thumbnail'</code> purposes with budgets; residency planner computes direction-aware look-ahead</td><td data-label="Gap">Production only ever requests <code>'active-card'</code> and gallery purposes; the painted path keys off full-size references; look-ahead never feeds <code>resolver.preload</code></td><td data-label="Effect">Fewer decode/raster spikes panning image-heavy Boards into view; lower memory against the 8/2&nbsp;MiB budgets</td></tr>
+          <tr><td data-label="Opportunity">5. Surface the perf counters</td><td data-label="Seam"><code>window.__EIDO_PERF__</code> counters (scene derivations, metric visits, resident sets) + rendition <code>snapshot()</code></td><td data-label="Gap">DEV-only install; consumed by probes only — no overlay or telemetry reads them in real sessions</td><td data-label="Effect">Cheap opt-in overlay makes the next "it feels laggy" report diagnosable in minutes; de-risks opportunities 1–3</td></tr>
+          <tr><td data-label="Opportunity">6. Typing path — no action needed</td><td data-label="Seam">Targeted per-card metric updates; array-reuse in scene derivation; per-card store subscriptions; shared node data reference</td><td data-label="Gap">None found — editing one Note does not re-render the other 29; the seams hold as designed</td><td data-label="Effect">All-clear: typing lag is not structurally expected, which narrows real-world lag to mount/render cost (opportunities 1–2)</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout decision"><strong>Recommended sequence:</strong> (1) bound long bodies with <code>content-visibility</code> — highest leverage, lowest risk, directly your scenario; (2) wire the text-weight budget into residency admission; (5) add the counter overlay so both changes are verifiable in your real session; then decide (3) motion demotion and (4) image prewarm on evidence. Each step has a natural validation gate: your own 30-long-note Board, plus the existing probes' <code>styleLayoutMs</code>/<code>longTasks</code> before/after.</div>
+    </article>
+  </section>
+
+  <section id="work-delivered" data-review-anchor data-anchor-label="Work delivered">
+    <h2>Area 1 — Work delivered</h2>
+    <p class="area-intro">Nine slices, eight PRs (S0 closed with zero code — inspection showed the seam already existed), all merged 2026-07-18 UTC, epic closed 2026-07-19. Every slice landed directly as production behavior with <code>git revert</code> as rollback — no flags, no canary, no staged rollout, exactly as the spec decreed for a pre-release product.</p>
+    <article id="completion-boundary" data-review-anchor data-anchor-label="Completion boundary">
+      <h3>Delivered versus intentionally excluded</h3>
+      <div class="two-col">
+        <div class="plain-group"><h4>Delivered</h4><ul>
+          <li>Bounded, buffered, direction-aware, hysteretic rich-DOM residency with a painted safety layer (S1)</li>
+          <li>Independent live pins for editing, selection, focus, scroll, media; exactly-once first intent (S2)</li>
+          <li>Long Note / Conversation / Result full interactivity once Live, incl. mid-scroll editor re-entry (S3; also closed long-standing bug #440)</li>
+          <li>Graph-complete Board search and whole-Board copy over unmounted Cards (S4)</li>
+          <li>Keyboard, focus, and accessibility continuity across mount/unmount (S5)</li>
+          <li>Visibility-aware disposable image renditions; authoritative references preserved for export/AI (S6, S7)</li>
+          <li>Saved-Board load → mutate → save → reload → export byte-compatibility journey (S8)</li>
+          <li>Long-Note fidelity: the 300k-character global demotion cap removed (#580, mid-train)</li>
+        </ul></div>
+        <div class="plain-group"><h4>Not delivered — explicitly, not silently</h4><ul>
+          <li>No controlled performance timing anywhere; all wall-clock claims <code>not-measured</code></li>
+          <li>No bound on the cost of <em>visible</em> rich Cards below the 540 ceiling (your scenario)</li>
+          <li>Native browser Find over unmounted content — documented limitation, per pre-approved founder decision 2026-07-19; in-app search is the covered path</li>
+          <li>No saved-format migration, no rollout apparatus, no new benchmark framework</li>
+          <li>#562 (Version Context graph-index optimization, the only quantified deferred perf item: 4 → 22 record visits) left open by choice</li>
+          <li>JS-heap, detached-DOM, GPU/decoder signals for S8: <code>not-measured</code> (no authoritative source exists)</li>
+        </ul></div>
+      </div>
+    </article>
+    <article id="selected-decision" data-review-anchor data-anchor-label="Selected decision or architecture">
+      <h3>Selected decision or architecture</h3>
+      <p>The evidence phase (#406) selected buffered rich-DOM residency and terminally rejected the two competitors: strict viewport-only residency (too much churn at edges) and the cached-passive-Card renderer (rejected outright). The selected design keeps the saved graph as sole authority — every runtime set (resident Cards, pins, caches, counters) is derived and rebuildable, honoring ADR 0011. Governing ADRs 0019/0020/0023/0024 were amended to "production since 2026-07-19," and the canvas foundation doc now teaches the shipped model. Eager whole-Board data loading was deliberately kept (#408): the performance problem was DOM residency, not data volume.</p>
+    </article>
+    <article id="delivery-ledger" data-review-anchor data-anchor-label="Delivery ledger">
+      <h3>Detailed delivery ledger</h3>
+      <details><summary>Open issue, PR, CI, release, and artifact detail</summary>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>Slice</th><th>Issue → PR</th><th>Merge SHA · date (UTC)</th><th>Focused proof</th><th>Notable</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Slice">S0 cold scene seam</td><td data-label="Issue → PR">#553 → no PR</td><td data-label="Merge">closed at main 6f1ae40</td><td data-label="Proof">Re-derivation close: seam already authoritative; Required run 29650888038 green on exact main</td><td data-label="Notable">Zero-code close per ADR 0028 — reused proof instead of manufacturing a delta; one duplicative pre-rebase test deleted</td></tr>
+            <tr><td data-label="Slice">S1 bounded residency</td><td data-label="Issue → PR">#554 → PR #582</td><td data-label="Merge">ccd54bc · 07-18 17:10</td><td data-label="Proof">347 focused tests; Required 29653306993; browser canary pass (non-gating)</td><td data-label="Notable">Review caught 1 real blocker (exported P/S reflected planner candidates, not mounted detail) — repaired before merge. Reserved timing run never executed.</td></tr>
+            <tr><td data-label="Slice">S2 live activation</td><td data-label="Issue → PR">#556 → PR #583</td><td data-label="Merge">438a5b5 · 07-18 17:28</td><td data-label="Proof">136 focused tests; Required 29653861402; independent Sol audit PASS/PASS</td><td data-label="Notable">Exactly-once first intent under activation race directly asserted</td></tr>
+            <tr><td data-label="Slice">S3 long-Card continuity</td><td data-label="Issue → PR">#557 → PR #588</td><td data-label="Merge">54de0bb · 07-18 19:00</td><td data-label="Proof">18/18 content-visibility tests + 3/3 browser journeys; broad 1,955/1,958 (2 macOS temp-alias failures, host-explainable)</td><td data-label="Notable">Closed #440; bundle 767,991 B vs 768,000 B cap</td></tr>
+            <tr><td data-label="Slice">S4 search/copy</td><td data-label="Issue → PR">#558 → PR #586</td><td data-label="Merge">3f05bd1 · 07-18 18:20</td><td data-label="Proof">14 focused tests; Required 29655466370</td><td data-label="Notable">First Required run failed the bundle budget (750.2 vs 750 KiB) — repaired via lazy panel chunk to 748.4 KiB; budget not raised. Result DOM bounded to 24 buttons/page while the semantic model stays complete.</td></tr>
+            <tr><td data-label="Slice">S5 focus/a11y</td><td data-label="Issue → PR">#559 → PR #587</td><td data-label="Merge">5ae487e · 07-18 18:39</td><td data-label="Proof">15 focused tests; Required 29656193462</td><td data-label="Notable">jsdom-only by argument: changed seam is DOM membership + focus ownership</td></tr>
+            <tr><td data-label="Slice">S6 image renditions</td><td data-label="Issue → PR">#555 → PR #581</td><td data-label="Merge">cc2f9a8 · 07-18 16:53</td><td data-label="Proof">8/8 seam tests RED→GREEN; Required 29652214024 + landed 29652865146</td><td data-label="Notable">Opus 4.8 review attempt died on expired auth; substituted same-vendor Codex Sol review (recorded)</td></tr>
+            <tr><td data-label="Slice">S7 image lifetimes</td><td data-label="Issue → PR">#560 → PR #585</td><td data-label="Merge">5519f20 · 07-18 18:03</td><td data-label="Proof">6 regression tests (adopted-blob-URL revocation); Required 29654929513/29655130600</td><td data-label="Notable">Preserves 8 MiB/2 MiB budgets; reused #413 plateau proof; no timing rerun (recorded)</td></tr>
+            <tr><td data-label="Slice">S8 compatibility</td><td data-label="Issue → PR">#561 → PR #590</td><td data-label="Merge">c88b5c2 · 07-18 19:32</td><td data-label="Proof">5/5 save/load/export journey; broad 1,970/1,972; Required 29657896235 + exact-main 29657996954; SHA-bound artifact 8433470774</td><td data-label="Notable">Bundle 408.0 KiB gzip / 450 cap; heap/GPU/timing signals recorded <code>not-measured</code></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>Implementation branches all carried the <code>codex/</code> prefix (GPT-5.6 implemented, per the epic's routing mandate that Fable 5 output could satisfy no gate). Hosted exact-head Required runs are the authoritative green for every slice.</p>
+      </details>
+    </article>
+    <article id="next-sequence" data-review-anchor data-anchor-label="Next sequence">
+      <h3>What happens next</h3>
+      <p>Rollback remains <code>git revert</code> per slice. Open successors: <a href="https://github.com/limweili/eido/issues/684">#684</a> certifies the packaged renderer + design system on unsigned candidates (the alpha path); <a href="https://github.com/limweili/eido/issues/562">#562</a> remains the optional Version Context index optimization. The BoardSearchPanel design-token reconciliation handoff (#510) already landed via the Design v1 train. The undecided item this review adds: whether dense visible long-text Boards deserve their own named claim and issue (see the lag section's decision prompt).</p>
+    </article>
+  </section>
+
+  <section id="technical-teaching" data-review-anchor data-anchor-label="Technical teaching">
+    <h2>Area 2 — Technical teaching</h2>
+    <div class="callout decision"><strong>Technical story in one minute:</strong> think of the Board as a city and rich Cards as fully furnished rooms. Before, every room in the city stayed furnished forever — walking anywhere got slower as the city grew. Now only the rooms near you (within ~one screen's margin) are furnished; rooms you're actively using are bolted open and can't be unfurnished under you; everywhere else shows an accurate painted facade so the city never looks empty. The trade: furnishing a room you approach costs a moment, and if you stand in a plaza surrounded by thirty huge furnished rooms, they're all real — nothing about this design makes <em>that</em> cheaper.</div>
+    <article id="technical-mechanism" data-review-anchor data-anchor-label="How it works">
+      <h3>How it works</h3>
+      <p><strong>Mechanism.</strong> A "cold" Board Scene derives, from the graph and viewport alone (never from pointer state), the sets that drive rendering: <code>V</code> visible Cards, <code>P</code> a preload window (Cards within 900&nbsp;px, kept until 1,350&nbsp;px away — that gap is the hysteresis that stops flicker at the boundary — plus direction-aware look-ahead while you pan), <code>L</code> Cards pinned by live interaction owners, <code>E ⊆ L</code> active editors, <code>G</code> at most two lightweight gesture proxies, and <code>S</code> the painted safety representation covering everything else. Rich DOM is exactly <code>P ∪ L</code>, capped at 540 Cards; above 540 visible Cards the whole viewport demotes to the painted layer. During motion, one CSS transform moves the whole Card container per frame — individual Cards are not re-rendered. Zoom bands govern representation: Reading (rich DOM) at zoom ≥ 0.325, painted Overview between 0.15 and 0.325, Map pills below 0.15.</p>
+      <p><strong>Trade-off.</strong> Bounded residency buys flat memory and flat navigation cost on large Boards; it pays with preparation cost at the preload boundary and full price for whatever is actually visible. <strong>Product meaning.</strong> Big Boards stop punishing you for having history; what you're looking at is always real and always complete. <strong>Validation gate.</strong> Structural: resident/owner/image counters must plateau under their ceilings (asserted in probes, inspectable at runtime via <code>window.__EIDO_PERF__</code>). Wall-clock: still open — no controlled timing exists.</p>
+    </article>
+    <article id="technical-diagram" data-review-anchor data-anchor-label="Technical diagram">
+      <h3>Residency zones around your viewport</h3>
+      <svg viewBox="0 0 760 404" role="img" aria-labelledby="resdiag-title resdiag-desc" style="width:100%;height:auto;max-width:56rem;">
+        <title id="resdiag-title">Residency zones around the viewport</title>
+        <desc id="resdiag-desc">Nested rectangles: the visible viewport holds full rich DOM; a 900 pixel preload margin around it also holds rich DOM; a wider 1350 pixel retention band keeps already-built Cards; everything beyond shows the painted safety layer. Live-pinned Cards keep rich DOM anywhere. A cap of 540 Cards applies to all rich DOM.</desc>
+        <rect x="8" y="8" width="744" height="330" rx="14" fill="var(--surface)" stroke="var(--border)"/>
+        <text x="24" y="36" fill="var(--muted)" font-size="14">S — painted safety layer (whole Board, always underneath: no blank regions, ever)</text>
+        <rect x="70" y="56" width="620" height="252" rx="12" fill="var(--warning-soft)" stroke="var(--warning)" stroke-dasharray="6 4"/>
+        <text x="86" y="82" fill="var(--warning)" font-size="14">Retention band — leave here (1,350 px) before rich DOM is released (hysteresis)</text>
+        <rect x="150" y="102" width="460" height="176" rx="10" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="166" y="128" fill="var(--accent)" font-size="14">P — preload window: rich DOM within 900 px (+ look-ahead in pan direction)</text>
+        <rect x="240" y="148" width="280" height="102" rx="8" fill="var(--decision-soft)" stroke="var(--decision)" stroke-width="2"/>
+        <text x="256" y="176" fill="var(--decision)" font-size="15" font-weight="700">V — your viewport</text>
+        <text x="256" y="198" fill="var(--fg)" font-size="13">Every visible Card: full rich DOM,</text>
+        <text x="256" y="216" fill="var(--fg)" font-size="13">admitted first, any text length</text>
+        <text x="256" y="240" fill="var(--muted)" font-size="12">(your 30 long Notes all live here)</text>
+        <text x="24" y="362" fill="var(--fg)" font-size="13">Ceiling: |rich DOM| ≤ 540 Cards · G ≤ 2 gesture proxies</text>
+        <text x="24" y="386" fill="var(--fg)" font-size="13">L (live pins: editing, selection, focus, media) keep rich DOM wherever they are</text>
+      </svg>
+    </article>
+    <article id="technical-limitations" data-review-anchor data-anchor-label="Technical limitations">
+      <h3>Limitations and open gates</h3>
+      <ul>
+        <li><strong>Visible cost is uncapped below 540.</strong> Thirty visible long Notes = thirty full rich Cards. Owner: open decision (this review's lag section). Gate: a named product claim + measurement if you want one.</li>
+        <li><strong>No wall-clock proof.</strong> Every timing claim is <code>not-measured</code> by recorded policy. Gate: one controlled idle-host run, if a product decision needs it.</li>
+        <li><strong>540 ceiling proven at the seam, thin at scale.</strong> The evidence-phase fixture (131 Cards) never exercised the ceiling; the train's primary fixture reached 540 structurally, but no timing accompanied it.</li>
+        <li><strong>Native browser Find</strong> does not see unmounted Cards; in-app search is the covered, tested path (pre-approved founder decision 2026-07-19).</li>
+        <li><strong>Heap / detached-DOM / GPU signals</strong> for the integrated journey: no authoritative source exists; recorded <code>not-measured</code>, not zero.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section id="retro" data-review-anchor data-anchor-label="Retro and collaboration">
+    <h2>Area 3 — Retro and how to work better together</h2>
+    <div class="callout decision"><strong>One-minute verdict:</strong> strongest outcome — nine slices landed in a single day behind SHA-bound gates with disciplined, honestly-labeled evidence, and review caught a real correctness blocker before merge. Principal gap — the epic optimized for structural truth so hard that it shipped with no perceivable-speed evidence at all, and nobody flagged that the one scenario a founder would naturally test (many long Notes on screen) sits outside the bounds and plausibly got heavier via #580. Most notable process wobble — cross-vendor review silently degraded to Codex-reviewing-Codex after an auth failure and was never restored. Also: this epic wrote no retro of its own; this report reconstructs one from tracker and git evidence.</div>
+    <div class="summary-grid">
+      <div class="card stat"><span class="muted">Principal bottleneck</span><strong>Evidence policy, not code</strong><span>The mid-train ADR 0028 amendment (first #570 comment) re-scoped per-slice ceremony; S1's reserved timing run was dropped under it.</span></div>
+      <div class="card stat"><span class="muted">Most effective unblock</span><strong>Risk-scaled proof reuse</strong><span>S0 closed with zero code on re-derived evidence; S7 reused #413's plateau instead of re-benchmarking. Whole train merged in ~3 hours of wall-clock on 07-18.</span></div>
+      <div class="card stat"><span class="muted">Future rule</span><strong>Name the founder's test</strong><span>Every perf epic should state, up front, the one scenario the owner will personally try — and either cover it or say plainly it's out of scope.</span></div>
+    </div>
+    <article id="retro-friction" data-review-anchor data-anchor-label="Friction and bottlenecks">
+      <h3>Friction, bottlenecks, and how they were unblocked</h3>
+      <p>Real friction was small and well-handled: S4's first Required run failed its bundle budget by 0.2&nbsp;KiB — repaired by lazy-loading the search panel chunk rather than raising the budget. Two macOS temp-root alias test failures were correctly classified host-explainable rather than blocking. A Windows WAL canary failure post-train was classified host-sensitive against an identical green tree. S1's review found the one genuine correctness blocker (exported residency sets reflected planner candidates rather than mounted detail) and it was repaired pre-merge. The structural discipline held throughout: budgets were never raised to pass, and unprovable claims were recorded <code>not-measured</code> instead of being faked.</p>
+    </article>
+    <article id="retro-interventions" data-review-anchor data-anchor-label="Founder interventions">
+      <h3>Founder interventions</h3>
+      <p>Two pre-approved founder decisions (2026-07-19) worked exactly as intended: app-level equivalents for Find/copy/accessibility removed a whole class of mid-train escalations, and the no-rollout-apparatus ruling kept slices small. The intervention that deserves scrutiny is the mid-train ADR 0028 evidence amendment: it eliminated redundant ceremony (good) but also absorbed the last reserved timing runs (S1, S7) into "timing only when a product decision depends on it." The product decision that depended on it — "does this feel faster?" — arrived one week later as your lag report. Better timing: land the amendment, but explicitly re-confirm which timing claims survive it, in the epic thread, before the affected slices merge.</p>
+    </article>
+    <article id="retro-accountability" data-review-anchor data-anchor-label="Agent accountability">
+      <h3>Agent and team accountability</h3>
+      <p>Three things the agents should have caught without being asked. <strong>First</strong>, the routing mandate said codex-implemented slices get Opus 4.8 review; when Opus authentication expired on S6, the recorded substitution was a same-vendor Codex Sol review — the substitution was logged, which is honest, but the mandate's cross-vendor invariant was broken for the rest of the train and nobody circled back. <strong>Second</strong>, #580 changed the performance envelope of text-heavy Boards (removing a global demotion cap) inside a performance epic, with its own perf suites marked non-blocking and not run — that deserved one sentence of founder-visible flagging: "long-Note Boards will now pay real rendering cost." <strong>Third</strong>, the epic closed without a retro document; the founder-review scaffold sat empty until this session. Delivery speed was excellent; the reflective layer lagged.</p>
+    </article>
+    <article id="retro-actions" data-review-anchor data-anchor-label="Future operating model">
+      <h3>Keep / Stop / Start / Change</h3>
+      <div class="two-col"><div class="plain-group"><h4>Keep / Start</h4><ul>
+        <li>Keep: SHA-bound hosted Required as the single authoritative green; honest <code>not-measured</code> labeling; budgets that fail loudly and get fixed, not raised.</li>
+        <li>Keep: zero-code closes when inspection shows the work already exists (S0).</li>
+        <li>Start: a "founder's test" line in every perf epic — the one manual scenario the owner will run, and its expected outcome.</li>
+        <li>Start: when a scope change (like #580) alters the perf envelope mid-train, require one founder-visible sentence stating the trade.</li>
+      </ul></div><div class="plain-group"><h4>Stop / Change</h4><ul>
+        <li>Change: a broken review-routing invariant (cross-vendor) should page the orchestrator to restore it on the next slice, not persist silently to train end.</li>
+        <li>Change: evidence-policy amendments mid-train must enumerate which previously-reserved proofs they cancel, explicitly.</li>
+        <li>Stop: closing epics without at least a one-page retro; the reconstruction cost lands on the next reviewer.</li>
+      </ul></div></div>
+    </article>
+    <details id="retro-forensic" data-review-anchor data-anchor-label="Forensic retro evidence"><summary>Open forensic retro evidence (incl. local lag diagnostic)</summary>
+      <p><strong>Merge timeline (2026-07-18 UTC):</strong> S6 16:53 → S1 17:10 → S2 17:28 → S7 18:03 → S4 18:20 → S5 18:39 → S3 19:00 → S8 19:32. Epic closed 2026-07-19 with "Renderer train COMPLETE."</p>
+      <p><strong>Review routing record:</strong> mandate — GPT-5.6 Sol implements, Opus 4.8 reviews (cross-vendor), Fable 5 barred from all gates. Actual — all branches <code>codex/*</code>; S6's Opus attempt INCOMPLETE (auth expired), substituted Codex Sol (same vendor); S1/S2/S7 reviewed by Codex Sol; S4/S5/S3 show no independent review comment on-PR; S8's close-out cites "bounded independent storage/export review passed" without naming the vendor.</p>
+      <p><strong>Evidence-phase numbers reused by the train:</strong> #402 control 131/131 rich Cards resident, zero blank frames; #403 prototype peaks 80 (ordinary pan) / 72 (fast pan) resident vs 131 baseline — labeled provisional; #413 image plateau 7.34&nbsp;MiB peak decoded (&lt;8&nbsp;MiB), ~0.01&nbsp;MiB derived (&lt;2&nbsp;MiB), 52 reference-aware evictions.</p>
+      <p id="lag-diagnostic-results"><strong>Local lag diagnostic (this review session, diagnostic-only):</strong> in progress at authoring time; results are appended here when the run completes.</p>
+    </details>
+  </section>
+
+  <section id="sources" data-review-anchor data-anchor-label="Sources and provenance">
+    <h2>Sources, evidence, and provenance</h2>
+    <ul>
+      <li><strong>Specification:</strong> GitHub issue <a href="https://github.com/limweili/eido/issues/570">#570</a> (epic spec, testing decisions, routing mandate) and its comment thread (ADR 0028 amendment, convergence checkpoints, close-out); slice issues #553–#561.</li>
+      <li><strong>Code / PRs:</strong> PRs #581–#590 on limweili/eido, merged 2026-07-18 UTC; key modules <code>src/canvas/boardScene.ts</code>, <code>src/canvas/cardResidency.ts</code>, <code>src/canvas/detailBands.ts</code>, <code>src/shared/imageRenditions.ts</code>; #580 (text-cap removal, merge 6f1ae40).</li>
+      <li><strong>Architecture:</strong> ADRs 0011, 0019, 0020, 0023, 0024, 0028 (<code>docs/adr/</code>); <code>docs/foundations/canvas-layer.md</code> (updated to the shipped model).</li>
+      <li><strong>Measurements:</strong> <code>research/03-performance-architecture/19-reading-band-architecture-selection.md</code> and <code>21-rich-card-production-implementation-sequence.md</code>; <code>src/performance/baselines/*.json</code> (evidence-phase, CI-host caveats recorded); probe harnesses under <code>src/performance/</code>.</li>
+      <li><strong>CI / release:</strong> hosted Required run IDs per slice (see delivery ledger); SHA-bound artifacts 8433173749, 8433470774.</li>
+      <li><strong>Retro:</strong> predecessor epic #410 retro (<code>docs/retros/epics/2026-07-14-epic-410-rich-card-rendering/RETRO.md</code>) and founder review (2026-07-18). Epic #570 has no retro document of its own; this report reconstructs the retro from tracker and git evidence, dated 2026-07-22 at origin/main f06a881.</li>
+      <li><strong>Applied-infrastructure scan:</strong> code-verified 2026-07-22 against this same head — key evidence: <code>src/shared/markdownPreview.ts</code> (inert 1,200-char cap; sole call site <code>NoteCard.tsx:35</code>), <code>src/canvas/boardScene.ts</code> (<code>boardDetailTextWeight</code> computed, never consulted), <code>src/canvas/cachedPassiveCard.ts</code> + <code>Board.tsx</code> (motion-aware painted path behind rejected-renderer build flags), <code>src/shared/imageRenditions.ts</code> (<code>'passive-card'</code>/<code>'card-thumbnail'</code> purposes never requested), <code>src/main.tsx</code> (<code>__EIDO_PERF__</code> DEV-only).</li>
+    </ul>
+  </section>
+
+  <section id="comment-workbench" class="card comment-workbench" data-review-anchor data-anchor-label="Comment workbench">
+    <p class="kicker">Standalone founder review workflow</p>
+    <h2>Comment directly in this review</h2>
+    <p>Comments are embedded into the saved HTML and explicitly marked for agent response.</p>
+    <div class="comment-grid">
+      <div>
+        <label for="founder-comment-anchor">Anchor section</label>
+        <select id="founder-comment-anchor"></select>
+        <label for="founder-comment-type">Comment type</label>
+        <select id="founder-comment-type"><option>Question</option><option>Change request</option><option>Concern</option><option>Approval</option></select>
+        <label for="founder-comment-body">Your comment</label>
+        <textarea id="founder-comment-body" rows="7" placeholder="Write the question or change you want addressed."></textarea>
+        <div class="actions"><button id="founder-comment-save" class="primary" type="button">Add founder comment</button><button id="founder-comment-cancel" type="button" hidden>Cancel edit</button></div>
+      </div>
+      <div>
+        <label>Selected quote</label>
+        <blockquote id="founder-comment-quote">No text selected. Highlight wording to use Comment here.</blockquote>
+        <div class="actions"><button id="founder-comment-use-selection" type="button">Use selected text</button><button id="founder-comment-clear-quote" type="button">Clear quote</button></div>
+        <div class="actions"><button id="founder-comments-save-html" class="primary" type="button">Save commented HTML</button><button id="founder-comments-export-json" type="button">Export comments JSON</button></div>
+        <p id="founder-comments-state" class="muted" aria-live="polite">No founder comments yet.</p>
+      </div>
+    </div>
+    <h3>Founder comment index <span id="founder-comment-count" class="badge">0</span></h3>
+    <div id="founder-comment-index" class="comment-index" aria-live="polite"></div>
+  </section>
+
+  <script id="founder-comments-data" type="application/json">{"schemaVersion":"founder-review-comments/v1","reportId":"epic-570-s0-s8-renderer-train-issues-553-561-epic-570-bounded-rich-card-renderer","comments":[],"deletedIds":[]}</script>
+  <footer><p>Epic #570 (S0–S8 renderer train, issues #553–#561) · 2026-07-22, origin/main f06a881, GitHub tracker limweili/eido · generated 2026-07-22</p></footer>
+</main>
+  <script>
+(() => {
+  'use strict';
+
+  const root = document.getElementById('founder-review');
+  if (!root) return;
+
+  const schemaVersion = 'founder-review-comments/v1';
+  const reportId = root.dataset.reportId;
+  const storageKey = `founder-review-comments:${reportId}`;
+  const dataNode = document.getElementById('founder-comments-data');
+  const anchorInput = document.getElementById('founder-comment-anchor');
+  const typeInput = document.getElementById('founder-comment-type');
+  const bodyInput = document.getElementById('founder-comment-body');
+  const quoteNode = document.getElementById('founder-comment-quote');
+  const saveButton = document.getElementById('founder-comment-save');
+  const cancelButton = document.getElementById('founder-comment-cancel');
+  const countNode = document.getElementById('founder-comment-count');
+  const indexNode = document.getElementById('founder-comment-index');
+  const stateNode = document.getElementById('founder-comments-state');
+
+  let pendingQuote = '';
+  let pendingAnchorId = 'executive-summary';
+  let pendingInlineTargetId = '';
+  let editingId = null;
+  let localStorageAvailable = true;
+
+  const selectionTrigger = document.createElement('button');
+  selectionTrigger.type = 'button';
+  selectionTrigger.className = 'primary selection-comment-trigger';
+  selectionTrigger.textContent = 'Comment here';
+  selectionTrigger.hidden = true;
+  selectionTrigger.dataset.exportTransient = 'true';
+  root.appendChild(selectionTrigger);
+
+  function safeJson(value) {
+    return JSON.stringify(value, null, 2).replace(/</g, '\\u003c');
+  }
+
+  function parsePayload(text) {
+    try {
+      const parsed = JSON.parse(text || '{}');
+      return {
+        schemaVersion: parsed.schemaVersion || schemaVersion,
+        reportId: parsed.reportId || reportId,
+        comments: Array.isArray(parsed.comments) ? parsed.comments : [],
+        deletedIds: Array.isArray(parsed.deletedIds) ? parsed.deletedIds : []
+      };
+    } catch (_) {
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function readLocalPayload() {
+    try {
+      return parsePayload(localStorage.getItem(storageKey) || '{}');
+    } catch (_) {
+      localStorageAvailable = false;
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function mergePayloads(embedded, local) {
+    const deleted = new Set([...(embedded.deletedIds || []), ...(local.deletedIds || [])]);
+    const byId = new Map();
+    [...(embedded.comments || []), ...(local.comments || [])].forEach(comment => {
+      if (!comment?.id || deleted.has(comment.id)) return;
+      const prior = byId.get(comment.id);
+      const priorTime = Date.parse(prior?.updatedAt || prior?.createdAt || 0) || 0;
+      const nextTime = Date.parse(comment.updatedAt || comment.createdAt || 0) || 0;
+      if (!prior || nextTime >= priorTime) byId.set(comment.id, comment);
+    });
+    return {
+      schemaVersion,
+      reportId,
+      comments: [...byId.values()].sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || ''))),
+      deletedIds: [...deleted]
+    };
+  }
+
+  let payload = mergePayloads(parsePayload(dataNode.textContent), readLocalPayload());
+
+  function anchors() {
+    return [...root.querySelectorAll('[data-review-anchor][id]')];
+  }
+
+  function anchorLabel(anchor) {
+    return anchor?.dataset.anchorLabel || anchor?.querySelector('h1,h2,h3,h4')?.textContent.trim() || anchor?.id || 'Review';
+  }
+
+  function ensureReviewUi() {
+    anchors().forEach(anchor => {
+      let tools = [...anchor.children].find(child => child.classList?.contains('annotation-tools'));
+      if (!tools) {
+        tools = document.createElement('div');
+        tools.className = 'annotation-tools';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'section-comment';
+        button.dataset.anchor = anchor.id;
+        button.textContent = 'Comment on this section';
+        const hint = document.createElement('span');
+        hint.textContent = 'Founder feedback is embedded in the returned HTML.';
+        tools.append(button, hint);
+        const heading = [...anchor.children].find(child => /^H[1-4]$/.test(child.tagName));
+        if (heading) heading.insertAdjacentElement('afterend', tools);
+        else anchor.prepend(tools);
+      }
+      let well = [...anchor.children].find(child => child.classList?.contains('section-comments'));
+      if (!well) {
+        well = document.createElement('div');
+        well.className = 'inline-comments section-comments';
+        well.dataset.commentsFor = anchor.id;
+        well.setAttribute('aria-live', 'polite');
+        anchor.appendChild(well);
+      }
+    });
+  }
+
+  function populateAnchors() {
+    const prior = anchorInput.value || pendingAnchorId;
+    anchorInput.replaceChildren();
+    anchors().forEach(anchor => {
+      const option = document.createElement('option');
+      option.value = anchor.id;
+      option.textContent = anchorLabel(anchor);
+      anchorInput.appendChild(option);
+    });
+    anchorInput.value = document.getElementById(prior) ? prior : anchorInput.options[0]?.value || '';
+    pendingAnchorId = anchorInput.value;
+  }
+
+  function persist() {
+    dataNode.textContent = safeJson(payload);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+      localStorageAvailable = true;
+    } catch (_) {
+      localStorageAvailable = false;
+    }
+  }
+
+  function badge(text) {
+    const node = document.createElement('span');
+    node.className = 'badge';
+    node.textContent = text;
+    return node;
+  }
+
+  function commentCard(comment, indexCopy = false) {
+    const card = document.createElement('article');
+    card.className = 'card founder-comment';
+    card.setAttribute('data-founder-comment', 'true');
+    card.dataset.commentId = comment.id;
+    card.dataset.authorRole = 'FOUNDER_REVIEW_COMMENT';
+    card.dataset.requiresAgentResponse = 'true';
+    card.dataset.status = comment.status || 'open';
+    card.dataset.anchorId = comment.anchorId || '';
+    if (indexCopy) card.dataset.indexCopy = 'true';
+
+    const label = document.createElement('div');
+    label.className = 'comment-label';
+    label.append(badge('FOUNDER REVIEW COMMENT'), badge(comment.type || 'Question'), badge((comment.status || 'open').toUpperCase()));
+    const required = document.createElement('span');
+    required.textContent = 'Requires agent response';
+    label.appendChild(required);
+    card.appendChild(label);
+
+    const link = document.createElement('a');
+    link.href = `#${comment.inlineTargetId || comment.anchorId}`;
+    link.textContent = comment.anchorLabel || comment.anchorId || 'Review';
+    card.appendChild(link);
+
+    if (comment.quote) {
+      const quote = document.createElement('blockquote');
+      quote.textContent = comment.quote;
+      card.appendChild(quote);
+    }
+    const body = document.createElement('p');
+    body.className = 'founder-comment-body';
+    body.textContent = comment.body;
+    card.appendChild(body);
+    const meta = document.createElement('p');
+    meta.className = 'muted';
+    meta.textContent = `${comment.createdAt || ''}${comment.updatedAt && comment.updatedAt !== comment.createdAt ? ` · updated ${comment.updatedAt}` : ''} · ID ${comment.id}`;
+    card.appendChild(meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    [['edit', 'Edit'], ['resolve', comment.status === 'resolved' ? 'Reopen' : 'Resolve'], ['delete', 'Delete']].forEach(([action, text]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.commentAction = action;
+      button.dataset.commentId = comment.id;
+      button.textContent = text;
+      if (action === 'delete') button.style.color = 'var(--danger)';
+      actions.appendChild(button);
+    });
+    card.appendChild(actions);
+    return card;
+  }
+
+  function insertNear(target, node) {
+    if (/^(LI|TD|TH)$/.test(target.tagName)) target.appendChild(node);
+    else target.insertAdjacentElement('afterend', node);
+  }
+
+  function inlineWell(target, targetId) {
+    let well = root.querySelector(`[data-inline-comments-for="${targetId}"]`);
+    if (!well) {
+      well = document.createElement('div');
+      well.className = 'inline-comments inline-target-comments';
+      well.dataset.inlineCommentsFor = targetId;
+      well.setAttribute('aria-live', 'polite');
+      insertNear(target, well);
+    }
+    return well;
+  }
+
+  function renderComments() {
+    root.querySelectorAll('.inline-target-comments').forEach(node => node.remove());
+    root.querySelectorAll('.section-comments').forEach(node => node.replaceChildren());
+    indexNode.replaceChildren();
+    payload.comments.forEach(comment => {
+      const anchor = document.getElementById(comment.anchorId);
+      const target = comment.inlineTargetId ? document.getElementById(comment.inlineTargetId) : null;
+      const well = target ? inlineWell(target, comment.inlineTargetId) : [...(anchor?.children || [])].find(child => child.classList?.contains('section-comments'));
+      if (well) well.appendChild(commentCard(comment));
+      indexNode.appendChild(commentCard(comment, true));
+    });
+    countNode.textContent = String(payload.comments.length);
+    if (!payload.comments.length) {
+      const empty = document.createElement('p');
+      empty.className = 'muted';
+      empty.textContent = 'No founder comments yet.';
+      indexNode.appendChild(empty);
+    }
+    stateNode.textContent = `${payload.comments.length} founder comment${payload.comments.length === 1 ? '' : 's'}${localStorageAvailable ? ' · saved locally · export HTML to return.' : ' · export HTML before closing.'}`;
+    dataNode.textContent = safeJson(payload);
+  }
+
+  function setQuote(text, anchorId, inlineTargetId = '') {
+    pendingQuote = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 1000);
+    if (anchorId && document.getElementById(anchorId)) {
+      pendingAnchorId = anchorId;
+      anchorInput.value = anchorId;
+    }
+    pendingInlineTargetId = inlineTargetId;
+    quoteNode.textContent = pendingQuote || 'No text selected. Highlight wording to use Comment here.';
+  }
+
+  function selectionBlock(element, anchor) {
+    return element?.closest?.('p,li,blockquote,td,th,pre,figure,.callout,.plain-group') || anchor;
+  }
+
+  function ensureTarget(element) {
+    if (!element.id) element.id = `founder-comment-target-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    element.dataset.founderCommentTarget = 'true';
+    return element.id;
+  }
+
+  function positionSelectionTrigger(rect) {
+    const rootRect = root.getBoundingClientRect();
+    selectionTrigger.hidden = false;
+    requestAnimationFrame(() => {
+      const left = Math.max(0, Math.min(rect.right - rootRect.left, root.clientWidth - selectionTrigger.offsetWidth));
+      selectionTrigger.style.left = `${left}px`;
+      selectionTrigger.style.top = `${Math.max(0, rect.bottom - rootRect.top + 6)}px`;
+    });
+  }
+
+  function captureSelection(moveToWorkbench = false) {
+    const selection = getSelection();
+    if (!selection || !selection.rangeCount || selection.isCollapsed) {
+      selectionTrigger.hidden = true;
+      return false;
+    }
+    const text = selection.toString().replace(/\s+/g, ' ').trim();
+    const range = selection.getRangeAt(0);
+    const node = range.startContainer;
+    const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    const anchor = element?.closest?.('[data-review-anchor][id]');
+    if (!text || !anchor || !root.contains(anchor)) return false;
+    const targetId = ensureTarget(selectionBlock(element, anchor));
+    const rects = [...range.getClientRects()];
+    setQuote(text, anchor.id, targetId);
+    if (moveToWorkbench) {
+      document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      bodyInput.focus();
+      selectionTrigger.hidden = true;
+    } else {
+      positionSelectionTrigger(rects.at(-1) || range.getBoundingClientRect());
+    }
+    return true;
+  }
+
+  function addComment(body, type, anchorId, quote, inlineTargetId) {
+    body = String(body || '').trim();
+    if (!body) return false;
+    const now = new Date().toISOString();
+    payload.comments.push({
+      id: `founder-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      authorRole: 'FOUNDER_REVIEW_COMMENT',
+      requiresAgentResponse: true,
+      reportId,
+      anchorId,
+      anchorLabel: anchorLabel(document.getElementById(anchorId)),
+      inlineTargetId: inlineTargetId || '',
+      quote: quote || '',
+      body,
+      type: type || 'Question',
+      status: 'open',
+      createdAt: now,
+      updatedAt: now
+    });
+    persist();
+    renderComments();
+    return true;
+  }
+
+  function closeInlineComposer() {
+    root.querySelector('.inline-composer')?.remove();
+  }
+
+  function openInlineComposer() {
+    closeInlineComposer();
+    const target = document.getElementById(pendingInlineTargetId) || document.getElementById(pendingAnchorId);
+    if (!target || !pendingQuote) return;
+    const composer = document.createElement('div');
+    composer.className = 'card inline-composer';
+    composer.dataset.exportTransient = 'true';
+    composer.innerHTML = '<strong>Comment on highlighted text</strong>';
+    const quote = document.createElement('blockquote');
+    quote.textContent = pendingQuote;
+    composer.appendChild(quote);
+    const fieldId = `founder-inline-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const typeLabel = document.createElement('label');
+    typeLabel.htmlFor = `${fieldId}-type`;
+    typeLabel.textContent = 'Comment type';
+    const type = document.createElement('select');
+    type.id = `${fieldId}-type`;
+    ['Question', 'Change request', 'Concern', 'Approval'].forEach(value => type.add(new Option(value, value)));
+    const bodyLabel = document.createElement('label');
+    bodyLabel.htmlFor = `${fieldId}-body`;
+    bodyLabel.textContent = 'Your comment';
+    const body = document.createElement('textarea');
+    body.id = `${fieldId}-body`;
+    body.placeholder = 'Write the question or change you want addressed.';
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'primary';
+    add.textContent = 'Add founder comment';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.textContent = 'Cancel';
+    actions.append(add, cancel);
+    composer.append(typeLabel, type, bodyLabel, body, actions);
+    insertNear(target, composer);
+    selectionTrigger.hidden = true;
+    body.focus();
+    add.addEventListener('click', () => {
+      if (!addComment(body.value, type.value, pendingAnchorId, pendingQuote, pendingInlineTargetId)) return body.focus();
+      closeInlineComposer();
+      getSelection()?.removeAllRanges();
+    });
+    cancel.addEventListener('click', closeInlineComposer);
+    body.addEventListener('keydown', event => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        event.preventDefault();
+        add.click();
+      }
+    });
+  }
+
+  function resetWorkbench() {
+    editingId = null;
+    bodyInput.value = '';
+    typeInput.value = 'Question';
+    setQuote('', anchorInput.value || 'executive-summary');
+    saveButton.textContent = 'Add founder comment';
+    cancelButton.hidden = true;
+  }
+
+  function saveWorkbenchComment() {
+    const body = bodyInput.value.trim();
+    if (!body) return bodyInput.focus();
+    if (editingId) {
+      const comment = payload.comments.find(item => item.id === editingId);
+      if (!comment) return;
+      comment.anchorId = anchorInput.value;
+      comment.anchorLabel = anchorLabel(document.getElementById(anchorInput.value));
+      comment.inlineTargetId = pendingInlineTargetId || '';
+      comment.quote = pendingQuote;
+      comment.body = body;
+      comment.type = typeInput.value;
+      comment.updatedAt = new Date().toISOString();
+      persist();
+      renderComments();
+    } else if (!addComment(body, typeInput.value, anchorInput.value, pendingQuote, pendingInlineTargetId)) {
+      return;
+    }
+    resetWorkbench();
+  }
+
+  function editComment(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    editingId = id;
+    anchorInput.value = comment.anchorId;
+    typeInput.value = comment.type;
+    bodyInput.value = comment.body;
+    setQuote(comment.quote, comment.anchorId, comment.inlineTargetId || '');
+    saveButton.textContent = 'Save founder comment';
+    cancelButton.hidden = false;
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function toggleResolved(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    comment.status = comment.status === 'resolved' ? 'open' : 'resolved';
+    comment.updatedAt = new Date().toISOString();
+    persist();
+    renderComments();
+  }
+
+  function deleteComment(id) {
+    if (!payload.comments.some(item => item.id === id) || !confirm('Delete this founder review comment?')) return;
+    payload.comments = payload.comments.filter(item => item.id !== id);
+    if (!payload.deletedIds.includes(id)) payload.deletedIds.push(id);
+    if (editingId === id) resetWorkbench();
+    persist();
+    renderComments();
+  }
+
+  function beginSectionComment(anchorId) {
+    closeInlineComposer();
+    selectionTrigger.hidden = true;
+    anchorInput.value = anchorId;
+    setQuote('', anchorId);
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function download(content, type, filename) {
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportJson() {
+    download(safeJson({ ...payload, exportedAt: new Date().toISOString() }), 'application/json;charset=utf-8', `${reportId}-founder-comments.json`);
+  }
+
+  function exportHtml() {
+    persist();
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('#founder-comments-data').textContent = safeJson(payload);
+    clone.querySelector('#founder-review').dataset.exportedWithFounderComments = new Date().toISOString();
+    clone.querySelectorAll('[data-export-transient="true"]').forEach(node => node.remove());
+    const clonedBody = clone.querySelector('#founder-comment-body');
+    if (clonedBody) clonedBody.textContent = '';
+    let marker = clone.querySelector('meta[name="founder-review-comments-schema"]');
+    if (!marker) {
+      marker = document.createElement('meta');
+      marker.name = 'founder-review-comments-schema';
+      clone.querySelector('head').appendChild(marker);
+    }
+    marker.content = schemaVersion;
+    const date = new Date().toISOString().slice(0, 10);
+    download(`<!doctype html>\n${clone.outerHTML}`, 'text/html;charset=utf-8', `${reportId}-commented-${date}.html`);
+    stateNode.textContent = `Commented HTML saved with ${payload.comments.length} embedded comment${payload.comments.length === 1 ? '' : 's'}.`;
+  }
+
+  ensureReviewUi();
+  populateAnchors();
+  renderComments();
+
+  root.addEventListener('click', event => {
+    const selectionButton = event.target.closest('.selection-comment-trigger');
+    if (selectionButton) return openInlineComposer();
+    const sectionButton = event.target.closest('.section-comment');
+    if (sectionButton) return beginSectionComment(sectionButton.dataset.anchor);
+    const actionButton = event.target.closest('[data-comment-action]');
+    if (!actionButton) return;
+    const { commentId, commentAction } = actionButton.dataset;
+    if (commentAction === 'edit') editComment(commentId);
+    if (commentAction === 'resolve') toggleResolved(commentId);
+    if (commentAction === 'delete') deleteComment(commentId);
+  });
+
+  root.addEventListener('mouseup', event => {
+    if (event.target.closest('#comment-workbench,.inline-composer,.selection-comment-trigger')) return;
+    setTimeout(() => captureSelection(false), 0);
+  });
+  anchorInput.addEventListener('change', () => {
+    pendingAnchorId = anchorInput.value;
+    pendingInlineTargetId = '';
+  });
+  saveButton.addEventListener('click', saveWorkbenchComment);
+  cancelButton.addEventListener('click', resetWorkbench);
+  document.getElementById('founder-comment-use-selection').addEventListener('click', () => captureSelection(true));
+  document.getElementById('founder-comment-clear-quote').addEventListener('click', () => setQuote('', anchorInput.value));
+  document.getElementById('founder-comments-save-html').addEventListener('click', exportHtml);
+  document.getElementById('founder-comments-export-json').addEventListener('click', exportJson);
+  bodyInput.addEventListener('keydown', event => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.preventDefault();
+      saveWorkbenchComment();
+    }
+  });
+})();
+  </script>
+</body>
+</html>
+

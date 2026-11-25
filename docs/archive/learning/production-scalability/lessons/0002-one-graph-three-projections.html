@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>One Graph, Three Projections</title>
+    <link rel="stylesheet" href="../assets/course.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="eyebrow">Lesson 0002</div>
+        <h1>One Graph, Three Projections</h1>
+        <p class="lede">The skill today: decide whether a feature belongs in Eido's source of truth or in one of its projections.</p>
+      </header>
+
+      <section class="rule">
+        <p><strong>Founder rule:</strong> if two parts of the app can disagree about reality, agents have accidentally created two products.</p>
+      </section>
+
+      <h2>The Shape</h2>
+      <p>Eido v3 already states the architecture plainly: one property graph, with the canvas, context compiler, and run engine as projections of it. In code, the source of truth is the saved <code>Board</code>: Cards, Connections, Outputs, Runs, Intent Log Events, and settings.</p>
+
+      <div class="swimlane">
+        <div class="lane">
+          <strong>Graph Truth</strong>
+          <p>Board records: cards, connections, outputs, runs, timeline events.</p>
+        </div>
+        <div class="lane">
+          <strong>Canvas View</strong>
+          <p>What is visible, selectable, culled, summarized, and drawn.</p>
+        </div>
+        <div class="lane">
+          <strong>Semantic View</strong>
+          <p>What context matters, what constrains, and what modifies the task.</p>
+        </div>
+        <div class="lane">
+          <strong>Execution View</strong>
+          <p>What ran, which model was used, what inputs were included, what version was produced.</p>
+        </div>
+        <div class="lane">
+          <strong>Playback View</strong>
+          <p>What meaningful board state existed at a selected time.</p>
+        </div>
+      </div>
+
+      <h2>Why This Scales</h2>
+      <p>The architecture scales because each view can optimize its own questions without becoming the owner of truth.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Canvas asks</h3>
+          <p>Which cards and connections should be rendered right now?</p>
+          <p><code>boardScene.ts</code> and <code>renderPlanning.ts</code> answer with visible cards, culled IDs, zoom bands, summaries, hit-test candidates, and connection plans.</p>
+        </div>
+        <div class="card">
+          <h3>Semantic asks</h3>
+          <p>What should AI use, ignore, or obey?</p>
+          <p><code>compiler.ts</code> turns graph relationships into a structured instruction: important context, also consider, constraints, modifiers, task.</p>
+        </div>
+        <div class="card">
+          <h3>Execution asks</h3>
+          <p>What happened, from what inputs, and what did it produce?</p>
+          <p><code>runEngine.ts</code> records runs, used card IDs, used connection IDs, applied Mods, source context, and output versions.</p>
+        </div>
+        <div class="card">
+          <h3>Playback asks</h3>
+          <p>What did the board mean at this time?</p>
+          <p><code>timeline.ts</code> projects board state from coarse intent events and checkpoints, rather than replaying every keystroke.</p>
+        </div>
+      </div>
+
+      <h2>The Mistake To Catch</h2>
+      <p>The most dangerous implementation smell is a feature that stores meaning only inside a view. Examples:</p>
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Smell</th>
+            <th>Why It Hurts Later</th>
+            <th>Better Question</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Connection meaning lives only in edge color.</td>
+            <td>The compiler cannot reliably know whether an edge supports, contradicts, feeds, or modifies.</td>
+            <td>What property on <code>Connection</code> owns the meaning?</td>
+          </tr>
+          <tr>
+            <td>AI output is just text in a card.</td>
+            <td>You lose which run, model, context, and graph version produced it.</td>
+            <td>What <code>RunRecord</code> and <code>OutputVersion</code> prove provenance?</td>
+          </tr>
+          <tr>
+            <td>Playback reuses undo history.</td>
+            <td>Undo wants short, fast memory. Playback wants durable semantic reconstruction.</td>
+            <td>Should this be Undo, Intent Log Event, both, or neither?</td>
+          </tr>
+          <tr>
+            <td>Canvas code scans the whole Board on pan.</td>
+            <td>Hot paths become slower as the user's thinking grows.</td>
+            <td>What render index or scene projection should answer this?</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>The Agent Review Move</h2>
+      <p>When an agent proposes a feature, ask for a placement map before accepting the implementation:</p>
+      <pre><code>Feature placement:
+1. Graph truth: which Board records own the durable meaning?
+2. Canvas view: what is merely visual or interactive?
+3. Semantic view: does this affect context compilation?
+4. Execution view: does this affect runs, provenance, or output versions?
+5. Playback view: does this create or consume Intent Log Events?</code></pre>
+
+      <p>If an agent cannot fill this in, the implementation is probably about to blur boundaries.</p>
+
+      <h2>Practice</h2>
+      <p>Pick the owner. Each scenario has one best first home; other views may project from it later.</p>
+      <div class="quiz" id="lesson-quiz">
+        <div class="quiz-question" data-correct="graph" data-note="The meaning must be durable before any view can render or compile it.">
+          <strong>A connection now means "this note contradicts that note."</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q1" value="graph"> Graph Data</label>
+            <label><input type="radio" name="q1" value="canvas"> Canvas Map</label>
+            <label><input type="radio" name="q1" value="context"> Context AI</label>
+            <label><input type="radio" name="q1" value="record"> Run Record</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-question" data-correct="canvas" data-note="Visible card sets, hit testing, and zoom bands are renderer projections.">
+          <strong>At far zoom, cards should become compact summaries.</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q2" value="graph"> Graph Data</label>
+            <label><input type="radio" name="q2" value="canvas"> Canvas Map</label>
+            <label><input type="radio" name="q2" value="context"> Context AI</label>
+            <label><input type="radio" name="q2" value="record"> Run Record</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-question" data-correct="context" data-note="Context compilation is the semantic projection over the graph.">
+          <strong>AI should treat negative links as constraints, not examples.</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q3" value="graph"> Graph Data</label>
+            <label><input type="radio" name="q3" value="canvas"> Canvas Map</label>
+            <label><input type="radio" name="q3" value="context"> Context AI</label>
+            <label><input type="radio" name="q3" value="record"> Run Record</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-question" data-correct="record" data-note="The run record and output version make generated work explainable after the live board changes.">
+          <strong>An output must remember which model and context produced it.</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q4" value="graph"> Graph Data</label>
+            <label><input type="radio" name="q4" value="canvas"> Canvas Map</label>
+            <label><input type="radio" name="q4" value="context"> Context AI</label>
+            <label><input type="radio" name="q4" value="record"> Run Record</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <button type="button" onclick="checkQuiz('lesson-quiz')">Check answers</button>
+        <div class="feedback quiz-score"></div>
+      </div>
+
+      <h2>Primary Source</h2>
+      <p>Read <code>research/02-source-studies/05-synthesis-one-graph-three-views.md</code>, then skim <code>README.md</code>. Keep <a href="../reference/0002-one-graph-three-views-map.html">Reference 0002</a> open when reviewing agent plans.</p>
+
+      <h2>Next Time</h2>
+      <p>Lesson 3 should teach hot paths and gates: how to spot work that will become slow, and how to demand proof before it lands. Ask follow-up questions if any boundary here feels blurry; that is exactly what this course is for.</p>
+
+      <h2>Related</h2>
+      <p><a href="0001-scalability-is-not-one-thing.html">Lesson 0001: Scalability Is Not One Thing</a></p>
+      <p><a href="../reference/0001-scalability-pattern-matrix.html">Reference 0001: Scalability Pattern Matrix</a></p>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>

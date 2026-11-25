@@ -1,0 +1,235 @@
+name: Native desktop proof
+
+on:
+  # No path filter here on purpose. A required check must report a conclusion
+  # on every pull request; a workflow held back by a path filter never reports
+  # at all and leaves the pull request pending forever. The scope job below
+  # decides in seconds whether the native matrix does real work, and the two
+  # matrix jobs report either way. See scripts/ci/desktop-proof-scope.mjs.
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  # A push to main is not a required check, so it stays path-filtered: the
+  # native minutes are only spent when a fingerprinted path actually moved.
+  # This list is CERTIFICATION_PROFILE_RUNTIME_PATHS, pinned to it and to
+  # docs/agents/release-gates.json by scripts/ci/workflow-policy.test.mjs.
+  push:
+    branches: [main]
+    paths:
+      - '.github/node-version'
+      - '.github/workflows/desktop-proof.yml'
+      - 'build/eido-path.nsh'
+      - 'docs/agents/release-gates.json'
+      - 'electron-builder.yml'
+      - 'electron/**'
+      - 'native/profile-live-gateway/**'
+      - 'package-lock.json'
+      - 'package.json'
+      - 'scripts/ci/desktop-proof-scope.mjs'
+      - 'scripts/ci/native-desktop-proof.mjs'
+      - 'scripts/ci/toolchain-policy.mjs'
+      - 'scripts/electron/**'
+      - 'src/App.tsx'
+      - 'src/brain/agentRunContract.ts'
+      - 'src/brain/agentRunExecutor.ts'
+      - 'src/brain/agentRunSession.ts'
+      - 'src/brain/chainStaleness.ts'
+      - 'src/brain/compiler.ts'
+      - 'src/brain/contextCompaction.ts'
+      - 'src/brain/conversationCompiler.ts'
+      - 'src/brain/executionPlan.ts'
+      - 'src/brain/followUpThread.ts'
+      - 'src/brain/groupDigestFreshness.ts'
+      - 'src/brain/modBlock.ts'
+      - 'src/brain/modelWindows.ts'
+      - 'src/brain/openRouter.ts'
+      - 'src/brain/runEngine.ts'
+      - 'src/brain/runLifecycle.ts'
+      - 'src/brain/sourceContext.ts'
+      - 'src/brain/transcript.ts'
+      - 'src/desktop/agentRunExecutionAdapter.ts'
+      - 'src/desktop/installedProfileRendererRuntime.ts'
+      - 'src/desktop/packagedProfileProof.ts'
+      - 'src/desktop/profileAgentMutationBarrier.ts'
+      - 'src/desktop/profileAgentRunBridgeHandler.ts'
+      - 'src/desktop/profileAgentRunRendererRuntime.ts'
+      - 'src/desktop/profileAgentRunRendererService.ts'
+      - 'src/electron-api.d.ts'
+      - 'src/graph/agentCardPlacement.ts'
+      - 'src/graph/agentSpatialRead.ts'
+      - 'src/graph/cardAuthorship.ts'
+      - 'src/graph/cardIdentityPresets.ts'
+      - 'src/graph/cardPlacement.ts'
+      - 'src/graph/connectionAddition.ts'
+      - 'src/graph/contextBudget.ts'
+      - 'src/graph/contextContracts.ts'
+      - 'src/graph/contextQuery.ts'
+      - 'src/graph/graphHelpers.ts'
+      - 'src/graph/graphIndex.ts'
+      - 'src/graph/profileLiveAuthorityMerge.ts'
+      - 'src/graph/profileModOrigins.ts'
+      - 'src/graph/profileRendererPersistence.ts'
+      - 'src/graph/resultCardPlacement.ts'
+      - 'src/graph/store.ts'
+      - 'src/graph/types.ts'
+      - 'src/main.tsx'
+      - 'src/mods/card.ts'
+      - 'src/mods/growth.ts'
+      - 'src/mods/identity.ts'
+      - 'src/mods/index.ts'
+      - 'src/mods/model.ts'
+      - 'src/mods/normalizer.ts'
+      - 'src/mods/prompt.ts'
+      - 'src/mods/seeds.ts'
+      - 'src/mods/snapshot.ts'
+      - 'src/persistence/profileAgentChangeTrail.ts'
+      - 'src/persistence/profileAgentCommandInstallation.ts'
+      - 'src/persistence/profileAgentCommandManifest.ts'
+      - 'src/persistence/profileAgentCommandPlan.ts'
+      - 'src/persistence/profileAgentEvent.ts'
+      - 'src/persistence/profileAgentGateway.ts'
+      - 'src/persistence/profileAgentModCommandPlan.ts'
+      - 'src/persistence/profileAgentRunGateway.ts'
+      - 'src/persistence/profileAgentSpatialQuery.ts'
+      - 'src/persistence/profileAssetKernel.ts'
+      - 'src/persistence/profileBuiltInMods.ts'
+      - 'src/persistence/profileGuiProjection.ts'
+      - 'src/persistence/profileGuiSaveScheduler.ts'
+      - 'src/persistence/profileIdeaClosure.ts'
+      - 'src/persistence/profileIdeaIdentityRemap.ts'
+      - 'src/persistence/profileIntentActor.ts'
+      - 'src/persistence/profileLogicalProjection.ts'
+      - 'src/persistence/profileLogicalQuery.ts'
+      - 'src/persistence/profileModRecords.ts'
+      - 'src/persistence/profilePortableArchive.ts'
+      - 'src/persistence/profileRevisionKernel.ts'
+      - 'src/persistence/profileServiceContract.ts'
+      - 'src/persistence/profileTransportContract.ts'
+      - 'src/shared/deepLinks.ts'
+      - 'src/shared/ids.ts'
+      - 'src/shared/stableHash.ts'
+      - 'src/shared/tokenEstimate.ts'
+      - 'src/types/electron-browser-boundary.d.ts'
+      - 'src/ui/cardIdentity.ts'
+      - 'tsconfig.electron.json'
+      - 'vite.config.ts'
+      - 'vite.electron.config.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('desktop-proof-pr-{0}', github.event.pull_request.number) || format('desktop-proof-sha-{0}', github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  scope:
+    name: Native desktop proof scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      in_scope: ${{ steps.decide.outputs.in_scope }}
+      reason: ${{ steps.decide.outputs.reason }}
+      matrix: ${{ steps.decide.outputs.matrix }}
+    steps:
+      - name: Check out enough history to compare both trees
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node for CI
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      - name: Decide whether the packaged runtime tree moved
+        id: decide
+        env:
+          EIDO_DESKTOP_PROOF_EVENT_NAME: ${{ github.event_name }}
+          EIDO_DESKTOP_PROOF_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          EIDO_DESKTOP_PROOF_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }}
+        run: node scripts/ci/desktop-proof-scope.mjs
+
+  native:
+    name: Native desktop proof — ${{ matrix.runner }} (${{ matrix.arch }})
+    needs: scope
+    # The matrix comes from the scope job so that `matrix.runner` and
+    # `matrix.arch` always render the same two check names, while `matrix.host`
+    # is the machine that actually boots. Out of scope that host is the cheapest
+    # Linux runner and every step below is skipped, so the gate still reports
+    # without making an unrelated pull request pay for a packaged build. The
+    # legs are declared in scripts/ci/desktop-proof-scope.mjs.
+    runs-on: ${{ matrix.host }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.scope.outputs.matrix) }}
+    env:
+      EIDO_DESKTOP_PROOF_TESTED_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      EIDO_DESKTOP_PROOF_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      EIDO_DESKTOP_PROOF_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event_name == 'push' && github.event.before || '' }}
+      EIDO_DESKTOP_PROOF_EXPECTED_PLATFORM: ${{ matrix.platform }}
+      EIDO_DESKTOP_PROOF_EXPECTED_ARCH: ${{ matrix.arch }}
+    steps:
+      # The reason is machine-generated, but it reaches the log through the
+      # environment rather than through string interpolation into the shell.
+      - name: Report why no native work is needed
+        if: needs.scope.outputs.in_scope != 'true'
+        env:
+          SCOPE_REASON: ${{ needs.scope.outputs.reason }}
+        run: |
+          echo "Native desktop proof passes without native work: $SCOPE_REASON"
+
+      - name: Check out the exact tested SHA
+        if: needs.scope.outputs.in_scope == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up Node for CI with npm cache
+        if: needs.scope.outputs.in_scope == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Verify the exact native evidence identity
+        if: needs.scope.outputs.in_scope == 'true'
+        run: node scripts/ci/native-desktop-proof.mjs
+
+      - name: Install locked dependencies
+        if: needs.scope.outputs.in_scope == 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Exercise the native Live Gateway security seam
+        if: needs.scope.outputs.in_scope == 'true'
+        timeout-minutes: 3
+        run: node scripts/electron/profile-live-gateway-native-proof.mjs
+
+      - name: Compile the macOS eido command offer
+        if: needs.scope.outputs.in_scope == 'true' && matrix.platform == 'darwin'
+        run: npx vitest run electron/eidoCommandInstaller.test.ts
+
+      - name: Run the fresh unpacked desktop proof
+        if: needs.scope.outputs.in_scope == 'true'
+        env:
+          EIDO_DESKTOP_PROOF_OS_USER_SCOPE: ${{ runner.environment }}
+          CSC_LINK: ${{ runner.temp }}/eido-proof-must-ignore-csc.pfx
+          CSC_NAME: Eido proof must ignore ambient identity
+          CSC_KEY_PASSWORD: must-not-be-used
+          WIN_CSC_LINK: ${{ runner.temp }}/eido-proof-must-ignore-win-csc.pfx
+          WIN_CSC_KEY_PASSWORD: must-not-be-used
+        run: npm run desktop:smoke
+
+      - name: Preserve exact-head native proof
+        if: needs.scope.outputs.in_scope == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-desktop-proof-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          path: .local/electron-shell/proof-evidence.json
+          if-no-files-found: error
+          retention-days: 3

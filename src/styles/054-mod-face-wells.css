@@ -1,0 +1,241 @@
+/* Pad and radar wells (#769). Continuous value paint stays on transforms/SVG attributes. */
+.mod-face--pad .i-pad {
+  position: relative;
+  height: calc(var(--e-sp-7) * 4);
+  overflow: hidden;
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-recessed);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.mod-face--pad .i-pad:focus-within {
+  outline: var(--e-card-border-width) solid var(--e-go);
+  outline-offset: calc(var(--e-sp-1) / 2);
+}
+
+.mod-face--pad .i-pad-plane,
+.mod-face--pad .i-pad-snaps {
+  position: absolute;
+  inset: var(--e-sp-4);
+  pointer-events: none;
+}
+
+.mod-face--pad .i-pad-wx,
+.mod-face--pad .i-pad-wy {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mod-face--pad .i-pad-wx {
+  z-index: var(--e-z-canvas-chrome);
+  transform: translateX(calc(var(--e-mod-face-x, 0.5) * 100%));
+  will-change: transform;
+}
+
+.mod-face--pad .i-pad-wy {
+  transform: translateY(calc((1 - var(--e-mod-face-y, 0.5)) * 100%));
+  will-change: transform;
+}
+
+.mod-face--pad .i-pad-ch {
+  position: absolute;
+  background: var(--e-line);
+  pointer-events: none;
+}
+
+.mod-face--pad .i-pad-ch--v {
+  top: calc(-1 * var(--e-sp-4));
+  bottom: calc(-1 * var(--e-sp-4));
+  left: 0;
+  width: var(--e-card-border-width);
+}
+
+.mod-face--pad .i-pad-ch--h {
+  top: 0;
+  right: calc(-1 * var(--e-sp-4));
+  left: calc(-1 * var(--e-sp-4));
+  height: var(--e-card-border-width);
+}
+
+.mod-face--pad .i-pad-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--e-sp-3) + var(--e-sp-2));
+  height: calc(var(--e-sp-3) + var(--e-sp-2));
+  border-radius: 50%;
+  background: var(--e-mod-face-accent, var(--e-mod));
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: filter var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--pad .i-pad.is-dragging .i-pad-handle {
+  filter: brightness(1.12);
+}
+
+.mod-face--pad .i-pad-end {
+  position: absolute;
+  color: var(--e-ink-faint);
+  line-height: 1;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.mod-face--pad .i-pad-end--xlo {
+  bottom: var(--e-sp-2);
+  left: var(--e-sp-3);
+}
+
+.mod-face--pad .i-pad-end--xhi {
+  right: var(--e-sp-3);
+  bottom: var(--e-sp-2);
+}
+
+.mod-face--pad .i-pad-end--yhi {
+  top: var(--e-sp-2);
+  left: var(--e-sp-3);
+}
+
+.mod-face--pad .i-pad-end--ylo {
+  bottom: var(--e-sp-5);
+  left: var(--e-sp-3);
+}
+
+.mod-face--pad .i-pad-snap {
+  position: absolute;
+  top: calc(var(--e-mod-face-snap-y) * 100%);
+  left: calc(var(--e-mod-face-snap-x) * 100%);
+  width: var(--e-sp-1);
+  height: var(--e-sp-1);
+  border-radius: 50%;
+  background: var(--e-dot);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.mod-face--pad .i-pad-axis-control {
+  position: absolute;
+  inset: 0;
+  outline: none;
+  pointer-events: none;
+}
+
+.mod-face-host[aria-disabled='true'] .mod-face--pad .i-pad {
+  cursor: inherit;
+}
+
+.mod-face--radar .i-radar {
+  position: relative;
+  height: calc(var(--e-sp-7) * 5);
+  overflow: hidden;
+  border: var(--e-card-border-width) solid var(--e-line);
+  border-radius: var(--e-r-well);
+  background: var(--e-surface-ground);
+}
+
+.mod-face--radar .i-radar-plane,
+.mod-face--radar .i-radar-label-plane {
+  position: absolute;
+  pointer-events: none;
+}
+
+.mod-face--radar .i-radar-plane {
+  inset-block: var(--e-sp-6);
+  inset-inline: calc(var(--e-sp-7) * 2 + var(--e-sp-1));
+}
+
+.mod-face--radar .i-radar-label-plane {
+  inset-block: var(--e-sp-4);
+  inset-inline: calc(var(--e-sp-7) + var(--e-sp-6) + var(--e-sp-1));
+}
+
+.mod-face--radar .i-radar-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mod-face--radar :is(.rd-back polygon, .rd-back line) {
+  fill: none;
+  stroke: var(--e-line);
+  stroke-width: var(--e-card-border-width);
+}
+
+.mod-face--radar .rd-fill {
+  fill: var(--e-wash);
+}
+
+.mod-face--radar .rd-line {
+  fill: none;
+  stroke: var(--e-ink);
+  stroke-linejoin: round;
+  stroke-width: calc(var(--e-card-border-width) * 2);
+}
+
+.mod-face--radar .rd-vert {
+  fill: var(--e-mod-face-accent, var(--e-mod));
+  stroke: transparent;
+  stroke-width: var(--e-sp-4);
+  cursor: grab;
+  touch-action: none;
+}
+
+.mod-face--radar .rd-vert.is-dragging {
+  cursor: grabbing;
+}
+
+.mod-face--radar .rd-vert:focus-visible {
+  outline: var(--e-card-border-width) solid var(--e-go);
+  outline-offset: calc(var(--e-sp-1) / 2);
+}
+
+.mod-face--radar .rd-tipwrap {
+  position: absolute;
+  top: calc(var(--e-mod-face-label-y) * 100%);
+  left: calc(var(--e-mod-face-label-x) * 100%);
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(-50%);
+}
+
+.mod-face--radar .rd-tipwrap[data-anchor='middle'] {
+  transform: translate(-50%, -50%);
+}
+
+.mod-face--radar .rd-tipwrap[data-anchor='end'] {
+  transform: translate(-100%, -50%);
+}
+
+.mod-face--radar .rd-lbl {
+  overflow: hidden;
+  max-width: calc(var(--e-sp-7) + var(--e-sp-5) + var(--e-sp-2));
+  border-radius: var(--e-r-inner);
+  color: var(--e-ink-soft);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mod-face--radar .rd-tipwrap .row-x {
+  top: calc(-1 * var(--e-sp-2));
+  right: auto;
+  left: calc(100% + var(--e-card-border-width));
+  transform: none;
+}
+
+.mod-face--radar .mod-row:hover .rd-tipwrap .row-x {
+  opacity: 0;
+}
+
+.mod-face--radar .mod-row .rd-tipwrap:is(:hover, :focus-within) .row-x {
+  opacity: 1;
+}
+
+.mod-face-host[aria-disabled='true'] .mod-face--radar .rd-vert {
+  cursor: inherit;
+}

@@ -1,0 +1,1381 @@
+/* Shared, domain-free instrument controls. Components select these semantic
+   roles; this sheet alone owns their visual recipes. */
+
+.e-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-sp-2);
+  min-height: 26px;
+  padding: 5px 12px;
+  border: 1px solid var(--e-ink);
+  border-radius: var(--e-r-chip);
+  background: transparent;
+  color: var(--e-ink);
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-button:hover:not(:disabled) {
+  background: var(--e-wash);
+}
+
+.e-button:active:not(:disabled) {
+  transform: scale(var(--e-scale-press));
+}
+
+.e-button:focus-visible {
+  outline: none;
+  border-color: var(--e-go);
+}
+
+.e-borderless-focus:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+.e-button--primary {
+  border-color: var(--e-go);
+  background: var(--e-go);
+  color: var(--e-on-solid);
+}
+
+.e-button--primary:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--e-go) 88%, var(--e-ink));
+  background: color-mix(in srgb, var(--e-go) 88%, var(--e-ink));
+}
+
+.e-button--primary:focus-visible {
+  border-color: var(--e-on-solid);
+}
+
+.e-button--ghost {
+  border-color: transparent;
+  color: var(--e-ink-soft);
+}
+
+.e-button--ghost:hover:not(:disabled) {
+  color: var(--e-ink);
+}
+
+.e-button--danger {
+  border-color: var(--e-avoid-ink);
+  color: var(--e-avoid-ink);
+}
+
+.e-button--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--e-avoid) 10%, transparent);
+}
+
+.e-button--danger-confirm {
+  border-color: var(--e-avoid);
+  background: var(--e-avoid);
+  color: var(--e-on-solid);
+}
+
+.e-button--danger-confirm:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--e-avoid) 88%, var(--e-ink));
+  background: color-mix(in srgb, var(--e-avoid) 88%, var(--e-ink));
+}
+
+.e-button--danger-confirm:focus-visible {
+  border-color: var(--e-on-solid);
+}
+
+.e-button:disabled {
+  border-color: var(--e-line);
+  background: transparent;
+  color: var(--e-ink-faint);
+  cursor: default;
+  transform: none;
+}
+
+.e-button--compact {
+  min-height: 24px;
+  padding-block: 3px;
+}
+
+.e-button--inline {
+  min-height: 22px;
+  padding-block: 2px;
+}
+
+.e-button--inline:not(.e-icon-button)::before {
+  position: absolute;
+  inset-block: -1px;
+  inset-inline: 0;
+  border-radius: inherit;
+  content: "";
+}
+
+.e-button--field-mate {
+  min-height: 30px;
+}
+
+.e-icon-button {
+  width: 26px;
+  padding: 0;
+}
+
+.e-icon-button.e-button--compact {
+  width: 24px;
+}
+
+.e-icon-button.e-button--inline {
+  width: 22px;
+}
+
+.e-icon-button.e-button--field-mate {
+  width: 30px;
+}
+
+.e-icon-button svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.75;
+}
+
+.e-icon-button.e-button--compact svg,
+.e-icon-button.e-button--inline svg {
+  width: 14px;
+  height: 14px;
+}
+
+.e-icon-button::before,
+.e-dock-key::before {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  content: "";
+}
+
+.e-icon-button--key {
+  border-color: transparent;
+}
+
+/* A borderless key stays borderless when it is spent. The base disabled recipe
+   draws the ordinary button's hairline, which put a box around the dock's
+   Undo/Redo keys that none of their neighbours wore; the ink-faint glyph
+   already says the key is unavailable (§6.1). */
+.e-icon-button--key:disabled {
+  border-color: transparent;
+}
+
+.e-icon-button--key[data-pressed="true"] {
+  border-color: var(--e-ink);
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+}
+
+/* Hovering the key you are already holding dips its solid one shade; it never
+   flips back to the ordinary ink wash (§6.4). Without this rule the base
+   `.e-button:hover` background won on specificity, so hovering the active tool
+   dropped its ink fill to a 7% wash while the glyph stayed paper-coloured: the
+   current tool read as unselected and its glyph all but vanished. */
+.e-icon-button--key[data-pressed="true"]:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--e-ink) 88%, var(--e-wash-base));
+  background: color-mix(in srgb, var(--e-ink) 88%, var(--e-wash-base));
+}
+
+.e-icon-button--key[data-pressed="true"]:focus-visible {
+  border-color: var(--e-on-solid);
+}
+
+/* Quiet icon keys that latch a positive state share one treatment wherever
+   they appear: the go boundary, wash and ink make the whole key read as on.
+   Keep this separate from --key, whose solid ink fill denotes the active
+   canvas instrument rather than a retained choice. */
+.e-icon-button--go-selected[data-pressed="true"] {
+  border-color: var(--e-go);
+  background: color-mix(in srgb, var(--e-go) 12%, var(--e-wash-base));
+  color: var(--e-go-ink);
+}
+
+.e-icon-button--go-selected[data-pressed="true"]:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--e-go) 20%, var(--e-wash-base));
+}
+
+.e-icon-button--go-selected[data-pressed="true"]:focus-visible {
+  outline: none;
+  border-color: var(--e-go);
+  box-shadow: inset 0 0 0 1px var(--e-go);
+}
+
+.e-stepper {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-recessed);
+}
+
+.e-stepper:focus-within {
+  border-color: var(--e-go);
+}
+
+.e-stepper > button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-height: 24px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--e-ink-soft);
+  cursor: pointer;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-stepper > button:hover:not(:disabled) {
+  background: var(--e-wash);
+  color: var(--e-ink);
+}
+
+.e-stepper > button:active:not(:disabled) {
+  transform: scale(var(--e-scale-press));
+}
+
+.e-stepper > button:disabled {
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.e-stepper > button:focus-visible,
+.e-stepper__value:focus-visible {
+  outline: none;
+}
+
+.e-stepper > button svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.75;
+}
+
+.e-stepper__value {
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--e-ink);
+  text-align: center;
+  appearance: textfield;
+}
+
+.e-stepper__value::-webkit-inner-spin-button,
+.e-stepper__value::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.e-field,
+.e-picker {
+  width: 100%;
+  min-height: 30px;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-chip);
+  outline: none;
+  background: var(--e-field-bg);
+  color: var(--e-ink);
+  caret-color: var(--e-go);
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+  font-size: var(--e-fs-ui);
+  line-height: 1.4;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-field {
+  padding: 5px 10px;
+}
+
+.e-field::placeholder,
+.e-picker__value--placeholder {
+  color: var(--e-ink-soft);
+}
+
+.e-field:hover:not(:focus):not(:disabled),
+.e-picker:hover:not(:focus-visible):not(:disabled):not([aria-expanded="true"]) {
+  background: var(--e-field-hover);
+}
+
+.e-field:focus,
+.e-picker:focus-visible,
+.e-picker[aria-expanded="true"] {
+  border-color: var(--e-go);
+  background: var(--e-field-bg);
+}
+
+.e-field:disabled,
+.e-picker:disabled {
+  border-color: var(--e-line);
+  background: var(--e-surface-field);
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.e-field--prose {
+  font-family: var(--e-sans);
+  font-size: var(--e-fs-prose-s);
+  line-height: 1.55;
+}
+
+.e-textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+
+.e-field-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--e-ink-soft);
+}
+
+.e-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  padding: 5px 10px;
+  text-align: left;
+}
+
+.e-picker__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.e-picker__chevron {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: var(--e-ink-soft);
+  stroke-width: 1.75;
+  transition: transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-picker[aria-expanded="true"] .e-picker__chevron {
+  transform: rotate(180deg);
+}
+
+.e-picker--compact {
+  min-height: 26px;
+  padding: 2px 8px;
+  font-size: var(--e-fs-label);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.e-picker__listbox,
+.e-popover,
+.e-popover-surface {
+  z-index: var(--e-z-popover);
+  overflow: auto;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-floating);
+  box-shadow: var(--e-shadow-lift);
+  color: var(--e-ink);
+  scrollbar-color: var(--e-ink-faint) transparent;
+}
+
+.e-picker__listbox,
+.e-popover {
+  position: fixed;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-picker__listbox[data-state="entered"],
+.e-popover[data-state="entered"],
+.e-toast[data-state="entered"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.e-picker__listbox {
+  padding: 6px;
+}
+
+.e-popover-surface {
+  padding: 6px;
+}
+
+.e-picker__option,
+.e-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  width: 100%;
+  min-height: 28px;
+  border: 0;
+  border-radius: var(--e-r-inner);
+  background: transparent;
+  color: var(--e-ink);
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+  font-size: var(--e-fs-ui);
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.e-picker__option {
+  padding: 4px 8px;
+}
+
+.e-picker__option:hover,
+.e-menu__item:hover:not(:disabled) {
+  background: var(--e-wash);
+}
+
+.e-picker__option[data-active="true"] {
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+}
+
+.e-picker__option[aria-disabled="true"] {
+  background: transparent;
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.e-picker__option-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* What choosing an option means, said softly at the row's far side. It joins
+   the row's accessible name, so a reader hears the meaning with the label. */
+.e-picker__option-hint {
+  flex: none;
+  color: var(--e-ink-soft);
+  font-size: var(--e-fs-micro);
+}
+
+.e-picker__option[data-active="true"] .e-picker__option-hint {
+  color: inherit;
+}
+
+.e-picker__check {
+  width: 14px;
+  flex: none;
+  margin-left: auto;
+  text-align: center;
+}
+
+/* ---------- colour picker ---------- */
+.e-colour-picker {
+  display: grid;
+  gap: var(--e-sp-3);
+}
+
+.e-colour-picker__label {
+  color: var(--e-ink-soft);
+}
+
+.e-colour-picker__controls {
+  display: flex;
+  align-items: stretch;
+  gap: var(--e-sp-3);
+}
+
+.e-colour-picker__modes {
+  display: grid;
+  grid-template-columns: repeat(2, 22px);
+  grid-template-rows: repeat(2, 22px);
+  gap: var(--e-sp-2);
+}
+
+.e-colour-picker__divider {
+  width: 1px;
+  background: var(--e-line);
+}
+
+.e-colour-picker__swatches {
+  display: grid;
+  grid-template-rows: repeat(2, 22px);
+  grid-auto-flow: column;
+  grid-auto-columns: 22px;
+  gap: var(--e-sp-2);
+}
+
+.e-colour-picker__mode,
+.e-colour-picker__swatch {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  place-self: center;
+  border: 1px solid var(--e-line-strong);
+  border-radius: 50%;
+  padding: 0;
+  background: var(--e-surface-card);
+  transition:
+    border-color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-colour-picker__swatch {
+  background: var(--e-colour-picker-swatch);
+}
+
+.e-colour-picker__mode:hover,
+.e-colour-picker__swatch:hover {
+  border-color: var(--e-ink);
+}
+
+.e-colour-picker__mode:active,
+.e-colour-picker__swatch:active {
+  transform: scale(var(--e-scale-press));
+}
+
+.e-colour-picker__mode[aria-checked='true'],
+.e-colour-picker__swatch[aria-checked='true'] {
+  outline: 1.5px solid var(--e-ink);
+  outline-offset: 2px;
+}
+
+.e-colour-picker__mode[aria-checked='false']:focus-visible,
+.e-colour-picker__swatch[aria-checked='false']:focus-visible {
+  border-color: var(--e-go);
+  outline: none;
+}
+
+.e-colour-picker__mode::after,
+.e-colour-picker__swatch::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+}
+
+.e-segmented {
+  display: inline-flex;
+  min-height: 26px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+  user-select: none;
+}
+
+.e-segmented__option {
+  position: relative;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--e-ink-soft);
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+  font-size: var(--e-fs-label);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-segmented__option::after {
+  position: absolute;
+  inset-block: -2px;
+  inset-inline: 0;
+  border-radius: inherit;
+  content: "";
+}
+
+.e-segmented__option + .e-segmented__option::before {
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 0;
+  width: 1px;
+  background: var(--e-line);
+  content: "";
+}
+
+.e-segmented__option:hover:not(:disabled) {
+  color: var(--e-ink);
+}
+
+.e-segmented__option[aria-checked="true"] {
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+}
+
+.e-segmented__option[aria-checked="true"]:hover:not(:disabled) {
+  color: var(--e-on-solid);
+}
+
+.e-segmented__option[aria-checked="true"]::before,
+.e-segmented__option[aria-checked="true"] + .e-segmented__option::before {
+  opacity: 0;
+}
+
+.e-segmented__option:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: -1px;
+}
+
+.e-segmented__option:disabled {
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.e-toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex: none;
+  border: 1px solid var(--e-line);
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-toggle::before {
+  position: absolute;
+  inset-block: -1px;
+  inset-inline: 0;
+  border-radius: inherit;
+  content: "";
+}
+
+.e-toggle::after {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--e-ink);
+  content: "";
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-move) var(--e-ease-settle);
+}
+
+.e-toggle[data-checked="true"] {
+  border-color: var(--e-go);
+  background: var(--e-go);
+}
+
+.e-toggle[data-checked="true"]::after {
+  background: var(--e-on-solid);
+  transform: translateX(18px);
+}
+
+.e-toggle:focus-visible {
+  outline: none;
+  border-color: var(--e-go);
+}
+
+.e-toggle[data-checked="true"]:focus-visible {
+  border-color: var(--e-on-solid);
+}
+
+.e-toggle:disabled {
+  border-color: var(--e-line);
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.e-chip,
+.e-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  border-radius: 999px;
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+}
+
+.e-state-word {
+  margin-left: auto;
+  color: var(--e-ink-soft);
+  white-space: nowrap;
+}
+
+.e-state-word--running {
+  color: var(--e-convo-ink);
+}
+
+.e-state-word--failed {
+  color: var(--e-avoid-ink);
+}
+
+.e-state-word__pulse {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: var(--e-sp-1);
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse var(--e-t-stream) ease-in-out infinite;
+  vertical-align: middle;
+}
+
+:root[data-reduced-motion="true"] .e-state-word__pulse {
+  animation: none !important;
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.e-chip {
+  padding: 3px 9px;
+  color: var(--e-ink-soft);
+  font-size: var(--e-fs-micro);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.e-chip--neutral {
+  background: var(--e-surface-recessed);
+}
+
+.e-chip--scope {
+  border: 1px solid var(--e-line-strong);
+}
+
+.e-chip--go {
+  background: color-mix(in srgb, var(--e-go) 12%, var(--e-wash-base));
+  color: var(--e-go-ink);
+}
+
+.e-chip--avoid {
+  background: color-mix(in srgb, var(--e-avoid) 12%, var(--e-wash-base));
+  color: var(--e-avoid-ink);
+}
+
+.e-chip--mod {
+  background: color-mix(in srgb, var(--e-mod) 12%, var(--e-wash-base));
+  color: var(--e-mod-ink);
+}
+
+.e-chip--convo {
+  background: color-mix(in srgb, var(--e-convo) 12%, var(--e-wash-base));
+  color: var(--e-convo-ink);
+}
+
+.e-chip--attention {
+  background: color-mix(in srgb, var(--e-attention) 18%, var(--e-wash-base));
+  color: var(--e-attention-ink);
+}
+
+.e-chip--interactive {
+  position: relative;
+  border: 0;
+  cursor: pointer;
+  transition:
+    box-shadow var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-chip--interactive.e-chip--scope {
+  border: 1px solid var(--e-line-strong);
+}
+
+.e-chip--interactive::before {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  content: "";
+}
+
+.e-chip--interactive:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--e-ink) 4%, transparent);
+}
+
+.e-chip--interactive:active:not(:disabled) {
+  transform: scale(var(--e-scale-press));
+}
+
+.e-chip--interactive:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 1px;
+}
+
+.e-chip--tooltip:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 1px;
+}
+
+.e-chip--scope.e-chip--tooltip:focus-visible {
+  border-color: var(--e-go);
+  outline: none;
+}
+
+.e-chip--interactive[data-selected="true"] {
+  outline: 1.5px solid var(--e-ink);
+  outline-offset: 1px;
+}
+
+.e-chip--interactive:disabled {
+  color: var(--e-ink-faint);
+  cursor: default;
+  transform: none;
+}
+
+.e-badge {
+  min-width: 20px;
+  padding-inline: 6px;
+  background: var(--e-surface-recessed);
+  color: var(--e-ink);
+  font-size: var(--e-fs-label);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.e-menu {
+  min-width: 180px;
+  padding: 6px;
+}
+
+.e-menu__item {
+  padding: 4px 8px;
+}
+
+.e-menu__item:disabled {
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.e-menu__item:focus-visible {
+  outline: none;
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+}
+
+.e-menu__item--danger {
+  color: var(--e-avoid-ink);
+}
+
+.e-menu__item--danger:hover:not(:disabled),
+.e-menu__item--danger:focus-visible {
+  background: color-mix(in srgb, var(--e-avoid) 10%, transparent);
+  color: var(--e-avoid-ink);
+}
+
+/* The pill centres its own content. A shortcut is not always a letter: MOVE
+   carries a drawn spacebar, and an inline glyph sitting on the text baseline
+   grew the line box upward only, so that one tip stood 7px taller than every
+   other and its label rode below the pill's centre. Centring here, rather than
+   at the one caller that happens to own a glyph, keeps every tip the same
+   stadium whatever its shortcut is drawn from. */
+.e-tooltip {
+  position: fixed;
+  z-index: var(--e-z-popover);
+  display: flex;
+  max-width: min(36ch, calc(100vw - 16px));
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-sp-1);
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--e-ink);
+  color: var(--e-surface-ground);
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+  font-size: var(--e-fs-micro);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(-100% - var(--e-sp-2)));
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-tooltip[data-state="entered"] {
+  opacity: 1;
+}
+
+.e-tooltip[data-side="below"] {
+  transform: translate(-50%, var(--e-sp-2));
+}
+
+/* Prose in the tooltip's box. A reach hint or the harness hint is a sentence
+   the control genuinely owns (#964), and a sentence cannot live in the caps
+   pill: nowrap clipped it at the pill's edge and the rest bled past the
+   radius. The primitive detects prose by its terminal punctuation and hands
+   it this treatment: sentence case at natural tracking, wrapped lines, and
+   the floating-surface radius, because a stadium end-cap around four lines
+   reads as a pill that failed rather than a shape that was chosen. */
+.e-tooltip--sentence {
+  display: block;
+  width: max-content;
+  padding: var(--e-sp-1) var(--e-sp-2);
+  border-radius: var(--e-r-card);
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-align: start;
+  text-transform: none;
+  white-space: normal;
+}
+
+/* A drawn shortcut key rides the label's own line, never its own. Sized to
+   1lh it fits the tip's stadium exactly, so a drawn shortcut and a typed one
+   ("MOVE · ⎵" and "SELECT · V") produce the same pill. */
+.shortcut-spacebar-icon {
+  display: block;
+  width: 1lh;
+  height: 1lh;
+}
+
+/* A callout is a tinted well, and §6.7a says the tint mixes into whatever the
+   callout is lying on, so the same component reads native wherever it lands.
+   That surface is a variable, not a constant: on a Card the reader has
+   coloured, the thing underneath is that colour, and mixing into the default
+   card paper made the callout arrive as a cream block from another Card
+   (founder report 2026-08-18). Surfaces that are not the default set
+   `--callout-base`, and all four tones follow it. */
+.e-callout {
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-sp-2);
+  padding: 7px 10px;
+  border-radius: var(--e-r-chip);
+  background: color-mix(in srgb, var(--e-attention) 18%, var(--callout-base, var(--e-surface-card)));
+  color: var(--e-ink);
+  font-family: var(--e-sans);
+  font-size: var(--e-fs-ui);
+  line-height: 1.5;
+}
+
+.e-callout__mark {
+  flex: none;
+  color: var(--e-attention-ink);
+  font-family: var(--e-mono);
+}
+/* The content slot. A flex item defaults to refusing to shrink below its own
+   content, so a callout holding anything wider than a word (a control, a long
+   address) pushed its text out past the callout and out past whatever the
+   callout was sitting in. Cards are resizable, so that is a normal width, not
+   an edge case. */
+.e-callout > span {
+  min-width: 0;
+}
+
+.e-callout--avoid {
+  background: color-mix(in srgb, var(--e-avoid) 12%, var(--callout-base, var(--e-surface-card)));
+}
+
+.e-callout--avoid .e-callout__mark {
+  color: var(--e-avoid-ink);
+}
+
+.e-callout--go {
+  background: color-mix(in srgb, var(--e-go) 10%, var(--callout-base, var(--e-surface-card)));
+}
+
+.e-callout--go .e-callout__mark {
+  color: var(--e-go-ink);
+}
+
+.e-callout--convo {
+  background: color-mix(in srgb, var(--e-convo) 10%, var(--callout-base, var(--e-surface-card)));
+}
+
+.e-callout--convo .e-callout__mark {
+  color: var(--e-convo-ink);
+}
+
+.e-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  padding: 9px 14px;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-floating);
+  box-shadow: var(--e-shadow-lift);
+  color: var(--e-ink);
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-ui);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-picker__listbox[data-state="exiting"],
+.e-popover[data-state="exiting"],
+.e-tooltip[data-state="exiting"],
+.e-toast[data-state="exiting"] {
+  pointer-events: none;
+  opacity: 0;
+  transition-duration: var(--e-t-exit);
+  transition-timing-function: var(--e-ease-in);
+}
+
+.e-picker__listbox[data-state="exiting"],
+.e-popover[data-state="exiting"],
+.e-toast[data-state="exiting"] {
+  transform: translateY(0);
+}
+
+.e-toast__dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+}
+
+.e-toast__dot--go { background: var(--e-go); }
+.e-toast__dot--avoid { background: var(--e-avoid); }
+.e-toast__dot--attention { background: var(--e-attention); }
+.e-toast__dot--convo { background: var(--e-convo); }
+
+.e-context-row {
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-card);
+  color: var(--e-ink);
+  transition:
+    border-color var(--e-t-fast) var(--e-ease-out),
+    box-shadow var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-context-row__head {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  min-height: 32px;
+  padding: 6px 10px;
+}
+
+summary.e-context-row__head {
+  cursor: pointer;
+  list-style: none;
+}
+
+summary.e-context-row__head::-webkit-details-marker {
+  display: none;
+}
+
+summary.e-context-row__head:focus {
+  outline: none;
+}
+
+summary.e-context-row__head:focus-visible {
+  box-shadow: inset 0 0 0 1.5px var(--e-go);
+}
+
+.e-context-row__rank,
+.e-context-row__title,
+.e-context-row__meta {
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+}
+
+.e-context-row__rank {
+  width: 14px;
+  flex: none;
+  color: var(--e-ink-faint);
+  font-size: var(--e-fs-ui);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.e-context-row__grip {
+  position: relative;
+  display: flex;
+  width: 14px;
+  height: 18px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--e-ink-faint);
+  cursor: grab;
+  transition: color var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-context-row__grip::before {
+  position: absolute;
+  inset: -5px;
+  content: "";
+}
+
+.e-context-row:hover .e-context-row__grip {
+  color: var(--e-ink);
+}
+
+.e-context-row__grip:active {
+  cursor: grabbing;
+}
+
+.e-context-row__grip svg,
+.e-context-row__chevron {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.75;
+}
+
+.e-context-row__glyph {
+  display: flex;
+  width: 18px;
+  height: 8px;
+  flex: none;
+  color: var(--e-go);
+}
+
+.e-context-row__glyph[data-relation="avoid"] {
+  color: var(--e-avoid);
+}
+
+.e-context-row__glyph svg {
+  width: 18px;
+  height: 8px;
+}
+
+.e-context-row__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--e-fs-ui);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.e-context-row__chevron {
+  flex: none;
+  color: var(--e-ink-faint);
+  transition: transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-context-row[open] .e-context-row__chevron {
+  transform: rotate(180deg);
+}
+
+.e-context-row__body {
+  padding: var(--e-sp-2) var(--e-sp-3) var(--e-sp-2) calc(var(--e-sp-7) + var(--e-sp-5));
+  border-top: 1px solid var(--e-line);
+}
+
+.e-context-row__meta {
+  margin-bottom: var(--e-sp-1);
+  color: var(--e-ink-soft);
+  font-size: var(--e-fs-micro);
+  letter-spacing: 0.06em;
+}
+
+.e-context-row__snippet {
+  color: var(--e-ink-soft);
+  font-family: var(--e-sans);
+  font-size: var(--e-fs-ui);
+  line-height: 1.5;
+}
+
+.e-context-row__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+}
+
+.e-context-row--avoid .e-context-row__body {
+  padding-left: calc(var(--e-sp-4) + var(--e-sp-3) + var(--e-sp-2));
+}
+
+.e-context-row--dimmed {
+  background: var(--e-surface-panel);
+}
+
+.e-context-row--dimmed .e-context-row__rank,
+.e-context-row--dimmed .e-context-row__glyph,
+.e-context-row--dimmed .e-context-row__title {
+  color: var(--e-ink-soft);
+}
+
+.e-context-row--lifted {
+  border-color: var(--e-line-strong);
+  box-shadow: var(--e-shadow-lift);
+  cursor: grabbing;
+}
+
+.e-context-row-boundary {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  padding: 2px 0;
+}
+
+.e-context-row-boundary::before,
+.e-context-row-boundary::after {
+  flex: 1;
+  border-top: 1px dashed var(--e-line-strong);
+  content: "";
+}
+
+.e-context-row-boundary span {
+  color: var(--e-ink-soft);
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (pointer: coarse) {
+  .e-colour-picker__modes {
+    grid-template-columns: repeat(2, 40px);
+    grid-template-rows: repeat(2, 40px);
+  }
+
+  .e-colour-picker__swatches {
+    grid-template-rows: repeat(2, 40px);
+    grid-auto-columns: 40px;
+  }
+
+  .e-colour-picker__mode::after,
+  .e-colour-picker__swatch::after {
+    inset: -12px;
+  }
+
+  .e-button:not(.e-icon-button),
+  .e-field,
+  .e-picker,
+  .e-picker__option,
+  .e-menu__item,
+  .e-segmented__option {
+    min-height: 40px;
+  }
+
+  .e-toggle::before {
+    inset-block: -9px;
+  }
+
+  .e-chip--interactive::before {
+    inset: -10px;
+  }
+
+  .e-segmented__option {
+    min-width: 40px;
+  }
+
+  .e-context-row__grip::before {
+    inset: -11px -13px;
+  }
+
+  .e-icon-button::before,
+  .e-dock-key::before {
+    inset: -7px;
+  }
+
+  .e-icon-button.e-button--compact::before {
+    inset: -8px;
+  }
+
+  .e-icon-button.e-button--inline::before {
+    inset: -9px;
+  }
+
+  .e-stepper {
+    height: 40px;
+  }
+
+  .e-stepper > button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .e-stepper__value {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+:root[data-reduced-motion="true"] .e-picker__listbox,
+:root[data-reduced-motion="true"] .e-popover,
+:root[data-reduced-motion="true"] .e-toast,
+:root[data-reduced-motion="true"] .e-picker__listbox[data-state="exiting"],
+:root[data-reduced-motion="true"] .e-popover[data-state="exiting"],
+:root[data-reduced-motion="true"] .e-toast[data-state="exiting"] {
+  transition-duration: var(--e-t-reduced-fade), var(--e-t-fast) !important;
+}
+
+:root[data-reduced-motion="true"] .e-tooltip,
+:root[data-reduced-motion="true"] .e-tooltip[data-state="exiting"] {
+  transition-duration: var(--e-t-reduced-fade) !important;
+}
+
+/* Grain — the ceremonial register (SYSTEM §1.8; prototype reference recipe).
+   Flat brand fields under one monochrome printed grain: the grain is what the
+   color is made of, never light falling on it, and it never animates. Ceremony
+   surfaces only (Idea covers, onboarding, empty states, milestones) — never on
+   working chrome, and at most one textured surface visible at a time. */
+.e-grain {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.e-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.55'/></svg>");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+}
+/* Text and glyphs ride above the grain — content is never textured itself. */
+.e-grain > * {
+  position: relative;
+  z-index: 2;
+}
+/* The green field: one flat brand ground with two soft off-center bleeds of
+   the neighbouring brand hues, like ink soaking into the sheet. */
+.e-grain--green {
+  background:
+    radial-gradient(120% 90% at 18% 12%, color-mix(in srgb, var(--e-brand-blue) 28%, transparent), transparent 62%),
+    radial-gradient(110% 110% at 85% 95%, color-mix(in srgb, var(--e-brand-amber) 30%, transparent), transparent 58%),
+    var(--e-brand-green);
+}

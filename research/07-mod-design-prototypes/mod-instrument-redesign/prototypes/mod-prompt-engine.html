@@ -1,0 +1,439 @@
+<!-- PROTOTYPE — throwaway. Companion to mod-design-language.html.
+     Question: how do controls, wiring, displays, and faces form one prompt engine —
+     and what do the engine / creator / user each own? -->
+<title>Mod prompt engine — prototype</title>
+<style>
+  :root{
+    --paper:#f6f5f1; --card:#fffdf8; --well:#edeae2;
+    --ink:#2b2a27; --ink-soft:#6b6962; --ink-faint:#9a978e;
+    --line:#e2ded3; --line-strong:#cfcabb;
+    --acc:#a946c8; --acc-soft:#a946c826;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  :root[data-theme="dark"]{ color-scheme:light; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--paper);}
+  body{font-family:var(--sans); color:var(--ink); padding:40px 20px 80px;}
+  .wrap{max-width:1020px; margin:0 auto;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--ink-faint); text-transform:uppercase;}
+  h1{font-family:var(--mono); font-weight:500; font-size:30px; letter-spacing:1px; margin:10px 0 6px;}
+  .lede{font-size:14px; color:var(--ink-soft); max-width:62ch; line-height:1.6;}
+  section{margin-top:46px;}
+  .sec-h{display:flex; align-items:baseline; gap:12px; border-bottom:1px solid var(--line-strong); padding-bottom:8px; margin-bottom:18px;}
+  .sec-h h2{font-family:var(--mono); font-weight:500; font-size:13px; letter-spacing:2.5px;}
+  .sec-h p{font-size:12.5px; color:var(--ink-faint);}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px;}
+  .lab{font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--ink-soft); text-transform:uppercase; display:flex; justify-content:space-between;}
+  .lab .val{color:var(--ink); font-size:11px;}
+  .emit{font-family:var(--mono); font-size:11px; line-height:1.6; color:var(--ink-soft); border-top:1px dashed var(--line-strong); padding-top:8px; margin-top:12px;}
+  .emit b{color:var(--acc); font-weight:500;}
+  .emit::before{content:'→ '; color:var(--ink-faint);}
+  .emit.mute{color:var(--ink-faint); font-style:italic;}
+
+  .slider{position:relative; height:26px; touch-action:none; cursor:pointer;}
+  .track{position:absolute; inset:0; border:1.5px solid var(--line-strong); border-radius:999px; background:var(--card);}
+  .fill{position:absolute; top:0; bottom:0; left:0; border-radius:999px; background:var(--acc-soft); opacity:0;}
+  .slider.touched .fill{opacity:1;}
+  .detents{position:absolute; inset:0; display:flex; justify-content:space-between; align-items:center; padding:0 10px; pointer-events:none;}
+  .detents i{width:4px; height:4px; border-radius:50%; background:var(--line-strong);}
+  .thumb{position:absolute; top:50%; width:22px; height:22px; border-radius:50%; background:var(--ink); transform:translate(-50%,-50%); pointer-events:none;}
+  .slider.touched .thumb{background:var(--acc);}
+
+  .seg{display:flex; border:1.5px solid var(--ink); border-radius:999px; overflow:hidden;}
+  .seg button{flex:1; font-family:var(--mono); font-size:11px; letter-spacing:1.5px; padding:9px 4px; background:transparent; color:var(--ink); border:0; cursor:pointer;}
+  .seg button.on{background:var(--ink); color:var(--card);}
+  .sw{width:52px; height:28px; border-radius:999px; border:1.5px solid var(--ink); position:relative; cursor:pointer; background:var(--card); flex:none;}
+  .sw i{position:absolute; top:50%; left:4px; width:18px; height:18px; border-radius:50%; background:var(--ink); transform:translateY(-50%); transition:left .15s;}
+  .sw.on{background:var(--acc-soft); border-color:var(--acc);}
+  .sw.on i{left:26px; background:var(--acc);}
+  .swrow{display:flex; align-items:center; gap:12px;}
+  .step{display:flex; align-items:center; border:1.5px solid var(--line-strong); border-radius:999px; overflow:hidden; width:max-content;}
+  .step button{font-family:var(--mono); font-size:15px; width:38px; padding:8px 0; background:transparent; border:0; cursor:pointer; color:var(--ink);}
+  .step .sv{font-family:var(--mono); font-size:12px; min-width:56px; text-align:center; border-left:1px solid var(--line); border-right:1px solid var(--line); padding:8px 6px;}
+  .tin{font-family:var(--mono); font-size:12px; letter-spacing:1px; padding:10px 14px; border:1.5px solid var(--line-strong); border-radius:999px; background:var(--card); color:var(--ink); width:100%;}
+  .tin:focus{outline:2px solid var(--acc); outline-offset:1px;}
+
+  .facebar{display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:18px;}
+  .facebar .seg{width:240px;}
+  .presets{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:16px;}
+  .presets button{font-family:var(--mono); font-size:10px; letter-spacing:1.5px; padding:9px 16px; border:1.5px solid var(--line-strong); border-radius:999px; background:var(--card); cursor:pointer; color:var(--ink);}
+  .presets button.on{border-color:var(--acc); background:var(--acc-soft);}
+  .radarwrap{display:flex; justify-content:center;}
+  .radar{touch-action:none; cursor:pointer;}
+  .radar .axis{stroke:var(--line-strong); stroke-width:1;}
+  .radar .ringl{stroke:var(--line); fill:none;}
+  .radar .shape{fill:var(--acc-soft); stroke:var(--acc); stroke-width:2;}
+  .radar .vtx{fill:var(--ink);}
+  .radar .vtx.hot{fill:var(--acc);}
+  .radar text{font-family:var(--mono); font-size:9px; letter-spacing:1px; fill:var(--ink-soft);}
+  .advgrid{display:grid; grid-template-columns:1fr 1fr; gap:16px 26px;}
+  @media (max-width:640px){ .advgrid{grid-template-columns:1fr;} }
+  .tape{margin-top:20px; border-top:1.5px solid var(--ink); padding-top:12px;}
+  .tape .th{font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--ink-faint); margin-bottom:8px;}
+  .tape .bucket{font-family:var(--mono); font-size:11.5px; line-height:1.8; color:var(--ink-soft); margin-bottom:8px;}
+  .tape .bn{color:var(--acc); font-size:10px; letter-spacing:1.5px;}
+  .tape .bucket div{padding-left:14px;}
+
+  .parts{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px;}
+  .part{border:1px solid var(--line); border-radius:14px; padding:12px; background:var(--card);}
+  .part .pn{font-family:var(--mono); font-size:10px; letter-spacing:2px; margin-bottom:6px; display:flex; align-items:center; gap:6px;}
+  .part .pn i{width:8px; height:8px; border-radius:50%; display:inline-block;}
+  .part p{font-size:11.5px; color:var(--ink-soft); line-height:1.5;}
+  .part .who{font-family:var(--mono); font-size:9px; letter-spacing:1.5px; margin-top:8px; color:var(--ink-faint);}
+
+  .duo{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:760px){ .duo{grid-template-columns:1fr;} }
+  .modehead{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .modehead .nm{font-family:var(--mono); font-size:11px; letter-spacing:2px;}
+  .modeflip{display:flex; border:1.5px solid var(--ink); border-radius:999px; overflow:hidden; width:max-content;}
+  .modeflip button{font-family:var(--mono); font-size:10px; letter-spacing:1.5px; padding:7px 14px; border:0; background:transparent; cursor:pointer; color:var(--ink);}
+  .modeflip button.on{background:var(--ink); color:var(--card);}
+  .authoring{display:flex; flex-direction:column; gap:12px;}
+  .authoring .frow{display:flex; flex-direction:column; gap:5px;}
+  .authoring input{font-family:var(--mono); font-size:11.5px; padding:8px 12px; border:1.5px dashed var(--line-strong); border-radius:10px; background:var(--well); color:var(--ink); width:100%;}
+  .authoring input:focus{outline:2px solid var(--acc); border-style:solid;}
+  .hint{font-size:10.5px; color:var(--ink-faint);}
+  .jacks{display:flex; gap:6px; flex-wrap:wrap;}
+  .jack{font-family:var(--mono); font-size:9.5px; letter-spacing:1px; padding:5px 10px; border:1.5px solid var(--line-strong); border-radius:999px; background:var(--card); cursor:pointer; color:var(--ink-soft);}
+  .jack.on{border-color:var(--acc); background:var(--acc-soft); color:var(--ink);}
+  .swatches{display:flex; gap:5px; flex-wrap:wrap;}
+  .swatches button{width:18px; height:18px; border-radius:50%; border:1px solid rgba(43,42,39,.2); cursor:pointer; padding:0;}
+  .swatches button.on{outline:2px solid var(--ink); outline-offset:2px;}
+
+  .wirechip{font-family:var(--mono); font-size:9.5px; letter-spacing:1.5px; color:var(--acc); border:1.5px dashed var(--acc); border-radius:999px; padding:5px 12px; width:max-content; margin:10px 0;}
+  .dim{opacity:.45;}
+  footer{margin-top:56px; font-size:11.5px; color:var(--ink-faint); line-height:1.7; max-width:70ch;}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eido · Mod system redesign · prototype 02</div>
+    <h1>THE PROMPT ENGINE</h1>
+    <p class="lede">One rule underneath everything: a control produces plain sentences, deterministically. Everything here — faces, presets, wiring, the radar — is a different handle on the same values. The tape never lies.</p>
+  </header>
+
+  <section>
+    <div class="sec-h"><h2>ONE MOD, TWO FACES</h2><p>same values — a picture in Simple, the parts in Advanced</p></div>
+    <div class="card">
+      <div class="facebar">
+        <div>
+          <div style="font-family:var(--mono); font-size:15px; letter-spacing:3px;">TONE OF VOICE</div>
+          <div style="font-size:11.5px; color:var(--ink-faint); margin-top:3px;">the radar is wired to five dials — drag its points, or flip to Advanced and drag the sliders</div>
+        </div>
+        <div class="seg" data-face><button class="on">SIMPLE</button><button>ADVANCED</button></div>
+      </div>
+      <div data-face-simple>
+        <div class="radarwrap">
+          <svg class="radar" width="320" height="290" viewBox="0 0 320 290"></svg>
+        </div>
+        <div class="presets" data-presets>
+          <button data-p="balanced">BALANCED</button>
+          <button data-p="punchy">PUNCHY</button>
+          <button data-p="gentle">GENTLE</button>
+          <button data-p="thorough">THOROUGH</button>
+          <button data-p="custom" disabled style="cursor:default">CUSTOM</button>
+        </div>
+      </div>
+      <div data-face-adv class="advgrid" style="display:none"></div>
+      <div class="tape"><div class="th">WHAT THE AI HEARS — LIVE</div><div id="tape"></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>THE FIVE PARTS OF EVERY CONTROL</h2><p>who owns what</p></div>
+    <div class="parts">
+      <div class="part"><div class="pn"><i style="background:#2b2a27"></i>MECHANIC</div><p>The value's shape and how it is spoken. A slider is a 0–10 number spoken as "7 of 10". Fixed in code.</p><div class="who">ENGINE</div></div>
+      <div class="part"><div class="pn"><i style="background:#a946c8"></i>FRAME</div><p>The words around the value: "Write as if for {value}". Choices carry one frame per option.</p><div class="who">CREATOR</div></div>
+      <div class="part"><div class="pn"><i style="background:#24986a"></i>VALUE</div><p>What fills the slot — the drag, the pick, the typed text.</p><div class="who">USER</div></div>
+      <div class="part"><div class="pn"><i style="background:#3f78df"></i>ADDRESS</div><p>Which of the four prompt sections the sentence lands in.</p><div class="who">CREATOR</div></div>
+      <div class="part"><div class="pn"><i style="background:#eca23b"></i>LOOK</div><p>Label, color, size, position. Never reaches the prompt — except the label, which speaks when no frame is written.</p><div class="who">CREATOR · USER</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>CREATING VS USING</h2><p>flip each card — dashed fields are the creator's, the control is the user's</p></div>
+    <div class="duo">
+      <div class="card" data-cu="text">
+        <div class="modehead"><span class="nm">SHORT TEXT</span>
+          <div class="modeflip"><button data-m="use" class="on">USING</button><button data-m="create">CREATING</button></div></div>
+        <div data-view="use">
+          <div class="lab" style="margin-bottom:6px"><span data-out="label">WRITE AS IF FOR</span></div>
+          <input class="tin" data-in="value" value="a busy founder" />
+        </div>
+        <div data-view="create" class="authoring" style="display:none">
+          <div class="frow"><span class="hint">Label — what the user sees</span><input data-in="label" value="WRITE AS IF FOR" /></div>
+          <div class="frow"><span class="hint">Frame — the sentence, {value} is the user's slot</span><input data-in="frame" value="Write as if for {value}." /></div>
+          <div class="frow"><span class="hint">Placeholder — a worked example</span><input data-in="ph" value="a busy founder" /></div>
+          <div class="frow"><span class="hint">Section — where the sentence lands</span>
+            <div class="jacks" data-jacks><span class="jack" data-j="Background">BACKGROUND</span><span class="jack" data-j="Boundaries">BOUNDARIES</span><span class="jack on" data-j="How to approach it">HOW TO APPROACH IT</span><span class="jack" data-j="The answer">THE ANSWER</span></div></div>
+          <div class="frow"><span class="hint">Control color — from the card palette</span><div class="swatches" data-swatch></div></div>
+        </div>
+        <div class="emit" data-out="emit"></div>
+      </div>
+      <div class="card" data-cu="slider">
+        <div class="modehead"><span class="nm">SLIDER</span>
+          <div class="modeflip"><button data-m="use" class="on">USING</button><button data-m="create">CREATING</button></div></div>
+        <div data-view="use">
+          <div class="lab" style="margin-bottom:6px"><span data-out="label">DETAIL</span><span class="val" data-out="vallab">6/10</span></div>
+          <div class="slider" data-cuslider></div>
+        </div>
+        <div data-view="create" class="authoring" style="display:none">
+          <div class="frow"><span class="hint">Label</span><input data-in="label" value="DETAIL" /></div>
+          <div class="frow"><span class="hint">Frame — leave it empty and the label speaks instead</span><input data-in="frame" value="Level of detail: {value} of 10." /></div>
+          <div class="frow"><span class="hint">Section</span>
+            <div class="jacks" data-jacks><span class="jack" data-j="Background">BACKGROUND</span><span class="jack" data-j="Boundaries">BOUNDARIES</span><span class="jack" data-j="How to approach it">HOW TO APPROACH IT</span><span class="jack on" data-j="The answer">THE ANSWER</span></div></div>
+          <div class="frow"><span class="hint">Control color</span><div class="swatches" data-swatch></div></div>
+        </div>
+        <div class="emit" data-out="emit"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><h2>WIRING</h2><p>two primitives, both deterministic — gate and select</p></div>
+    <div class="duo">
+      <div class="card">
+        <div class="lab" style="margin-bottom:10px"><span>Include examples</span></div>
+        <div class="swrow"><div class="sw on" id="gateSw"></div><span style="font-size:12px;color:var(--ink-soft)">worked examples in the answer</span></div>
+        <div class="wirechip">WIRE · GATE → "HOW MANY"</div>
+        <div id="gateTarget">
+          <div class="lab" style="margin-bottom:8px"><span>How many</span></div>
+          <div class="step"><button id="gMinus">−</button><span class="sv" id="gVal">2</span><button id="gPlus">+</button></div>
+        </div>
+        <div class="emit" id="gateEmit"></div>
+      </div>
+      <div class="card">
+        <div class="lab" style="margin-bottom:10px"><span>Audience</span></div>
+        <div class="seg" id="selSeg"><button class="on">TEAM</button><button>CLIENT</button><button>PUBLIC</button></div>
+        <div class="wirechip">WIRE · SELECT → "WARMTH" PICKS ITS FRAME</div>
+        <div class="lab" style="margin-bottom:6px"><span>Warmth</span><span class="val" id="selVal">7/10</span></div>
+        <div class="slider" id="selSlider"></div>
+        <div class="emit" id="selEmit"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    PROTOTYPE — throwaway. Everything above is one system: controls emit sentences (engine mechanic + creator frame + user value),
+    wires gate and select them, displays like the radar are two-way lenses over wired controls, and faces are creator-assembled
+    arrangements of the same state. Full write-up: docs/design/mods/prompt-engine.md.
+  </footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var CARD_COLORS=['#222222','#8f9aa3','#d66be8','#a946c8','#3f78df','#48a2ef','#eca23b','#d76519','#24986a','#65b563','#f1666d','#d72e35'];
+  function el(q,r){ return (r||document).querySelector(q); }
+  function els(q,r){ return Array.prototype.slice.call((r||document).querySelectorAll(q)); }
+  function clamp(v,a,b){ return Math.min(b,Math.max(a,v)); }
+  function drag(t,fn){
+    t.addEventListener('pointerdown',function(e){
+      e.preventDefault(); t.setPointerCapture(e.pointerId); t.classList.add('touched'); fn(e);
+      function mv(ev){ fn(ev); }
+      function up(){ t.removeEventListener('pointermove',mv); t.removeEventListener('pointerup',up); }
+      t.addEventListener('pointermove',mv); t.addEventListener('pointerup',up);
+    });
+  }
+  function mkSlider(node,get,set){
+    node.innerHTML='<div class="track"></div><div class="fill"></div><div class="detents">'+Array(11).fill('<i></i>').join('')+'</div><div class="thumb"></div>';
+    var thumb=el('.thumb',node), fill=el('.fill',node);
+    function paint(){ var p=get()/10*100; thumb.style.left=p+'%'; fill.style.width=p+'%'; }
+    drag(node,function(e){
+      var r=node.getBoundingClientRect();
+      set(clamp(Math.round((e.clientX-r.left)/r.width*10),0,10)); paint();
+    });
+    paint();
+    return paint;
+  }
+
+  /* ============ ONE MOD, TWO FACES ============ */
+  var AXES=['WARMTH','DETAIL','PACE','FORMALITY','CONFIDENCE'];
+  var V=[7,5,4,6,8];
+  var PRESETS={balanced:[5,5,5,5,5], punchy:[4,3,8,3,9], gentle:[9,4,3,4,4], thorough:[6,9,4,7,7]};
+  var svg=el('.radar'), NS='http://www.w3.org/2000/svg';
+  var CX=160, CY=150, R=105;
+  function axPoint(i,val){
+    var a=(-90+i*72)*Math.PI/180, rr=val/10*R;
+    return [CX+Math.cos(a)*rr, CY+Math.sin(a)*rr];
+  }
+  [2.5,5,7.5,10].forEach(function(ring){
+    var poly=document.createElementNS(NS,'polygon');
+    poly.setAttribute('class','ringl');
+    poly.setAttribute('points',AXES.map(function(_,i){ return axPoint(i,ring).join(','); }).join(' '));
+    svg.appendChild(poly);
+  });
+  AXES.forEach(function(name,i){
+    var p=axPoint(i,10);
+    var ln=document.createElementNS(NS,'line');
+    ln.setAttribute('class','axis'); ln.setAttribute('x1',CX); ln.setAttribute('y1',CY);
+    ln.setAttribute('x2',p[0]); ln.setAttribute('y2',p[1]); svg.appendChild(ln);
+    var tx=document.createElementNS(NS,'text');
+    var lp=axPoint(i,12.2);
+    tx.setAttribute('x',lp[0]); tx.setAttribute('y',lp[1]);
+    tx.setAttribute('text-anchor', Math.abs(lp[0]-CX)<10?'middle':(lp[0]>CX?'start':'end'));
+    tx.textContent=name; svg.appendChild(tx);
+  });
+  var shape=document.createElementNS(NS,'polygon'); shape.setAttribute('class','shape'); svg.appendChild(shape);
+  var vtx=AXES.map(function(){ var c=document.createElementNS(NS,'circle'); c.setAttribute('r','8'); c.setAttribute('class','vtx'); svg.appendChild(c); return c; });
+  var paintAdv=[];
+  function paintRadar(){
+    shape.setAttribute('points',V.map(function(v,i){ return axPoint(i,v).join(','); }).join(' '));
+    vtx.forEach(function(c,i){ var p=axPoint(i,V[i]); c.setAttribute('cx',p[0]); c.setAttribute('cy',p[1]); });
+    var match=Object.keys(PRESETS).filter(function(k){ return PRESETS[k].join()===V.join(); })[0];
+    els('[data-presets] button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-p')===(match||'custom'));
+    });
+  }
+  var hot=-1;
+  svg.addEventListener('pointerdown',function(e){
+    e.preventDefault(); svg.setPointerCapture(e.pointerId);
+    function apply(ev){
+      var r=svg.getBoundingClientRect();
+      var sx=320/r.width, sy=290/r.height;
+      var x=(ev.clientX-r.left)*sx-CX, y=(ev.clientY-r.top)*sy-CY;
+      var ang=Math.atan2(y,x)*180/Math.PI;
+      var best=0,bd=1e9;
+      for(var i=0;i<5;i++){ var d=Math.abs(((ang-(-90+i*72))%360+540)%360-180); if(d<bd){bd=d;best=i;} }
+      hot=best;
+      vtx.forEach(function(c,i){ c.setAttribute('class', i===hot?'vtx hot':'vtx'); });
+      V[hot]=clamp(Math.round(Math.sqrt(x*x+y*y)/R*10),0,10);
+      paintRadar(); paintAdv.forEach(function(f){f();}); tape();
+    }
+    apply(e);
+    function mv(ev){ apply(ev); }
+    function up(){ svg.removeEventListener('pointermove',mv); svg.removeEventListener('pointerup',up); hot=-1; vtx.forEach(function(c){c.setAttribute('class','vtx');}); }
+    svg.addEventListener('pointermove',mv); svg.addEventListener('pointerup',up);
+  });
+  els('[data-presets] button').forEach(function(b){
+    var k=b.getAttribute('data-p');
+    if(!PRESETS[k]) return;
+    b.addEventListener('click',function(){
+      PRESETS[k].forEach(function(v,i){ V[i]=v; });
+      paintRadar(); paintAdv.forEach(function(f){f();}); tape();
+    });
+  });
+  var adv=el('[data-face-adv]');
+  AXES.forEach(function(name,i){
+    var box=document.createElement('div');
+    box.innerHTML='<div class="lab" style="margin-bottom:6px"><span>'+name+'</span><span class="val"></span></div><div class="slider"></div>';
+    adv.appendChild(box);
+    var vlab=el('.val',box);
+    var paint=mkSlider(el('.slider',box), function(){ return V[i]; }, function(v){ V[i]=v; paintRadar(); tape(); vlab.textContent=v+'/10'; });
+    paintAdv.push(function(){ paint(); vlab.textContent=V[i]+'/10'; });
+    vlab.textContent=V[i]+'/10';
+  });
+  els('[data-face] button').forEach(function(b,i){
+    b.addEventListener('click',function(){
+      els('[data-face] button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      el('[data-face-simple]').style.display = i===0?'':'none';
+      adv.style.display = i===0?'none':'grid';
+    });
+  });
+  function tape(){
+    var approach=['Warmth: '+V[0]+' of 10. Pace: '+V[2]+' of 10.','Formality: '+V[3]+' of 10.','State conclusions with confidence '+V[4]+' of 10.'];
+    var answer=['Level of detail: '+V[1]+' of 10.'];
+    el('#tape').innerHTML=
+      '<div class="bucket"><span class="bn">HOW TO APPROACH IT</span>'+approach.map(function(l){return '<div>'+l+'</div>';}).join('')+'</div>'+
+      '<div class="bucket"><span class="bn">THE ANSWER</span>'+answer.map(function(l){return '<div>'+l+'</div>';}).join('')+'</div>';
+  }
+  paintRadar(); tape();
+
+  /* ============ CREATING VS USING ============ */
+  function swatchRow(node, onPick){
+    CARD_COLORS.forEach(function(c,i){
+      var b=document.createElement('button');
+      b.style.background=c;
+      b.setAttribute('aria-label','Color '+c);
+      if(c==='#a946c8') b.classList.add('on');
+      b.addEventListener('click',function(){
+        els('button',node).forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on'); onPick(c);
+      });
+      node.appendChild(b);
+    });
+  }
+  function fillFrame(frame,label,val,section){
+    var spoken = frame.trim()? frame : (label+': {value}.');
+    var s = spoken.indexOf('{value}')>=0 ? spoken.split('{value}').join('<b>'+val+'</b>') : spoken+' <b>'+val+'</b>';
+    return '“'+s+'”&ensp;<span style="color:var(--ink-faint)">· lands in '+section.toUpperCase()+'</span>';
+  }
+  els('[data-cu]').forEach(function(card){
+    var kind=card.getAttribute('data-cu');
+    var st={ label: kind==='text'?'WRITE AS IF FOR':'DETAIL',
+             frame: kind==='text'?'Write as if for {value}.':'Level of detail: {value} of 10.',
+             value: kind==='text'?'a busy founder':6,
+             section: kind==='text'?'How to approach it':'The answer' };
+    var emitEl=el('[data-out="emit"]',card);
+    function paint(){
+      var lab=el('[data-out="label"]',card); if(lab) lab.textContent=st.label;
+      var vl=el('[data-out="vallab"]',card); if(vl) vl.textContent=st.value+'/10';
+      var v = kind==='text' ? (String(st.value).trim()||'…') : (st.value+(kind==='slider'?' of 10':''));
+      if(kind==='text' && !String(st.value).trim()){ emitEl.className='emit mute'; emitEl.innerHTML='empty — nothing is said.'; }
+      else { emitEl.className='emit'; emitEl.innerHTML=fillFrame(st.frame,st.label,kind==='text'?v:String(st.value),st.section); }
+    }
+    els('.modeflip button',card).forEach(function(b){
+      b.addEventListener('click',function(){
+        els('.modeflip button',card).forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        var m=b.getAttribute('data-m');
+        el('[data-view="use"]',card).style.display = m==='use'?'':'none';
+        el('[data-view="create"]',card).style.display = m==='create'?'':'none';
+      });
+    });
+    els('[data-in]',card).forEach(function(inp){
+      var key=inp.getAttribute('data-in');
+      inp.addEventListener('input',function(){
+        if(key==='value'||key==='label'||key==='frame') st[key]=inp.value;
+        if(key==='ph') inp.value=inp.value;
+        paint();
+      });
+    });
+    els('[data-jacks] .jack',card).forEach(function(j){
+      j.addEventListener('click',function(){
+        els('[data-jacks] .jack',card).forEach(function(x){x.classList.remove('on');});
+        j.classList.add('on'); st.section=j.getAttribute('data-j'); paint();
+      });
+    });
+    var sw=el('[data-swatch]',card);
+    if(sw) swatchRow(sw,function(c){ card.style.setProperty('--acc',c); card.style.setProperty('--acc-soft',c+'26'); });
+    var sl=el('[data-cuslider]',card);
+    if(sl) mkSlider(sl,function(){ return st.value; },function(v){ st.value=v; paint(); });
+    paint();
+  });
+
+  /* ============ WIRING ============ */
+  var gOn=true, gN=2;
+  function paintGate(){
+    el('#gVal').textContent=gN;
+    el('#gateTarget').className = gOn?'':'dim';
+    var e=el('#gateEmit');
+    if(gOn){ e.className='emit'; e.innerHTML='“Include <b>'+gN+'</b> worked example'+(gN===1?'':'s')+'.”'; }
+    else { e.className='emit mute'; e.innerHTML='"How many" is muted — its gate ("Include examples") is off.'; }
+  }
+  el('#gateSw').innerHTML='<i></i>';
+  el('#gateSw').addEventListener('click',function(){ this.classList.toggle('on'); gOn=!gOn; paintGate(); });
+  el('#gMinus').addEventListener('click',function(){ gN=clamp(gN-1,1,9); paintGate(); });
+  el('#gPlus').addEventListener('click',function(){ gN=clamp(gN+1,1,9); paintGate(); });
+  paintGate();
+
+  var FRAMES={TEAM:'Warm but brisk — we know each other: {value} of 10.',
+              CLIENT:'Warm and unhurried — build trust: {value} of 10.',
+              PUBLIC:'Warm, plain, welcoming to strangers: {value} of 10.'};
+  var selA='TEAM', selV=7;
+  function paintSel(){
+    el('#selVal').textContent=selV+'/10';
+    el('#selEmit').innerHTML='“'+FRAMES[selA].split('{value}').join('<b>'+selV+'</b>')+'”&ensp;<span style="color:var(--ink-faint)">· frame picked by AUDIENCE = '+selA+'</span>';
+  }
+  els('#selSeg button').forEach(function(b){
+    b.addEventListener('click',function(){
+      els('#selSeg button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); selA=b.textContent; paintSel();
+    });
+  });
+  mkSlider(el('#selSlider'),function(){ return selV; },function(v){ selV=v; paintSel(); });
+  paintSel();
+})();
+</script>

@@ -1,0 +1,217 @@
+
+/* ---------- Playback ---------- */
+.playback-active .topbar {
+  border-bottom-color: var(--e-line-strong);
+  background: var(--e-surface-panel);
+}
+.board-wrap.playback-mode {
+  background: var(--e-surface-ground);
+}
+.board-wrap.playback-mode .react-flow__pane {
+  cursor: grab;
+}
+.playback-node {
+  animation: timeline-card-in 180ms ease-out;
+}
+.playback-card {
+  pointer-events: none;
+}
+.playback-card .react-flow__handle {
+  opacity: 0;
+}
+.playback-kind-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--e-ink);
+  flex: 0 0 auto;
+}
+.playback-kind-dot.has-color {
+  background: var(--card-header-color);
+  box-shadow: none;
+}
+.playback-card.mod .playback-kind-dot:not(.has-color) {
+  background: var(--e-mod);
+}
+.playback-card.conversation .playback-kind-dot:not(.has-color) {
+  background: var(--e-convo);
+}
+.playback-card.fill-full .playback-kind-dot.has-color {
+  background: var(--card-header-ink);
+}
+.playback-card-body {
+  max-height: 190px;
+  overflow: hidden;
+}
+.playback-card-text {
+  white-space: pre-wrap;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+  color: var(--e-ink);
+}
+.playback-card.fill-full .playback-card-text {
+  color: var(--identity-body-ink);
+}
+.playback-asset-count {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--e-surface-field);
+  color: var(--e-ink-soft);
+  font-size: 11px;
+}
+.playback-card.fill-full .playback-asset-count {
+  background: transparent;
+  color: var(--identity-body-ink-soft);
+}
+.playback-card.fill-full .playback-card-body > .result-empty {
+  color: var(--identity-body-ink-soft);
+}
+.timeline-ghost-card {
+  opacity: 0.38;
+  filter: grayscale(0.45);
+  border-style: dashed;
+  box-shadow: none;
+}
+.timeline-panel {
+  position: absolute;
+  left: 50%;
+  width: 90vw;
+  max-width: 90vw;
+  bottom: var(--e-sp-5);
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-3);
+  padding: var(--e-sp-2) var(--e-sp-3);
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-well);
+  background: var(--e-surface-panel);
+}
+.timeline-play {
+  flex: none;
+}
+.timeline-panel.empty {
+  width: auto;
+  max-width: min(520px, calc(100% - var(--e-sp-6)));
+}
+.timeline-empty-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  min-width: 0;
+}
+.timeline-empty-copy strong {
+  font-size: var(--e-fs-ui);
+}
+.timeline-empty-copy span {
+  color: var(--e-ink-soft);
+  font-size: var(--e-fs-label);
+}
+.timeline-scrub {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 160px;
+  height: 24px;
+}
+.timeline-scrub input[type='range'] {
+  appearance: none;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  cursor: ew-resize;
+}
+.timeline-scrub input[type='range']:disabled {
+  cursor: default;
+}
+.timeline-scrub input[type='range']::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+}
+.timeline-scrub input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--e-ink);
+}
+.timeline-scrub input[type='range']::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+}
+.timeline-scrub input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--e-ink);
+}
+.timeline-track {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 6px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+  pointer-events: none;
+}
+.timeline-count {
+  flex: none;
+  color: var(--e-ink-soft);
+  white-space: nowrap;
+}
+.timeline-speed {
+  width: 74px;
+  flex: none;
+}
+@keyframes timeline-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes timeline-edge-in {
+  from {
+    stroke-dashoffset: 16;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (pointer: coarse) {
+  .timeline-scrub {
+    height: 40px;
+  }
+}
+@media (max-width: 720px) {
+  .timeline-panel {
+    bottom: var(--e-sp-3);
+    gap: var(--e-sp-2);
+  }
+  .timeline-scrub {
+    min-width: 0;
+  }
+}

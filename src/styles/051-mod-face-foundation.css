@@ -1,0 +1,133 @@
+/* Shared v2 Mod face host, row, inline-edit, removal, and growth recipes. */
+.mod-face-host {
+  min-width: 0;
+  contain: layout style;
+  user-select: none;
+}
+
+.mod-face {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--e-sp-3);
+  /* 14px gutters — the face shares the card head's rails (reference .mod-body). */
+  padding: var(--e-sp-3) 14px 0;
+}
+
+.mod-row {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+}
+
+.mod-row-head {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-sp-2);
+}
+
+.mod-row-head.has-x {
+  padding-right: var(--e-sp-5);
+}
+
+.mod-sub {
+  min-width: 0;
+  overflow: hidden;
+  flex: 1 1 auto;
+  color: var(--e-ink-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mod-val {
+  overflow: hidden;
+  flex: none;
+  max-width: 176px;
+  color: var(--e-ink);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+.e-edit {
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  outline: none;
+  caret-color: var(--e-go);
+  transition:
+    color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.e-edit:hover {
+  border-bottom-color: var(--e-line-strong);
+}
+
+.e-edit:focus {
+  border-bottom-color: var(--e-go);
+  color: var(--e-ink);
+  box-shadow: none;
+}
+
+.row-x {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: var(--e-z-canvas-chrome);
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--e-line-strong);
+  border-radius: 50%;
+  background: var(--e-surface-card);
+  color: var(--e-ink-soft);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition:
+    opacity var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-row:hover .row-x,
+.mod-row:focus-within .row-x {
+  opacity: 1;
+}
+
+.row-x:hover {
+  border-color: var(--e-ink);
+  color: var(--e-ink);
+}
+
+.row-x:focus-visible {
+  border-color: var(--e-go);
+  outline: none;
+  color: var(--e-ink);
+}
+
+.row-x::before {
+  position: absolute;
+  inset: -4px;
+  content: '';
+}
+
+.mod-face-host[aria-disabled='true'] :is(.row-x, .e-edit) {
+  cursor: inherit;
+}
+
+@media (pointer: coarse) {
+  .row-x::before {
+    inset: -12px;
+  }
+}

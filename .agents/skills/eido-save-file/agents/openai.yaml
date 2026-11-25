@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eido Save File"
+  short_description: "Inspect local Eido board intent"
+  default_prompt: "Use $eido-save-file to summarize intent from my explicitly selected legacy browser JSON save."

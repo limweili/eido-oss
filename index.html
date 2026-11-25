@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preload" href="/src/assets/fonts/jetbrains-mono-latin-wght-400-700.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/src/assets/fonts/open-sans-latin-variable-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/src/assets/fonts/open-sans-latin-variable-italic.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Eido — where ideas find their form</title>
+    <script data-eido-theme-bootstrap>
+      (() => {
+        let theme = 'light'
+        try {
+          const raw = localStorage.getItem('eido-v3-settings')
+          const saved = raw ? JSON.parse(raw) : null
+          const preference = saved && typeof saved === 'object' ? saved.theme : 'light'
+          if (preference === 'dark') theme = 'dark'
+          else if (preference === 'system' && matchMedia('(prefers-color-scheme: dark)').matches) {
+            theme = 'dark'
+          }
+        } catch {
+          // Missing, corrupt, or unavailable device settings default to Light.
+        }
+        document.documentElement.dataset.theme = theme
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

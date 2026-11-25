@@ -1,0 +1,365 @@
+name: Packaged certification
+
+on:
+  workflow_dispatch:
+    inputs:
+      semver:
+        description: Unique non-0.0.0 SemVer for this sealed certification set
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: packaged-certification-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare packaged certification set
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      certification_set_id: ${{ steps.identity.outputs.certification_set_id }}
+    steps:
+      # fetch-depth: 0 so proof-revalidation can fingerprint the main commits
+      # that earlier Native desktop proof runs covered, not just this one.
+      - name: Check out the exact dispatched SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node for CI
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      - name: Verify exact current main and mint a one-run set identity
+        id: identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = "refs/heads/main"
+          current_main="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq '.object.sha')"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$current_main" = "$GITHUB_SHA"
+          echo "certification_set_id=eido-cert-v2-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+
+      # Admission. This resolves the Native desktop proof run that covers this
+      # exact runtime tree and refuses the dispatch if there is none, so no
+      # native minute is spent on a tree without authoritative two-platform
+      # proof. It writes certification-revalidation.json, the machine-written
+      # record that replaces the old hand-appended ledger entry.
+      - name: Validate certification admission before native spend
+        env:
+          CERTIFICATION_SET_ID: ${{ steps.identity.outputs.certification_set_id }}
+          CERTIFICATION_SEMVER: ${{ inputs.semver }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/certification/prepare-certification.mjs \
+            --source-sha "$GITHUB_SHA" \
+            --semver "$CERTIFICATION_SEMVER" \
+            --certification-set-id "$CERTIFICATION_SET_ID" \
+            --output "$RUNNER_TEMP/eido-certification-preparation"
+
+      # The resolver runs once. Native legs must consume this exact record so
+      # a newer equivalent proof cannot change the evidence mid-certification.
+      - name: Preserve prepared certification admission
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-certification-admission-${{ steps.identity.outputs.certification_set_id }}
+          path: ${{ runner.temp }}/eido-certification-preparation/certification-revalidation.json
+          if-no-files-found: error
+          retention-days: 3
+
+  certify-macos:
+    name: Packaged certification — macos-15 (arm64)
+    needs: prepare
+    runs-on: macos-15
+    # Every published macOS Release is signed with Eido's Developer ID,
+    # hardened, notarized by Apple, and stapled, so this leg needs the signing
+    # identity. The identity lives on this GitHub Environment; the job cannot
+    # reach it without the binding, and the lane fails closed without it.
+    environment: macos-signing-smoke
+    # 360 minutes: two independently bounded 150-minute notarization waits
+    # (the app before archive construction, then the outer DMG), plus an hour
+    # for packaging, cleanup, and certification. Authority:
+    # MACOS_RELEASE_JOB_TIMEOUT_MINUTES in
+    # scripts/release-signing/macos-release.mjs.
+    timeout-minutes: 360
+    env:
+      EIDO_CERTIFICATION_SET_ID: ${{ needs.prepare.outputs.certification_set_id }}
+      EIDO_CERTIFICATION_SOURCE_SHA: ${{ github.sha }}
+      EIDO_CERTIFICATION_SEMVER: ${{ inputs.semver }}
+      EIDO_CERTIFICATION_PLATFORM: darwin
+      EIDO_CERTIFICATION_ARCH: arm64
+      EIDO_MACOS_EXPECTED_TEAM_ID: ${{ vars.EIDO_MACOS_EXPECTED_TEAM_ID }}
+      EIDO_MACOS_EXPECTED_AUTHORITY: ${{ vars.EIDO_MACOS_EXPECTED_AUTHORITY }}
+      VITE_EIDO_RELEASE_VERSION: ${{ inputs.semver }}
+    steps:
+      - name: Check out the exact certified SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Download prepared certification admission
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" \
+            --name "eido-certification-admission-${EIDO_CERTIFICATION_SET_ID}" \
+            --dir "$RUNNER_TEMP/eido-certification-admission"
+
+      # The `runner` context (runner.environment, runner.temp) is only valid
+      # inside a step (if/env/run/with/continue-on-error/timeout-minutes), not
+      # in a job-level `env:` map. Resolve it here, once, into $GITHUB_ENV so
+      # every later step in this job inherits the same EIDO_CERTIFICATION_*
+      # variable names the harness (certify-packaged.mjs) already expects.
+      - name: Resolve runner-scoped certification environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "EIDO_CERTIFICATION_OS_USER_SCOPE=${{ runner.environment }}"
+            echo "EIDO_CERTIFICATION_INTENT_PATH=${{ runner.temp }}/eido-certification-preparation/certification-intent.json"
+            echo "EIDO_CERTIFICATION_PROVENANCE_PATH=${{ runner.temp }}/eido-certification-preparation/certification-provenance.json"
+            echo "EIDO_CERTIFICATION_REVALIDATION_PATH=${{ runner.temp }}/eido-certification-admission/certification-revalidation.json"
+          } >> "$GITHUB_ENV"
+
+      - name: Verify exact native identity and prepare embedded provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node scripts/certification/prepare-certification.mjs \
+            --source-sha "$GITHUB_SHA" \
+            --semver "$EIDO_CERTIFICATION_SEMVER" \
+            --certification-set-id "$EIDO_CERTIFICATION_SET_ID" \
+            --revalidation-path "$EIDO_CERTIFICATION_REVALIDATION_PATH" \
+            --output "$RUNNER_TEMP/eido-certification-preparation"
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      # Credential material exists only between this step and the cleanup step
+      # below, only under $RUNNER_TEMP/eido-macos-release-signing, and is gone
+      # before the packaged app is launched or any artifact is uploaded.
+      - name: Preflight the signing identity before native spend
+        env:
+          EIDO_MACOS_CSC_LINK: ${{ secrets.EIDO_MACOS_CSC_LINK }}
+          EIDO_MACOS_CSC_KEY_PASSWORD: ${{ secrets.EIDO_MACOS_CSC_KEY_PASSWORD }}
+          EIDO_MACOS_NOTARIZATION_API_KEY_BASE64: ${{ secrets.EIDO_MACOS_NOTARIZATION_API_KEY_BASE64 }}
+          EIDO_MACOS_NOTARIZATION_API_KEY_ID: ${{ vars.EIDO_MACOS_NOTARIZATION_API_KEY_ID }}
+          EIDO_MACOS_NOTARIZATION_API_ISSUER: ${{ vars.EIDO_MACOS_NOTARIZATION_API_ISSUER }}
+        run: node scripts/release-signing/macos-release.mjs preflight
+
+      - name: Build the sealed, signed production installer
+        env:
+          APP_BUILDER_TMP_DIR: ${{ runner.temp }}/eido-macos-release-signing
+          CSC_LINK: ${{ runner.temp }}/eido-macos-release-signing/certificate.p12
+          CSC_KEY_PASSWORD: ${{ secrets.EIDO_MACOS_CSC_KEY_PASSWORD }}
+          EIDO_MACOS_NOTARIZATION_API_KEY_ID: ${{ vars.EIDO_MACOS_NOTARIZATION_API_KEY_ID }}
+          EIDO_MACOS_NOTARIZATION_API_ISSUER: ${{ vars.EIDO_MACOS_NOTARIZATION_API_ISSUER }}
+        run: npm run release:package
+
+      - name: Notarize and staple the sealed DMG
+        env:
+          EIDO_MACOS_NOTARIZATION_API_KEY_ID: ${{ vars.EIDO_MACOS_NOTARIZATION_API_KEY_ID }}
+          EIDO_MACOS_NOTARIZATION_API_ISSUER: ${{ vars.EIDO_MACOS_NOTARIZATION_API_ISSUER }}
+        run: node scripts/release-signing/macos-release.mjs notarize-dmg
+
+      - name: Remove signing credentials from the runner
+        if: ${{ always() }}
+        run: node scripts/release-signing/macos-release.mjs cleanup
+
+      - name: Certify installed GUI, CLI, MCP, lifecycle, inventory, and posture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run release:certify
+
+      - name: Preserve sealed bytes and digest-addressed native evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-packaged-certification-${{ needs.prepare.outputs.certification_set_id }}-darwin-arm64
+          path: |
+            .local/packaged-certification/${{ needs.prepare.outputs.certification_set_id }}/darwin-arm64/package/*.dmg
+            .local/packaged-certification/${{ needs.prepare.outputs.certification_set_id }}/darwin-arm64/package/*.zip
+            .local/packaged-certification/${{ needs.prepare.outputs.certification_set_id }}/darwin-arm64/evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
+  certify-windows:
+    name: Packaged certification — windows-2025 (x64)
+    needs: prepare
+    runs-on: windows-2025
+    timeout-minutes: 45
+    env:
+      EIDO_CERTIFICATION_SET_ID: ${{ needs.prepare.outputs.certification_set_id }}
+      EIDO_CERTIFICATION_SOURCE_SHA: ${{ github.sha }}
+      EIDO_CERTIFICATION_SEMVER: ${{ inputs.semver }}
+      EIDO_CERTIFICATION_PLATFORM: win32
+      EIDO_CERTIFICATION_ARCH: x64
+      VITE_EIDO_RELEASE_VERSION: ${{ inputs.semver }}
+    steps:
+      - name: Check out the exact certified SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Download prepared certification admission
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" \
+            --name "eido-certification-admission-${EIDO_CERTIFICATION_SET_ID}" \
+            --dir "$RUNNER_TEMP/eido-certification-admission"
+
+      - name: Resolve runner-scoped certification environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "EIDO_CERTIFICATION_OS_USER_SCOPE=${{ runner.environment }}"
+            echo "EIDO_CERTIFICATION_INTENT_PATH=${{ runner.temp }}/eido-certification-preparation/certification-intent.json"
+            echo "EIDO_CERTIFICATION_PROVENANCE_PATH=${{ runner.temp }}/eido-certification-preparation/certification-provenance.json"
+            echo "EIDO_CERTIFICATION_REVALIDATION_PATH=${{ runner.temp }}/eido-certification-admission/certification-revalidation.json"
+          } >> "$GITHUB_ENV"
+
+      - name: Verify exact native identity and prepare embedded provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node scripts/certification/prepare-certification.mjs \
+            --source-sha "$GITHUB_SHA" \
+            --semver "$EIDO_CERTIFICATION_SEMVER" \
+            --certification-set-id "$EIDO_CERTIFICATION_SET_ID" \
+            --revalidation-path "$EIDO_CERTIFICATION_REVALIDATION_PATH" \
+            --output "$RUNNER_TEMP/eido-certification-preparation"
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      # Windows artifacts are deliberately unsigned: Eido does not buy an
+      # Authenticode certificate, and users accept one SmartScreen warning at
+      # first install (spec #975, "Out of Scope"). Identity auto-discovery stays
+      # off so no certificate present on the runner can be picked up silently,
+      # and certification asserts that NotSigned posture rather than ignoring it.
+      - name: Build the sealed production installer
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run release:package
+
+      - name: Certify installed GUI, CLI, MCP, lifecycle, inventory, and posture
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run release:certify
+
+      - name: Preserve sealed bytes and digest-addressed native evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-packaged-certification-${{ needs.prepare.outputs.certification_set_id }}-win32-x64
+          path: |
+            .local/packaged-certification/${{ needs.prepare.outputs.certification_set_id }}/win32-x64/package/*.exe
+            .local/packaged-certification/${{ needs.prepare.outputs.certification_set_id }}/win32-x64/evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
+  pair:
+    name: Bind paired packaged certification set
+    needs: [prepare, certify-macos, certify-windows]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CERTIFICATION_SET_ID: ${{ needs.prepare.outputs.certification_set_id }}
+      CERTIFICATION_SEMVER: ${{ inputs.semver }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out the exact certified SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node for CI
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      - name: Download the exact native packets from this run
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" \
+            --name "eido-packaged-certification-${CERTIFICATION_SET_ID}-darwin-arm64" \
+            --dir "$RUNNER_TEMP/eido-certification-packets/darwin"
+          gh run download "$GITHUB_RUN_ID" \
+            --name "eido-packaged-certification-${CERTIFICATION_SET_ID}-win32-x64" \
+            --dir "$RUNNER_TEMP/eido-certification-packets/win32"
+
+      - name: Download prepared certification admission
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download "$GITHUB_RUN_ID" \
+            --name "eido-certification-admission-${CERTIFICATION_SET_ID}" \
+            --dir "$RUNNER_TEMP/eido-certification-admission"
+
+      - name: Finalize the immutable paired manifest and external reference
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/certification/prepare-certification.mjs \
+            --source-sha "$GITHUB_SHA" \
+            --semver "$CERTIFICATION_SEMVER" \
+            --certification-set-id "$CERTIFICATION_SET_ID" \
+            --revalidation-path "$RUNNER_TEMP/eido-certification-admission/certification-revalidation.json" \
+            --output "$RUNNER_TEMP/eido-certification-preparation"
+          node scripts/certification/finalize-certification.mjs \
+            --intent "$RUNNER_TEMP/eido-certification-preparation/certification-intent.json" \
+            --mac "$RUNNER_TEMP/eido-certification-packets/darwin/evidence/platform-evidence.json" \
+            --windows "$RUNNER_TEMP/eido-certification-packets/win32/evidence/platform-evidence.json" \
+            --output ".local/packaged-certification/${CERTIFICATION_SET_ID}/set"
+
+      - name: Preserve the digest-addressed paired-set reference
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-packaged-certification-${{ needs.prepare.outputs.certification_set_id }}-paired-set
+          path: .local/packaged-certification/${{ needs.prepare.outputs.certification_set_id }}/set/*.json
+          if-no-files-found: error
+          retention-days: 3

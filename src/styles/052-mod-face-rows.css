@@ -1,0 +1,375 @@
+/* Slider tracer (#763); #767 extends this sheet with dial, count, and switch. */
+.mod-face--slider .i-sliderline {
+  display: flex;
+  align-items: center;
+}
+
+.mod-face--slider .i-track {
+  position: relative;
+  min-width: 40px;
+  height: 32px;
+  flex: 1 1 auto;
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.mod-face--slider .i-track:focus-visible {
+  outline: 1px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+.mod-face--slider .i-rail {
+  position: absolute;
+  top: 50%;
+  right: var(--e-sp-4);
+  left: var(--e-sp-4);
+  height: 24px;
+  transform: translateY(-50%);
+}
+
+.mod-face--slider .i-fill {
+  /* The fill spans the track inset by 4px (the rail parent sits 12px in), and
+     the reveal is paint-only: the clip's right cap lands at the handle centre,
+     square, tucked flush behind the handle; the left cap stays round. */
+  position: absolute;
+  top: 0;
+  right: -12px;
+  bottom: 0;
+  left: -12px;
+  background: color-mix(
+    in srgb,
+    var(--e-mod-face-accent, var(--e-mod)) 30%,
+    var(--e-surface-recessed)
+  );
+  clip-path: inset(
+    0
+    calc((100% - 24px) * (1 - var(--e-mod-face-ratio, 0)) + 12px)
+    0 0
+    round 999px 0 0 999px
+  );
+  pointer-events: none;
+}
+
+.mod-face--slider .i-detent {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--e-dot);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.mod-face--slider .i-travel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform: translateX(calc(var(--e-mod-face-ratio) * 100%));
+  will-change: transform;
+}
+
+.mod-face--slider .i-handle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--e-ink);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: background-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--slider .i-track.is-dragging .i-handle {
+  background: var(--e-mod-face-accent, var(--e-mod));
+}
+
+.mod-face-host[aria-disabled='true'] .i-track {
+  cursor: inherit;
+}
+
+@media (pointer: coarse) {
+  .mod-face--slider .i-track::before {
+    position: absolute;
+    inset: -4px 0;
+    content: '';
+  }
+}
+
+/* Dial row family (#767). */
+.mod-face--dial .i-dials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: var(--e-sp-3) var(--e-sp-2);
+}
+
+.mod-face--dial .i-dial {
+  position: relative;
+  display: flex;
+  width: 82px;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e-sp-1);
+}
+
+.mod-face--dial .i-dial-surface {
+  display: block;
+  width: 60px;
+  height: 60px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.mod-face--dial .i-dial-surface > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mod-face--dial .i-dial-surface:focus-visible {
+  border-radius: 50%;
+  outline: 1px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+.mod-face--dial .arc-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--e-ink) 13%, transparent);
+  stroke-linecap: round;
+  stroke-width: 6;
+}
+
+.mod-face--dial .arc-value {
+  fill: none;
+  stroke: var(--e-mod-face-accent, var(--e-mod));
+  stroke-linecap: round;
+  stroke-width: 6;
+}
+
+.mod-face--dial .core {
+  fill: var(--e-ink);
+  transition: fill var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--dial .needle {
+  stroke: var(--e-surface-card);
+  stroke-linecap: round;
+  stroke-width: 4.5;
+}
+
+.mod-face--dial .tick {
+  stroke: var(--e-dot);
+  stroke-linecap: round;
+  stroke-width: 1.6;
+}
+
+.mod-face--dial .i-dial.is-dragging .core {
+  fill: color-mix(in srgb, var(--e-ink) 88%, var(--e-mod-face-accent, var(--e-mod)));
+}
+
+.mod-face--dial .mod-sub,
+.mod-face--dial .mod-val {
+  max-width: 100%;
+  flex: none;
+  text-align: center;
+}
+
+.mod-face--dial .row-x {
+  top: -2px;
+  right: 2px;
+  transform: none;
+}
+
+.mod-face--dial .i-dial:hover .row-x,
+.mod-face--dial .i-dial:focus-within .row-x {
+  opacity: 1;
+}
+
+.mod-face-host[aria-disabled='true'] .i-dial-surface {
+  cursor: inherit;
+}
+
+/* Count row family (#767). */
+.mod-face--count .i-countrow {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--e-sp-3);
+}
+
+.mod-face--count .i-countrow .mod-sub {
+  flex: 1 1 auto;
+}
+
+.mod-face--count .i-count {
+  display: flex;
+  width: 122px;
+  height: 30px;
+  flex: none;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+}
+
+.mod-face--count .i-count-step {
+  width: 30px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--e-ink);
+  cursor: pointer;
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-micro);
+  line-height: 1;
+  transition: background-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--count .i-count-step:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--e-mod-face-accent, var(--e-mod)) 18%, transparent);
+}
+
+.mod-face--count .i-count-step:active:not(:disabled) {
+  background: color-mix(in srgb, var(--e-mod-face-accent, var(--e-mod)) 32%, transparent);
+}
+
+.mod-face--count .i-count-step:focus-visible {
+  outline: 1px solid var(--e-go);
+  outline-offset: -2px;
+}
+
+.mod-face--count .i-count-step:disabled {
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.mod-face--count .i-count .n {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  color: var(--e-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.mod-face--count .i-count .n i {
+  color: var(--e-ink-soft);
+  font-style: normal;
+  white-space: pre;
+}
+
+.mod-face--count .i-count-foot {
+  display: flex;
+  align-items: center;
+}
+
+.mod-face--count .count-mode {
+  min-height: 24px;
+  padding: 0 var(--e-sp-2);
+  border: 1px solid var(--e-ink);
+  border-radius: var(--e-r-chip);
+  background: transparent;
+  color: var(--e-ink);
+  cursor: pointer;
+}
+
+.mod-face--count .count-mode:hover:not(:disabled),
+.mod-face--count .count-mode:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--e-ink) 7%, transparent);
+}
+
+.mod-face--count .count-mode:focus-visible {
+  border-color: var(--e-go);
+}
+
+.mod-face--count .count-mode:disabled {
+  border-color: var(--e-line-strong);
+  color: var(--e-ink-faint);
+  cursor: default;
+}
+
+.mod-face--count .row-x {
+  top: -7px;
+  right: -4px;
+  transform: none;
+}
+
+/* Switch row family (#767). */
+.mod-face--switch .i-swrow {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--e-sp-3);
+}
+
+.mod-face--switch .i-swrow .mod-sub {
+  flex: 1 1 auto;
+}
+
+.mod-face--switch .i-switch {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+  cursor: pointer;
+  transition: background-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--switch .i-switch::after {
+  position: absolute;
+  top: var(--e-sp-1);
+  left: var(--e-sp-1);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--e-ink);
+  content: '';
+  transition:
+    transform var(--e-t-fast) var(--e-ease-out),
+    background-color var(--e-t-fast) var(--e-ease-out);
+  will-change: transform;
+}
+
+.mod-face--switch .i-switch.is-on {
+  background: var(--e-mod-face-accent, var(--e-mod));
+}
+
+.mod-face--switch .i-switch.is-on::after {
+  background: var(--e-surface-card);
+  transform: translateX(24px);
+}
+
+.mod-face--switch .i-switch:focus-visible {
+  outline: 1px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+.mod-face--switch .i-switch:disabled {
+  cursor: default;
+}
+
+.mod-face--switch .row-x {
+  top: -7px;
+  right: -4px;
+  transform: none;
+}
+

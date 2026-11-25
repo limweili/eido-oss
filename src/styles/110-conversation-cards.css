@@ -1,0 +1,42 @@
+
+/* ---- Conversation card --------------------------------------------------- */
+.card.conversation .kind-dot:not(.has-color) {
+  background: var(--e-convo);
+}
+
+/* ---- Conversation Result: the transcript --------------------------------- */
+.transcript {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-3);
+  max-height: 320px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+}
+.bubble-text.markdown > :first-child {
+  margin-top: 0;
+}
+.bubble-text.markdown > :last-child {
+  margin-bottom: 0;
+}
+.streaming-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: var(--e-sp-1);
+  border-radius: 50%;
+  background: var(--e-convo);
+  animation: pulse var(--e-t-stream) ease-in-out infinite;
+  vertical-align: middle;
+}
+:root[data-reduced-motion="true"] .streaming-dot {
+  animation: none !important;
+  opacity: 1;
+}
+/* The gap belongs between the dot and the words it trails. Standing alone as a
+   placeholder there are no words, so there is nothing to stand away from. */
+.result-text > .streaming-dot,
+.followup-bubble > .streaming-dot:first-child {
+  margin-left: 0;
+}

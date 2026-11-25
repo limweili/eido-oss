@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "scope": "#470",
+  "artifact": {
+    "class": "windows-signing-smoke",
+    "fileName": "Eido-Windows-Signing-Smoke-0.0.0-x64.exe",
+    "platform": "win32",
+    "arch": "x64",
+    "target": "nsis",
+    "version": "0.0.0",
+    "promotable": false,
+    "publishPolicy": "never"
+  },
+  "builder": {
+    "forceCodeSigning": true,
+    "verifyUpdateCodeSignature": true,
+    "publishArgument": "never"
+  },
+  "identityContract": {
+    "bindingStatus": "provider-unselected",
+    "providerClass": null,
+    "expectedPublisher": null,
+    "expectedCertificateThumbprintSha256": null,
+    "trustedTimestampRequired": true
+  },
+  "lifecycleContract": [
+    "install",
+    "launch",
+    "offline-launch",
+    "uninstall"
+  ],
+  "smartScreenContract": {
+    "reporting": [
+      "observed",
+      "not-measurable"
+    ],
+    "warningFreeRequired": false
+  }
+}

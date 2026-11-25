@@ -1,0 +1,777 @@
+{
+  "schemaVersion": 1,
+  "manifestKind": "release-planning",
+  "platforms": [
+    "darwin-arm64",
+    "win32-x64"
+  ],
+  "targets": [
+    {
+      "version": "0.1.0-alpha.8",
+      "sourceSha": "e27f1cc340f67457c3d938c64e6a730a868d724c",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "e27f1cc340f67457c3d938c64e6a730a868d724c",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:4edc8e264b301d2342220f189269f3d48002a2f5fc60df7014c846cfaab4b18a"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "e27f1cc340f67457c3d938c64e6a730a868d724c",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:678353298e7920cdc259f4a1210eef17a5a6b24e71f051addb3f0483e8f1b631"
+        }
+      ]
+    },
+    {
+      "version": "0.1.1",
+      "sourceSha": "6ba51738147262009345be0326140f7e7ea43a1a",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "6ba51738147262009345be0326140f7e7ea43a1a",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:54ada062295652baf1b23e674b3e71ce675cc83fc67e659ab1abe5e26fe5a108"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "6ba51738147262009345be0326140f7e7ea43a1a",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:dcd6bb6a3e4879b70d635e9f276fb6ce628442823763e817051a89216811a417"
+        }
+      ]
+    },
+    {
+      "version": "0.1.2",
+      "sourceSha": "4f3cdbcc9d1087aad8a16cced6c41edb03040409",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "4f3cdbcc9d1087aad8a16cced6c41edb03040409",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:dd2616d25c4201537dfd877ddef5e14aca5f6d88cba0160019e52a4a90b56235"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "4f3cdbcc9d1087aad8a16cced6c41edb03040409",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:9e8ba45c6648939fc0b25ed0fa31aa6795ef985bdc7bfe89176fc8021a0cc232"
+        }
+      ]
+    },
+    {
+      "version": "0.1.3",
+      "sourceSha": "3da22b4f08b42dd14aed46ea8e0cf4e578ffb964",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "3da22b4f08b42dd14aed46ea8e0cf4e578ffb964",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:edd99c0751fbd7833479e5989d3df2ed59c6c58bf18f0040749e06a2c0d4bd6a"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "3da22b4f08b42dd14aed46ea8e0cf4e578ffb964",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:2286932b647ab04fba67cb23cb17fdfbd6013fb2328830230e95c1907a3434a1"
+        }
+      ]
+    },
+    {
+      "version": "0.1.4",
+      "sourceSha": "de02effaa615d5868c19bb8f61a2bf4804c87a89",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "de02effaa615d5868c19bb8f61a2bf4804c87a89",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:c385cd4db6b1fd04cf985ecea7d2b8b87c212893dcd83d0241e851056623e4af"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "de02effaa615d5868c19bb8f61a2bf4804c87a89",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:c870ccf0b8f58126d5c7fc85a943c75f91132c2b89eea7a28e0ba97453e32030"
+        }
+      ]
+    },
+    {
+      "version": "0.1.5",
+      "sourceSha": "5538e90ea2a05541eb49b400a80820e3fa458b1c",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "5538e90ea2a05541eb49b400a80820e3fa458b1c",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:2b5079f3d37c4cc73823cc7c5a72a84dfb644a420e3ffb84ae4923e3f734ce4b"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "5538e90ea2a05541eb49b400a80820e3fa458b1c",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:7cffd9350bd7a2e22990f0fad3b0003e62d27e6d69d1350c9ac45d00dead6fb5"
+        }
+      ]
+    },
+    {
+      "version": "0.1.6",
+      "sourceSha": "8f36e7d7ef79dedd849b4819df8f0b04aaad48c6",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "8f36e7d7ef79dedd849b4819df8f0b04aaad48c6",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:401ece40ea4a582c941ba94475f4c2d7ee05f55e9968dfd8e71ddb2fb1cd5f61"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "8f36e7d7ef79dedd849b4819df8f0b04aaad48c6",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:c7f61cd940c4cccf447bdc4549cc44a329d41903568706203f2958a2a62c6dcb"
+        }
+      ]
+    },
+    {
+      "version": "0.1.7",
+      "sourceSha": "e9a3ace49fce8f4d4e330782fdf3d7c702b5b675",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "e9a3ace49fce8f4d4e330782fdf3d7c702b5b675",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:6bd82660226763490309ee5e92598b126024d810d1a306d6f294fb5ec8321242"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "e9a3ace49fce8f4d4e330782fdf3d7c702b5b675",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:d645e38c2993203d9bcae2e5d570ec282d0d5f01bc2850e1469b393007210a3d"
+        }
+      ]
+    },
+    {
+      "version": "0.1.8",
+      "sourceSha": "5c2b4fc38c1193ecdc487b9417c009dac28c0856",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "5c2b4fc38c1193ecdc487b9417c009dac28c0856",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:cfab9dae155d5ab7c6a6407b6f22cd816b75f6b3c83bbe540b1e00188e248eb5"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "5c2b4fc38c1193ecdc487b9417c009dac28c0856",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:e091a108663bd47302599276f91de20fe4739a3063e9617cd947bcabb242ce29"
+        }
+      ]
+    },
+    {
+      "version": "0.1.9",
+      "sourceSha": "81cb378514e9bf5ca68bc29600ec45864dd5a712",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "81cb378514e9bf5ca68bc29600ec45864dd5a712",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:222faac83aa4885f8143e7acfe6e0c6d196dae4cc0678376ee4fd05aa82b8d29"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "81cb378514e9bf5ca68bc29600ec45864dd5a712",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:dd0eeba6d9392886dbb4d54678ab7fa257db72816da529d36c01c123b13c334f"
+        }
+      ]
+    },
+    {
+      "version": "0.1.10",
+      "sourceSha": "791d42969bdd10cc7ffe34cfb3b1dcde7a05f792",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "791d42969bdd10cc7ffe34cfb3b1dcde7a05f792",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:841f4b0d24ed602e7828971b3b329d9c10f8955ba9d6f53b317fed1053597413"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "791d42969bdd10cc7ffe34cfb3b1dcde7a05f792",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:a8fc01ca5233579ce14ae2c4249b13c83ce6e406292507d24b30a2fa544cf155"
+        }
+      ]
+    },
+    {
+      "version": "0.1.11",
+      "sourceSha": "b8a5719fcc77e72d98869fd8504bdf4a1e8dc706",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "b8a5719fcc77e72d98869fd8504bdf4a1e8dc706",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:807dd21a6905b7708b2ea30cb9c158782d725030070e541538ccd858a04cf087"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "b8a5719fcc77e72d98869fd8504bdf4a1e8dc706",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:e3ac47ab3e84b4e410e93928ee749055edae16e0ef6c09bbc1c36a39cba87e30"
+        }
+      ]
+    },
+    {
+      "version": "0.1.12",
+      "sourceSha": "60c785df804239e36a3366431e877b209be1c990",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "60c785df804239e36a3366431e877b209be1c990",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:9f47168bb7f00b03c71a7ed4fc01a2b580e61aa0d9b60afc9af39650d703f2f5"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "60c785df804239e36a3366431e877b209be1c990",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:620cd18081d787cd8c7b1cc95d9d1cb446c9bde115ff7825bdadbe9c13e7b4f2"
+        }
+      ]
+    },
+    {
+      "version": "0.1.13",
+      "sourceSha": "b55aba6b5f9c9b0320501dd985e47cb0f10aa3ab",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "b55aba6b5f9c9b0320501dd985e47cb0f10aa3ab",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:0b4eae33908a40c5633ef981d1302f379ca397de444fd4e58ca23a31eda6846b"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "b55aba6b5f9c9b0320501dd985e47cb0f10aa3ab",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:3024f1b3f0b6c0583a32a46e2a873e9ddcd4c637144949685078d9c30297388a"
+        }
+      ]
+    },
+    {
+      "version": "0.1.14",
+      "sourceSha": "fbd8a5cb71ca611e0bee9eb868fa2b141176de70",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "fbd8a5cb71ca611e0bee9eb868fa2b141176de70",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:8df7901aaf573b4faecc75495a2d58f0edf04ec67d9f0e729663e6644344f574"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "fbd8a5cb71ca611e0bee9eb868fa2b141176de70",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:80a25d6e34ca4bfbf445e0d1cbdbd18e0b5d546a5f30e9df61f73fe86ab5f722"
+        }
+      ]
+    },
+    {
+      "version": "0.1.15",
+      "sourceSha": "ff8f6cac8a409487bd07c32619fe45e6d319f48e",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "ff8f6cac8a409487bd07c32619fe45e6d319f48e",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:f352e80129a1bcf8f1e8b024e2c00e74769ebbae150ce715fea96abb2a9539ac"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "ff8f6cac8a409487bd07c32619fe45e6d319f48e",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:1bd1260d9c34b71e7cba4e35f1118cd1eea9be5181f184f1eaa752c680d798c6"
+        }
+      ]
+    },
+    {
+      "version": "0.1.16",
+      "sourceSha": "9ebef357503ceced92a8c18a7d3bde8c43008c94",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "9ebef357503ceced92a8c18a7d3bde8c43008c94",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:15525cf5b8ef6648b75053c1554dc437998f139ab28df92430e710d77740d8e1"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "9ebef357503ceced92a8c18a7d3bde8c43008c94",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:d80857c5909df13f3b99479e93e3106d177847fb56c7951d462aa3e79994cd33"
+        }
+      ]
+    },
+    {
+      "version": "0.1.17",
+      "sourceSha": "6e7445bf777cf762b9d61545ad242bad4a7c5364",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "6e7445bf777cf762b9d61545ad242bad4a7c5364",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:283253578067179ff771f9790a6dc8c1c97dcaba4a4fd14041957937ad14f527"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "6e7445bf777cf762b9d61545ad242bad4a7c5364",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:b3798a57ff5ecf6065b8c2853edf1acb301958e44a43427e6ee229bfaffccb3d"
+        }
+      ]
+    },
+    {
+      "version": "0.1.18",
+      "sourceSha": "19392f35cb2a27fdeade2bc529ba97b0e2e73543",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "19392f35cb2a27fdeade2bc529ba97b0e2e73543",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:39133770efd17b83dba07d8f00bc0ea2e64e4b2494855fc2457048e8028b0ffd"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "19392f35cb2a27fdeade2bc529ba97b0e2e73543",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:61f97a7971a69f48ed31962dbdc1674cdf9c1c79b49b48d7a34345134330c1ef"
+        }
+      ]
+    },
+    {
+      "version": "0.1.19",
+      "sourceSha": "02a4b11fd02682e48020bf221155a57d2c534527",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "02a4b11fd02682e48020bf221155a57d2c534527",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:018c4cbb9fe3be270122fc172f107b16755d61a66d0eb943cdc8afb212ad02ee"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "02a4b11fd02682e48020bf221155a57d2c534527",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:35f0515079f179feb5400f4fa7e9d964bd9638b94ec5044bddd7dd6fe96aa5a5"
+        }
+      ]
+    },
+    {
+      "version": "0.1.20",
+      "sourceSha": "ea20d272dc5a9ef6e227ed49ff52625bf6fc5936",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "ea20d272dc5a9ef6e227ed49ff52625bf6fc5936",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:99b97c7009aaf9752e84ada27f6a86a6f69507a265b25b00fee3a76bfbfc8fc0"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "ea20d272dc5a9ef6e227ed49ff52625bf6fc5936",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:b2e9894021c24275c16b810ee719b77478465a3bd031f9f1919225baa9fee8c0"
+        }
+      ]
+    },
+    {
+      "version": "0.1.21",
+      "sourceSha": "d6f44b86ef2f2ee4f2c025513602f0a30da64123",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "d6f44b86ef2f2ee4f2c025513602f0a30da64123",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:b886828b2e234a7240f33de03bb910b7aaa0330a2a219f5a5f50bff876ac310c"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "d6f44b86ef2f2ee4f2c025513602f0a30da64123",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:5b09fcae3411b409d73442c38da181e1511df102b57398c4ea604a0b703c9df2"
+        }
+      ]
+    },
+    {
+      "version": "0.1.22",
+      "sourceSha": "a327cdc3405e03bd3d54321c283a12152bf21094",
+      "evidenceKind": "release-target",
+      "status": "promotable",
+      "promotable": true,
+      "toolchain": {
+        "source": "package.json",
+        "engines": {
+          "node": ">=24 <25",
+          "npm": ">=11 <12"
+        },
+        "volta": {
+          "node": "24.12.0",
+          "npm": "11.6.2"
+        }
+      },
+      "platformEvidence": [
+        {
+          "platform": "darwin-arm64",
+          "sourceSha": "a327cdc3405e03bd3d54321c283a12152bf21094",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:5a10a7ec082b724266327ac5f983de1174f55be5c40612adcc49705c329c5a16"
+        },
+        {
+          "platform": "win32-x64",
+          "sourceSha": "a327cdc3405e03bd3d54321c283a12152bf21094",
+          "evidenceKind": "sealed-candidate",
+          "digest": "sha256:49a593e85e4cf678ac6d637ebbfa633c464ebe376dc2c22d7eda5afb8809bdda"
+        }
+      ]
+    }
+  ],
+  "dependencyLedgerSchemaNote": "A resolved #528 entry requires an exact targetSha, a certificationSetId, and one or more unique evidence kinds addressed by lowercase sha256:<64-hex> digests. Unresolved carries no claimed set or evidence; a target-SHA mismatch is stale.",
+  "externalDependencies": [
+    {
+      "id": "profile-agent-packaged-certification",
+      "parentIssue": {
+        "number": 520,
+        "url": "https://github.com/limweili/eido/issues/520"
+      },
+      "issue": {
+        "number": 528,
+        "url": "https://github.com/limweili/eido/issues/528"
+      },
+      "state": "resolved",
+      "targetSha": "a327cdc3405e03bd3d54321c283a12152bf21094",
+      "certificationSetId": "eido-cert-v2-33154569845-1",
+      "evidence": [
+        {
+          "kind": "certification-manifest",
+          "digest": "sha256:8db6d7b553719b8cfd983475860313988c78116d0b4152623fe1738356c2cd0d"
+        },
+        {
+          "kind": "darwin-arm64-evidence",
+          "digest": "sha256:5a10a7ec082b724266327ac5f983de1174f55be5c40612adcc49705c329c5a16"
+        },
+        {
+          "kind": "win32-x64-evidence",
+          "digest": "sha256:49a593e85e4cf678ac6d637ebbfa633c464ebe376dc2c22d7eda5afb8809bdda"
+        }
+      ]
+    }
+  ]
+}

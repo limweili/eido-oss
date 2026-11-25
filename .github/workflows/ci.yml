@@ -1,0 +1,163 @@
+# Required integration proof for every PR and exact proof for every main commit.
+# Keep one always-reporting Required gate conclusion. A diff entirely inside
+# site/ reaches its static proof; every other diff uses the canonical app gate.
+name: CI
+
+on:
+  pull_request:
+    # No branch filter: stacked PRs need proof too. Retargeted PRs get a fresh
+    # synchronize event from the merge captain's required reconciliation push.
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Superseded PR runs are waste. Main runs use the immutable SHA as their group,
+# so a later merge can never cancel the verdict for an earlier merge commit.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('ci-pr-{0}', github.event.pull_request.number) || format('ci-sha-{0}', github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  scope:
+    name: Required gate scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    outputs:
+      marketing_only: ${{ steps.scope.outputs.marketing_only }}
+      reason: ${{ steps.scope.outputs.reason }}
+      classifier_outcome: ${{ steps.scope.outcome }}
+    steps:
+      # On a PR, checkout intentionally tests GitHub's synthetic merge ref: the
+      # head integrated with its base at run time. On push, this is the main SHA.
+      - name: Check out the tested ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Record the evidence identity
+        shell: bash
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          {
+            echo '### Evidence identity'
+            echo "- Checked-out SHA: $(git rev-parse HEAD)"
+            if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+              echo "- PR head SHA: $PR_HEAD_SHA"
+              echo "- PR base SHA at run time: $PR_BASE_SHA"
+              echo '- Proof type: GitHub synthetic merge ref'
+            else
+              echo '- Proof type: exact pushed SHA'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Set up Node for CI
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      - name: Select the proportionate CI lane
+        id: scope
+        continue-on-error: true
+        env:
+          EIDO_CHANGE_SCOPE_EVENT_NAME: ${{ github.event_name }}
+          EIDO_CHANGE_SCOPE_HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          EIDO_CHANGE_SCOPE_BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event_name == 'push' && github.event.before || '' }}
+        run: node scripts/ci/marketing-site-scope.mjs
+
+      - name: Report scope-classifier fallback
+        if: ${{ always() && steps.scope.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::warning::Marketing-site scope classification failed; the full-app Required lane will run."
+          echo 'Marketing-site scope classification failed, so CI is failing open to the full-app Required lane.' >> "$GITHUB_STEP_SUMMARY"
+
+  site:
+    name: Marketing site required lane
+    needs: scope
+    if: ${{ needs.scope.result == 'success' && needs.scope.outputs.classifier_outcome == 'success' && needs.scope.outputs.marketing_only == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Check out the tested ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node for CI
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      - name: Check the marketing site
+        run: node --test scripts/ci/site-static.test.mjs
+
+  full:
+    name: Full app required lane
+    needs: scope
+    if: ${{ always() && (needs.scope.result != 'success' || needs.scope.outputs.classifier_outcome != 'success' || needs.scope.outputs.marketing_only != 'true') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the tested ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      # This package script is the single source of truth. Merge Captain's
+      # disposable-worktree fallback invokes the same command, so the hosted
+      # and local definitions cannot quietly drift apart.
+      - name: Run the canonical required gate
+        run: npm run ci:required
+
+      # This is a release candidate, not an automatic deployment. Three-day
+      # retention bounds storage even at 50 merges/day.
+      - name: Preserve green-main release candidate
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-main-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 3
+
+  required:
+    name: Required gate
+    needs: [scope, site, full]
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Enforce selected required lane
+        shell: bash
+        env:
+          MARKETING_ONLY: ${{ needs.scope.outputs.marketing_only }}
+          CLASSIFIER_OUTCOME: ${{ needs.scope.outputs.classifier_outcome }}
+          SCOPE_RESULT: ${{ needs.scope.result }}
+          SITE_RESULT: ${{ needs.site.result }}
+          FULL_RESULT: ${{ needs.full.result }}
+        run: |
+          if [[ "$SCOPE_RESULT" == 'success' && "$CLASSIFIER_OUTCOME" == 'success' && "$MARKETING_ONLY" == 'true' ]]; then
+            test "$SCOPE_RESULT" = 'success'
+            test "$SITE_RESULT" = 'success'
+            test "$FULL_RESULT" = 'skipped'
+            echo 'Required gate passed through the marketing-site lane.'
+          else
+            test "$SITE_RESULT" = 'skipped'
+            test "$FULL_RESULT" = 'success'
+            echo 'Required gate passed through the canonical full-app lane.'
+          fi

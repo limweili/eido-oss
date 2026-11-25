@@ -1,0 +1,141 @@
+/* The Mod card title edits in place: an e-edit underline, never a boxed input.
+   Display and edit states share one flush box (the shared e-edit recipe), so
+   entering edit never shifts geometry. */
+.card.mod .mod-card-title,
+.card.mod .mod-card-title-input {
+  display: block;
+  min-width: 0;
+  flex: 1 1 auto;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  caret-color: var(--e-go);
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: none;
+  transition:
+    color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.card.mod .mod-card-title:hover {
+  border-bottom-color: var(--e-line-strong);
+}
+
+.card.mod .mod-card-title:focus-visible::before {
+  box-shadow: none;
+}
+
+.card.mod .mod-card-title:focus-visible {
+  border-bottom-color: var(--e-go);
+}
+
+.card.mod .mod-card-title-input:focus {
+  border-bottom-color: var(--e-go);
+  box-shadow: none;
+}
+
+/* The foot — the CONTEXT key lives at the card's bottom (main-app card grammar). */
+.card.mod .mod-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-top: auto;
+  padding: 9px 14px;
+  border-top: 1px solid var(--e-line);
+}
+
+.mod-ikey {
+  display: flex;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--e-ink);
+  border-radius: var(--e-r-chip);
+  background: transparent;
+  color: var(--e-ink);
+  cursor: pointer;
+  transition: background-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-ikey:hover {
+  background: color-mix(in srgb, var(--e-ink) 7%, transparent);
+}
+
+.mod-ikey:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 1px;
+}
+
+.mod-ikey svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+}
+
+.mod-context-popover {
+  width: calc(
+    var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-7) +
+    var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-3)
+  );
+  max-width: calc(100vw - var(--e-sp-4));
+  padding: var(--e-sp-3);
+}
+
+.mod-context-popover__heading {
+  margin-bottom: var(--e-sp-2);
+  color: var(--e-ink-soft);
+}
+
+.mod-context-popover__sentences {
+  display: grid;
+  gap: var(--e-sp-1);
+  margin-bottom: var(--e-sp-3);
+  padding: 0;
+  list-style: none;
+}
+
+.mod-context-popover__sentence {
+  color: var(--e-ink-soft);
+}
+
+.mod-context-popover__sentence b {
+  background: var(--card-header-soft);
+  color: var(--e-ink);
+}
+
+.mod-context-popover .acc-mark {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.75;
+  transition: transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-context-popover .e-acc.is-open .acc-mark {
+  transform: rotate(180deg);
+}
+
+.mod-context-popover__help {
+  margin-top: var(--e-sp-1);
+}
+
+/* The Mod colour popover is the standard card colour popover — the wrapper
+   adds no chrome of its own. */
+
+.mod-settings-popover {
+  width: calc(
+    var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-7) +
+    var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-3)
+  );
+  max-width: calc(100vw - var(--e-sp-4));
+  padding: var(--e-sp-3);
+}

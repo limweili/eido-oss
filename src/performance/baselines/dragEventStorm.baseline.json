@@ -1,0 +1,24 @@
+{
+  "name": "drag-event-storm",
+  "capturedFromCommit": "d49dcb2",
+  "capturedAt": "2026-07-06T15:47:24.337Z",
+  "config": {
+    "stormMs": 2000,
+    "stormHz": 500,
+    "longFrameMs": 25,
+    "boardCards": 60,
+    "viewportZoom": 0.8
+  },
+  "refreshHz": 59.88023952095833,
+  "metrics": {
+    "eventsDispatched": 1000,
+    "durationMs": 2029.1000000238419,
+    "commits": 394,
+    "commitsPerSec": 194.17475727927186,
+    "frames": 86,
+    "framesPerSec": 42.38332265486645,
+    "longFrames": 34,
+    "maxFrameGapMs": 35.29999999999973,
+    "p95FrameGapMs": 35.19999999999982
+  }
+}

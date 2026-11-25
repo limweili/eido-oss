@@ -1,0 +1,23 @@
+# Keep internal records and reference captures out of public source archives.
+docs/design/references/mod-redesign/*.png export-ignore
+docs/design/references/mod-redesign/*.webp export-ignore
+research/07-mod-design-prototypes/mod-instrument-redesign/references/*.png export-ignore
+research/07-mod-design-prototypes/mod-instrument-redesign/references/*.webp export-ignore
+research/04-activity-language/assets/eido-board-reference.png export-ignore
+research/15-berd-ai-harness-routing/berd-to-eido-visual-report.html export-ignore
+*.mhtml export-ignore
+release/planning/*-proof-transcript.txt export-ignore
+
+# Retired commercial and privacy research and development tooling.
+.codex/** export-ignore
+docs/monetization/** export-ignore
+docs/research/monetization/** export-ignore
+research/09-product-analytics/** export-ignore
+research/10-drybread-editorial/** export-ignore
+research/12-eu-uk-privacy-overlay/** export-ignore
+research/13-us-privacy-overlay/** export-ignore
+research/14-legal-and-trust/** export-ignore
+.agents/skills/stripe-*/** export-ignore
+.agents/skills/upgrade-stripe/** export-ignore
+.agents/skills/connect-recommend/** export-ignore
+.agents/skills/connect-required-verification-information/** export-ignore

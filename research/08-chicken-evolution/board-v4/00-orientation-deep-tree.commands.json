@@ -1,0 +1,295 @@
+[
+  {
+    "version": 1,
+    "id": "v4-orient-group",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "group",
+      "groupTitle": "ORIENTATION + DEEP LINEAGE",
+      "compressionPrompt": "Preserve the nested lineage, the Archosauria sibling split, convention warnings, confidence language, and every DOI link. Never turn a side branch into a direct ancestor.",
+      "position": { "x": 52, "y": -10000 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-title",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "title",
+      "body": "Chicken Research_4 · orientation and deep lineage",
+      "position": { "x": 52, "y": -20 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-guide",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**How to read this board**\n\nThe horizontal route is a nested lineage, not a march of progress. A strong connection marks a stable nesting claim; a weak connection marks a convention-dependent handoff. Fossils live on the separate side shelf. Archaeological dates and genomic model dates are never merged.",
+      "position": { "x": 80, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-root",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Animal-to-amniote backbone**\n\nEukaryota → Opisthokonta → Metazoa → Bilateria → Deuterostomia → Chordata → Vertebrata → Gnathostomata → Osteichthyes → Sarcopterygii → Tetrapoda → Amniota. Broad phylogenomics supports Chordata within deuterostomes and the bony-vertebrate-to-tetrapod spine. [Bourlat et al. 2006](https://doi.org/10.1038/nature05241); [Irisarri et al. 2017](https://doi.org/10.1038/s41559-017-0240-5)",
+      "position": { "x": 500, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-sauropsida",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Sauropsida → Sauria → Archelosauria**\n\nThe reptile-crown labels are definition-sensitive. Genomic evidence places turtles as the living sister lineage of archosaurs within Archelosauria; this is not a turtle-to-bird ancestor claim. [Crawford et al. 2015](https://doi.org/10.1016/j.ympev.2014.10.021)",
+      "position": { "x": 900, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-archosauria",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Archosauria — a sibling split**\n\nArchosauria divides into the crocodile line, Pseudosuchia, and the bird line, Avemetatarsalia. The chicken route continues through Avemetatarsalia. Neither living crocodilians nor bird-line archosaurs descend from the other sibling. [Nesbitt et al. 2017](https://doi.org/10.1038/nature22037)",
+      "position": { "x": 1300, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-crocodile-line",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Pseudosuchia · crocodile-line sibling**\n\nThis is the sister branch at the Archosauria split. It supplies comparative context for ancestral archosaur traits; it is not nested on the lineage to chickens.",
+      "position": { "x": 1300, "y": 480 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-avemetatarsalia",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Avemetatarsalia · bird-line archosaurs**\n\nThe bird line existed before Dinosauria. Early aphanosaur evidence shows that its first known members retained unexpected ankle and body combinations, so the branch should not be narrated as continuous ‘birdification.’ [Nesbitt et al. 2017](https://doi.org/10.1038/nature22037)",
+      "position": { "x": 1700, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-dinosauria",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Ornithodira → Dinosauromorpha → Dinosauriformes → Dinosauria**\n\nThese are nested landmarks on the bird-line route. Basal dinosaur topology remains hypothesis-dependent, but Dinosauria → Theropoda is the safe invariant used here. [Baron, Norman & Barrett 2017](https://doi.org/10.1038/nature21700); [Langer et al. 2017](https://doi.org/10.1038/nature24011)",
+      "position": { "x": 2100, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-theropod",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Theropoda → Neotheropoda → Averostra → Tetanurae → Coelurosauria**\n\nSustained miniaturization and unusually rapid anatomical innovation accumulated along the avian stem; small-bodied avialans were not produced by one sudden flight event. [Lee et al. 2014](https://doi.org/10.1126/science.1252243); [Benson et al. 2014](https://doi.org/10.1371/journal.pbio.1001853)",
+      "position": { "x": 2500, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-paraves",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Maniraptoriformes → Maniraptora → Pennaraptora → Paraves**\n\nComplex feathers and aerodynamic surfaces were distributed across neighboring paravian branches. Their presence outside Avialae does not establish one flight origin or one original feather function. [Xu et al. 2003](https://doi.org/10.1038/nature01342); [Hu et al. 2009](https://doi.org/10.1038/nature08322)",
+      "position": { "x": 2900, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-avialae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Avialae**\n\nThe lineage now includes early avialans and multiple extinct side experiments. Archaeopteryx-grade forms, Zhengheornis, and Baminornis belong on side branches in the fossil shelf—not as rungs that directly became chickens.",
+      "position": { "x": 3300, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-pygostylia",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Pygostylia → Ornithothoraces**\n\nThis crownward scaffold is retained without treating the disputed Baminornis element as a secure Jurassic pygostyle. Tail shortening is securely earlier than terminal fusion; exact membership can move when anatomy is recoded. [Wang et al. 2026](https://doi.org/10.1126/sciadv.aeb5202)",
+      "position": { "x": 3700, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-euornithes",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Euornithes / ornithuromorph line — convention-dependent**\n\nThis board uses a crownward waypoint before Ornithurae and crown birds. Euornithes and Ornithuromorpha are not universal synonyms, and fossil membership varies among matrices. Read the biological branch first and the label second.",
+      "position": { "x": 4100, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-crown",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Ornithurae → crown birds**\n\n‘Crown birds’ means the least inclusive clade containing all living birds. Many authors call it Neornithes; Aves is used both for this crown and more broadly. The living-tree zone expands the biological split without forcing one nomenclatural convention.",
+      "position": { "x": 4500, "y": 160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-group",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-group" }, "identity": { "preset": "blue", "fill": "pattern" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-guide",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-guide" }, "identity": { "preset": "charcoal", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-root",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-root" }, "identity": { "preset": "slate", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-sauropsida",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-sauropsida" }, "identity": { "preset": "slate", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-archosauria",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-archosauria" }, "identity": { "preset": "blue", "fill": "body" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-crocodile",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-crocodile-line" }, "identity": { "preset": "slate", "fill": "pattern" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-avemet",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-avemetatarsalia" }, "identity": { "preset": "sky", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-dinosauria",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-dinosauria" }, "identity": { "preset": "sky", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-theropod",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-theropod" }, "identity": { "preset": "blue", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-paraves",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-paraves" }, "identity": { "preset": "blue", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-avialae",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-avialae" }, "identity": { "preset": "mint", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-pygostylia",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-pygostylia" }, "identity": { "preset": "mint", "fill": "soft" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-euornithes",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-euornithes" }, "identity": { "preset": "amber", "fill": "pattern" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-id-crown",
+    "name": "card.set-identity",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-crown" }, "identity": { "preset": "green", "fill": "body" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-member-guide",
+    "name": "group.membership.set",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-orient-guide" }, "group": { "createdByCommandId": "v4-orient-group" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-orient-arrange",
+    "name": "cards.arrange",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "frames": [
+        { "card": { "createdByCommandId": "v4-orient-group" }, "position": { "x": 52, "y": 114 }, "size": { "width": 4816, "height": 616 } },
+        { "card": { "createdByCommandId": "v4-orient-title" }, "position": { "x": 52, "y": -20 }, "size": { "width": 800, "height": 82 } },
+        { "card": { "createdByCommandId": "v4-orient-guide" }, "position": { "x": 80, "y": 160 }, "size": { "width": 360, "height": 260 } },
+        { "card": { "createdByCommandId": "v4-orient-root" }, "position": { "x": 500, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-sauropsida" }, "position": { "x": 900, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-archosauria" }, "position": { "x": 1300, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-crocodile-line" }, "position": { "x": 1300, "y": 480 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-avemetatarsalia" }, "position": { "x": 1700, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-dinosauria" }, "position": { "x": 2100, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-theropod" }, "position": { "x": 2500, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-paraves" }, "position": { "x": 2900, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-avialae" }, "position": { "x": 3300, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-pygostylia" }, "position": { "x": 3700, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-euornithes" }, "position": { "x": 4100, "y": 160 }, "size": { "width": 340, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-orient-crown" }, "position": { "x": 4500, "y": 160 }, "size": { "width": 340, "height": 220 } }
+      ]
+    }
+  },
+  { "version": 1, "id": "v4-orient-edge-guide-root", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-guide" }, "to": { "createdByCommandId": "v4-orient-root" }, "strength": "weak", "polarity": "helps", "reason": "opens the board's nested lineage without turning it into a progress ladder" } },
+  { "version": 1, "id": "v4-orient-edge-root-sauropsida", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-root" }, "to": { "createdByCommandId": "v4-orient-sauropsida" }, "strength": "strong", "polarity": "helps", "reason": "nested amniote route toward the reptile crown" } },
+  { "version": 1, "id": "v4-orient-edge-sauropsida-archosauria", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-sauropsida" }, "to": { "createdByCommandId": "v4-orient-archosauria" }, "strength": "strong", "polarity": "helps", "reason": "Archelosauria contains Archosauria on the chicken route" } },
+  { "version": 1, "id": "v4-orient-edge-arch-croc", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-archosauria" }, "to": { "createdByCommandId": "v4-orient-crocodile-line" }, "strength": "strong", "polarity": "helps", "reason": "one sibling branch at the Archosauria split; not a chicken ancestor" } },
+  { "version": 1, "id": "v4-orient-edge-arch-avemet", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-archosauria" }, "to": { "createdByCommandId": "v4-orient-avemetatarsalia" }, "strength": "strong", "polarity": "helps", "reason": "the bird-line sibling continues toward Dinosauria and living birds" } },
+  { "version": 1, "id": "v4-orient-edge-avemet-dinosauria", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-avemetatarsalia" }, "to": { "createdByCommandId": "v4-orient-dinosauria" }, "strength": "strong", "polarity": "helps", "reason": "bird-line nesting through Ornithodira and dinosauromorph landmarks" } },
+  { "version": 1, "id": "v4-orient-edge-dinosauria-theropod", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-dinosauria" }, "to": { "createdByCommandId": "v4-orient-theropod" }, "strength": "strong", "polarity": "helps", "reason": "Dinosauria to Theropoda is the invariant route used despite basal-topology debate" } },
+  { "version": 1, "id": "v4-orient-edge-theropod-paraves", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-theropod" }, "to": { "createdByCommandId": "v4-orient-paraves" }, "strength": "strong", "polarity": "helps", "reason": "nested coelurosaur and maniraptoran route" } },
+  { "version": 1, "id": "v4-orient-edge-paraves-avialae", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-paraves" }, "to": { "createdByCommandId": "v4-orient-avialae" }, "strength": "strong", "polarity": "helps", "reason": "Avialae is one paravian branch; neighboring feathered taxa remain side relatives" } },
+  { "version": 1, "id": "v4-orient-edge-avialae-pygostylia", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-avialae" }, "to": { "createdByCommandId": "v4-orient-pygostylia" }, "strength": "strong", "polarity": "helps", "reason": "crownward avialan nesting without assigning side fossils as ancestors" } },
+  { "version": 1, "id": "v4-orient-edge-pygostylia-euornithes", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-pygostylia" }, "to": { "createdByCommandId": "v4-orient-euornithes" }, "strength": "weak", "polarity": "helps", "reason": "a convention-dependent crownward handoff rather than a universal rank sequence" } },
+  { "version": 1, "id": "v4-orient-edge-euornithes-crown", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-orient-euornithes" }, "to": { "createdByCommandId": "v4-orient-crown" }, "strength": "weak", "polarity": "helps", "reason": "the biological line reaches Ornithurae and crown birds while names remain convention-dependent" } }
+]

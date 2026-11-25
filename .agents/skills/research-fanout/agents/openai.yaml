@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research fanout"
+  short_description: "Coordinate low-cost parallel research lanes"
+  default_prompt: "Use $research-fanout with the configured coordinator and research worker tier to investigate this topic and deliver a visual teaching report."

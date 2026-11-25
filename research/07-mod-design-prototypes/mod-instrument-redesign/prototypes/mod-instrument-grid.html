@@ -1,0 +1,656 @@
+<title>Mod instrument grid — Capsule 03</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ————— Capsule design language, polished pass —————
+     Single deliberate light theme: instrument-flat on warm paper. */
+  :root{
+    --paper:#f6f5f1; --panel:#fffdf8; --ink:#2b2a27; --mut:#8a867e;
+    --line:#dedbd2; --line2:#eceade;
+    --acc-voice:#a946c8; --acc-shape:#3f78df; --acc-master:#24986a;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box; margin:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font:15px/1.5 -apple-system,'SF Pro Text','Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace}
+  button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 80px}
+
+  /* ————— name plate ————— */
+  .plate{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px}
+  .plate h1{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:22px;
+    letter-spacing:.14em; font-weight:700}
+  .plate .chip{font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.18em;
+    border:1.5px solid var(--ink); border-radius:999px; padding:3px 10px; font-weight:700}
+  .plate .note{margin-left:auto; color:var(--mut); font-size:12.5px}
+  .sub{color:var(--mut); font-size:13px; margin-bottom:22px}
+
+  /* ————— the rack ————— */
+  .rack{display:grid; grid-template-columns:1.15fr 84px 1.15fr 236px; gap:14px;
+    align-items:stretch}
+  @media (max-width:1020px){
+    .rack{grid-template-columns:1fr}
+    .strip{order:2} .module.shape{order:3} .master{order:4}
+  }
+
+  .module,.master{background:var(--panel); border:1.5px solid var(--line);
+    border-radius:16px; padding:16px 18px 18px; display:flex; flex-direction:column; gap:14px}
+
+  /* module title bar — the underlined divider from ref 08 */
+  .tbar{display:flex; align-items:baseline; gap:10px;
+    border-bottom:2px solid var(--ink); padding-bottom:7px}
+  .tbar b{font-family:ui-monospace,Menlo,monospace; font-size:13px; letter-spacing:.22em}
+  .tbar i{width:9px; height:9px; border-radius:50%; background:var(--acc); align-self:center}
+  .tbar .sm{margin-left:auto; color:var(--mut); font-size:10.5px;
+    font-family:ui-monospace,Menlo,monospace; letter-spacing:.14em}
+
+  /* ————— visualizer zone: bracketed like a scope window ————— */
+  .viz{position:relative; padding:12px 14px; min-height:150px; flex:1;
+    display:flex; flex-direction:column; justify-content:center}
+  .viz .ck{position:absolute; width:16px; height:16px; border-color:var(--ink); border-style:solid; border-width:0}
+  .viz .tl{top:0; left:0; border-top-width:2px; border-left-width:2px}
+  .viz .tr{top:0; right:0; border-top-width:2px; border-right-width:2px}
+  .viz .bl{bottom:0; left:0; border-bottom-width:2px; border-left-width:2px}
+  .viz .br{bottom:0; right:0; border-bottom-width:2px; border-right-width:2px}
+  .viz .tag{position:absolute; top:-7px; left:26px; background:var(--panel); padding:0 7px;
+    font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.2em; color:var(--mut)}
+  .viz canvas{display:block; width:100%; height:128px}
+  .viz svg{display:block; width:100%; flex:1; min-height:128px; max-height:220px}
+  .viz .cap{position:absolute; bottom:-6px; right:26px; background:var(--panel); padding:0 7px;
+    font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.16em; color:var(--mut)}
+
+  /* ————— rows ————— */
+  .row{display:flex; gap:10px; align-items:flex-start; justify-content:space-between}
+  .row.center{justify-content:space-around}
+  .foot{border-top:1.5px solid var(--line2); padding-top:12px; display:flex; gap:16px;
+    align-items:center; flex-wrap:wrap; margin-top:auto}
+
+  /* ————— dials ————— */
+  .dial{display:flex; flex-direction:column; align-items:center; gap:6px; user-select:none;
+    -webkit-user-select:none; touch-action:none; border-radius:12px; padding:6px 8px}
+  .dial label{font-family:ui-monospace,Menlo,monospace; font-size:10.5px; letter-spacing:.18em;
+    color:var(--ink); font-weight:700}
+  .dial .face{position:relative; cursor:ns-resize}
+  .dial svg{display:block}
+  .dial output{font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--mut);
+    font-variant-numeric:tabular-nums}
+  .dial.hero .face svg{width:96px; height:96px}
+  .dial.small .face svg{width:60px; height:60px}
+  .dial.small label{font-size:9.5px}
+  .dial.small output{font-size:11px}
+  .dial.wiredHi{box-shadow:0 0 0 2px var(--acc), 0 0 0 7px color-mix(in srgb,var(--acc) 14%, transparent)}
+  .pulse{animation:pul .7s ease-out 1}
+  @keyframes pul{0%{box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 55%, transparent)}
+    100%{box-shadow:0 0 0 14px transparent}}
+
+  /* ————— switches ————— */
+  .swrap{display:flex; align-items:center; gap:8px}
+  .swrap label{font-family:ui-monospace,Menlo,monospace; font-size:10.5px; letter-spacing:.16em; font-weight:700}
+  .sw{width:44px; height:24px; border:2px solid var(--ink); border-radius:999px; position:relative;
+    background:var(--panel); transition:background .18s}
+  .sw i{position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+    background:var(--ink); transition:left .18s, background .18s}
+  .sw.on{background:var(--acc)}
+  .sw.on i{left:22px; background:#fffdf8}
+
+  /* ————— stepper ————— */
+  .step{display:flex; align-items:center; gap:0; border:2px solid var(--ink); border-radius:999px;
+    overflow:hidden; height:28px}
+  .step button{width:30px; height:100%; font-family:ui-monospace,Menlo,monospace; font-weight:700;
+    font-size:15px; line-height:1}
+  .step button:hover{background:var(--line2)}
+  .step b{min-width:30px; text-align:center; font-family:ui-monospace,Menlo,monospace; font-size:13px;
+    border-left:2px solid var(--ink); border-right:2px solid var(--ink); height:100%;
+    display:flex; align-items:center; justify-content:center}
+  .gwrap{display:flex; align-items:center; gap:8px; border-radius:10px; padding:2px 6px}
+  .gwrap label{font-family:ui-monospace,Menlo,monospace; font-size:10.5px; letter-spacing:.16em; font-weight:700}
+  .gated{opacity:.32; filter:grayscale(1)}
+  .gated .step{pointer-events:none}
+
+  /* ————— segmented ————— */
+  .segwrap{display:flex; flex-direction:column; gap:6px; align-items:center}
+  .segwrap>label{font-family:ui-monospace,Menlo,monospace; font-size:10.5px; letter-spacing:.18em; font-weight:700}
+  .seg{display:flex; border:2px solid var(--ink); border-radius:999px; overflow:hidden}
+  .seg button{padding:5px 14px; font-family:ui-monospace,Menlo,monospace; font-size:11px;
+    letter-spacing:.12em; border-right:2px solid var(--ink)}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--acc); color:#fffdf8; font-weight:700}
+
+  /* ————— range (LENGTH) ————— */
+  .range{flex:1; min-width:220px; user-select:none; -webkit-user-select:none}
+  .range>label{font-family:ui-monospace,Menlo,monospace; font-size:10.5px; letter-spacing:.18em;
+    font-weight:700; display:block; text-align:center; margin-bottom:8px}
+  .rtrack{position:relative; height:26px; border:2px solid var(--ink); border-radius:999px;
+    margin:0 12px; touch-action:none}
+  .rfill{position:absolute; top:2px; bottom:2px; background:color-mix(in srgb,var(--acc) 22%, transparent);
+    border-radius:999px}
+  .rdet{position:absolute; top:50%; width:7px; height:7px; border-radius:50%; background:var(--line);
+    transform:translate(-50%,-50%)}
+  .rh{position:absolute; top:50%; width:20px; height:20px; border-radius:50%; background:var(--ink);
+    transform:translate(-50%,-50%); cursor:ew-resize; border:3px solid var(--panel);
+    box-shadow:0 0 0 2px var(--ink)}
+  .rlabels{position:relative; height:15px; margin:8px 12px 0}
+  .rlabels span{position:absolute; transform:translateX(-50%);
+    font-family:ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.1em;
+    color:var(--mut)}
+  .rlabels span.lit{color:var(--ink); font-weight:700}
+
+  /* ————— audience strip (the patch bay between modules) ————— */
+  .strip{display:flex; flex-direction:column; align-items:center; gap:8px; padding:16px 6px;
+    background:var(--panel); border:1.5px solid var(--line); border-radius:16px}
+  .strip>label{font-family:ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.2em;
+    font-weight:700; writing-mode:initial}
+  .jack{width:9px; height:9px; border:2px solid var(--ink); transform:rotate(45deg); background:var(--panel)}
+  .strip .wire{flex:0 0 14px; width:0; border-left:2px dashed var(--line)}
+  .aud{display:flex; flex-direction:column; gap:6px; width:100%}
+  .aud button{border:2px solid var(--ink); border-radius:999px; padding:7px 2px;
+    font-family:ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.12em; font-weight:700}
+  .aud button.on{background:var(--ink); color:var(--paper)}
+  .strip .why{font-size:9px; color:var(--mut); text-align:center;
+    font-family:ui-monospace,Menlo,monospace; letter-spacing:.08em; line-height:1.6}
+
+  /* ————— master column ————— */
+  .master .tbar{border-color:var(--ink)}
+  .meterCol{display:flex; gap:14px; align-items:center; justify-content:center}
+  .vmeter{display:flex; flex-direction:column-reverse; gap:3px; padding:8px 7px;
+    border:2px solid var(--ink); border-radius:10px}
+  .vmeter i{width:22px; height:7px; border-radius:2px; background:var(--line2)}
+  .vmeter i.lit{background:var(--acc)}
+  .mlabel{font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.16em;
+    color:var(--mut); text-align:center; line-height:1.7}
+  .mlabel b{display:block; color:var(--ink); font-size:15px}
+  .runrow{display:flex; flex-direction:column; gap:8px}
+  .btn{border:2px solid var(--ink); border-radius:999px; padding:9px 12px; text-align:center;
+    font-family:ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.16em; font-weight:700}
+  .btn:hover{background:var(--line2)}
+  .btn.acc{background:var(--acc); border-color:var(--acc); color:#fffdf8}
+  .btn.acc:hover{filter:brightness(1.06)}
+  .toast{font-size:10.5px; color:var(--mut); text-align:center; min-height:16px;
+    font-family:ui-monospace,Menlo,monospace}
+
+  /* ————— the drawer: compiled instruction, hidden while shaping ————— */
+  .drawer{margin-top:14px; background:var(--panel); border:1.5px solid var(--line); border-radius:16px;
+    overflow:hidden}
+  .drawer>button{width:100%; display:flex; align-items:center; gap:10px; padding:13px 18px;
+    font-family:ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.18em; font-weight:700}
+  .drawer>button:hover{background:var(--line2)}
+  .drawer>button .n{margin-left:auto; color:var(--mut); font-weight:400; letter-spacing:.08em}
+  .drawer>button .arr{transition:transform .2s}
+  .drawer.open>button .arr{transform:rotate(90deg)}
+  .dbody{display:none; padding:4px 18px 18px; }
+  .drawer.open .dbody{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+  @media (max-width:1020px){.drawer.open .dbody{grid-template-columns:1fr 1fr}}
+  .bucket h3{font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.2em;
+    color:var(--mut); border-bottom:1.5px solid var(--line2); padding-bottom:5px; margin-bottom:8px}
+  .bucket p{font-size:12.5px; line-height:1.55; padding:3px 0; border-left:2.5px solid var(--bc,var(--line));
+    padding-left:9px; margin-bottom:6px}
+  .bucket .none{color:var(--mut); font-style:italic; border:none; padding-left:0; font-size:12px}
+
+  .legend{margin-top:14px; color:var(--mut); font-size:11.5px; display:flex; gap:22px; flex-wrap:wrap;
+    font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em}
+</style>
+
+<div class="wrap">
+  <div class="plate">
+    <h1>WRITE-UP</h1>
+    <span class="chip">MOD · CAPSULE 03</span>
+    <span class="note">one state → a wave, a capsule, and the sentences. Turn anything.</span>
+  </div>
+  <p class="sub">Two modules and a master. The wave and the capsule are drawn only from the
+    controls — never from the AI. The compiled instruction stays folded below while you shape.</p>
+
+  <div class="rack">
+
+    <!-- ═══════════ MODULE 1 · VOICE ═══════════ -->
+    <section class="module voice" style="--acc:var(--acc-voice)">
+      <div class="viz">
+        <b class="ck tl"></b><b class="ck tr"></b><b class="ck bl"></b><b class="ck br"></b>
+        <span class="tag">SEMANTIC WAVE</span>
+        <canvas id="scope" width="640" height="256"></canvas>
+        <span class="cap" id="scopeCap">LIVE · FROM CONTROLS</span>
+      </div>
+      <div class="tbar"><i></i><b>VOICE</b><span class="sm">HOW IT SPEAKS</span></div>
+
+      <div class="row center">
+        <div class="dial hero" id="d-warmth"><label>WARMTH</label>
+          <div class="face"></div><output></output></div>
+        <div class="dial hero" id="d-pace"><label>PACE</label>
+          <div class="face"></div><output></output></div>
+        <div class="dial hero" id="d-detail"><label>DETAIL</label>
+          <div class="face"></div><output></output></div>
+      </div>
+
+      <div class="row center">
+        <div class="dial small" id="d-formality"><label>FORMALITY</label>
+          <div class="face"></div><output></output></div>
+        <div class="dial small" id="d-confidence"><label>CONFIDENCE</label>
+          <div class="face"></div><output></output></div>
+      </div>
+
+      <div class="foot">
+        <div class="swrap"><div class="sw" id="sw-examples"><i></i></div><label>EXAMPLES</label></div>
+        <div class="gwrap" id="g-howmany"><label>HOW MANY</label>
+          <div class="step" id="st-howmany"><button data-d="-1">−</button><b>2</b><button data-d="1">+</button></div>
+        </div>
+        <div class="swrap"><div class="sw" id="sw-hedge"><i></i></div><label>NO HEDGING</label></div>
+      </div>
+    </section>
+
+    <!-- ═══════════ PATCH BAY · AUDIENCE ═══════════ -->
+    <aside class="strip" id="strip" style="--acc:var(--acc-voice)">
+      <label>AUDIENCE</label>
+      <div class="jack"></div><div class="wire"></div>
+      <div class="aud" id="aud">
+        <button data-a="TEAM" class="on">TEAM</button>
+        <button data-a="CLIENT">CLIENT</button>
+        <button data-a="PUBLIC">PUBLIC</button>
+      </div>
+      <div class="wire"></div><div class="jack"></div>
+      <div class="why">SELECT WIRE<br>picks the frames<br>both sides use</div>
+    </aside>
+
+    <!-- ═══════════ MODULE 2 · SHAPE ═══════════ -->
+    <section class="module shape" style="--acc:var(--acc-shape)">
+      <div class="viz">
+        <b class="ck tl"></b><b class="ck tr"></b><b class="ck bl"></b><b class="ck br"></b>
+        <span class="tag">INSTRUCTION CAPSULE</span>
+        <svg id="capsule" viewBox="0 0 320 128" preserveAspectRatio="xMidYMid meet"></svg>
+        <span class="cap" id="capCap">0% FORMED</span>
+      </div>
+      <div class="tbar"><i></i><b>SHAPE</b><span class="sm">THE ANSWER'S FORM</span></div>
+
+      <div class="row">
+        <div class="range" id="r-length">
+          <label>LENGTH</label>
+          <div class="rtrack" id="rtrack">
+            <div class="rfill"></div>
+            <div class="rdet" style="left:6%"></div><div class="rdet" style="left:37.33%"></div>
+            <div class="rdet" style="left:68.66%"></div><div class="rdet" style="left:94%"></div>
+            <div class="rh" data-h="lo"></div><div class="rh" data-h="hi"></div>
+          </div>
+          <div class="rlabels"><span style="left:6%">LINE</span><span style="left:37.33%">PARA</span><span style="left:68.66%">PAGE</span><span style="left:94%">REPORT</span></div>
+        </div>
+      </div>
+
+      <div class="row center" style="align-items:center">
+        <div class="segwrap"><label>FORMAT</label>
+          <div class="seg" id="seg-format">
+            <button data-f="PROSE">PROSE</button><button data-f="LIST" class="on">LIST</button><button data-f="TABLE">TABLE</button>
+          </div>
+        </div>
+        <div class="gwrap"><label>SECTIONS</label>
+          <div class="step" id="st-structure"><button data-d="-1">−</button><b>3</b><button data-d="1">+</button></div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <div class="swrap"><div class="sw" id="sw-citations"><i></i></div><label>CITATIONS</label></div>
+        <div class="gwrap" id="g-sources"><label>SOURCES ≥</label>
+          <div class="step" id="st-sources"><button data-d="-1">−</button><b>2</b><button data-d="1">+</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ MASTER ═══════════ -->
+    <aside class="master" style="--acc:var(--acc-master)">
+      <div class="tbar"><i></i><b>MASTER</b></div>
+      <div class="row center">
+        <div class="dial hero" id="d-intensity"><label>INTENSITY</label>
+          <div class="face"></div><output></output></div>
+      </div>
+      <div class="meterCol">
+        <div class="vmeter" id="vmeter"></div>
+        <div class="mlabel">FORMED<b id="pct">0%</b><span id="spk">0 SPEAKING</span></div>
+      </div>
+      <div class="runrow" style="margin-top:auto">
+        <button class="btn" id="viewBtn">VIEW INSTRUCTION</button>
+        <button class="btn acc" id="runBtn">RUN ▸</button>
+        <div class="toast" id="toast"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ═══════════ the folded instruction ═══════════ -->
+  <div class="drawer" id="drawer">
+    <button id="drawerBtn"><span class="arr">▸</span> INSTRUCTION
+      <span class="n" id="drawerN">folded while shaping — the picture above is the feedback</span></button>
+    <div class="dbody" id="dbody"></div>
+  </div>
+
+  <div class="legend">
+    <span>dimmed = gated off by its switch</span>
+    <span>◇ audience strip = a select wire feeding both modules</span>
+    <span>drag dials vertically</span>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+document.addEventListener('animationend', e => e.target.classList?.remove('pulse'));
+
+/* ————— state: one object, every picture reads it ————— */
+const S = {
+  warmth:6, pace:5, detail:7, formality:4, confidence:8,
+  examples:true, howMany:2, hedge:false,
+  lengthLo:1, lengthHi:2, format:'LIST', structure:3,
+  citations:false, sources:2,
+  audience:'TEAM', intensity:6,
+};
+
+const LEN = ['a line','a paragraph','a page','a full report'];
+const LENPOS = [6, 37.33, 68.66, 94]; // % positions of the four detents
+
+const AUD = {
+  TEAM:   { reader:'the team',          warm:'Write like a close teammate — warmth {value} of 10.' },
+  CLIENT: { reader:'a client',          warm:'Warm but professional — warmth {value} of 10.' },
+  PUBLIC: { reader:'a general reader',  warm:'Approachable for anyone — warmth {value} of 10.' },
+};
+
+/* ————— emission: pure state → sentences (the hidden compiler) ————— */
+const B = ['BACKGROUND','BOUNDARIES','HOW TO APPROACH IT','THE ANSWER'];
+function emitAll(){
+  const R = k => Math.round(S[k]);   // dials are spoken as whole numbers
+  const paceWord = R('pace')<=3?'unhurried':R('pace')<=7?'measured':'brisk';
+  const intWord  = R('intensity')<=3?'gently':R('intensity')<=7?'firmly':'strictly';
+  const L = [
+    {b:0, t:`The reader is ${AUD[S.audience].reader}.`, src:'aud'},
+    {b:2, t:`Apply these settings ${intWord}.`, src:'int'},
+    {b:2, t:AUD[S.audience].warm.replace('{value}', R('warmth')), src:'warmth'},
+    {b:2, t:`Pace: ${R('pace')} of 10 — ${paceWord}.`, src:'pace'},
+    {b:2, t:`Detail: ${R('detail')} of 10.`, src:'detail'},
+    {b:2, t:`Formality: ${R('formality')} of 10.`, src:'formality'},
+    {b:2, t:`Take positions with confidence ${R('confidence')} of 10.`, src:'confidence'},
+    S.examples ? {b:3, t:`Give exactly ${S.howMany} example${S.howMany===1?'':'s'}.`, src:'ex'} : null,
+    S.hedge ? {b:1, t:`Do not hedge.`, src:'hedge'} : null,
+    {b:3, t: S.lengthLo===S.lengthHi ? `Length: about ${LEN[S.lengthLo]}.`
+            : `Length: between ${LEN[S.lengthLo]} and ${LEN[S.lengthHi]}.`, src:'len'},
+    {b:3, t: S.format==='PROSE'?'Answer in flowing prose.'
+           : S.format==='LIST' ?'Answer as a bulleted list.'
+           : 'Put the answer in a table.', src:'fmt'},
+    {b:3, t:`Organize into exactly ${S.structure} section${S.structure===1?'':'s'}.`, src:'str'},
+    S.citations ? {b:1, t:`Cite sources — at least ${S.sources}.`, src:'cit'} : null,
+  ];
+  return L.filter(Boolean);
+}
+const MAX_LINES = 13;
+
+/* ————— generic vertical-drag helper ————— */
+function vdrag(el, get, set){
+  el.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    el.setPointerCapture(e.pointerId);
+    const y0 = e.clientY, v0 = get();
+    const move = ev => set(Math.max(0, Math.min(10, v0 + (y0 - ev.clientY) / 14)));
+    const up = () => { el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  });
+}
+
+/* ————— dials: arc of dot detents + needle + a picture in the face ————— */
+const DIALS = [];
+function mkDial(id, key, faceKind){
+  const root = document.getElementById(id);
+  const hero = root.classList.contains('hero');
+  const sz = hero ? 96 : 60, c = sz/2, rArc = c-4, rDot = hero?3:2.2;
+  const face = root.querySelector('.face');
+  const dots = [];
+  for(let i=0;i<=10;i++){
+    const a = (-225 + i*27) * Math.PI/180;
+    dots.push(`<circle class="det" data-i="${i}" cx="${c + rArc*Math.cos(a)}" cy="${c + rArc*Math.sin(a)}" r="${rDot}"/>`);
+  }
+  face.innerHTML = `<svg viewBox="0 0 ${sz} ${sz}">
+      <g class="detg">${dots.join('')}</g>
+      <circle cx="${c}" cy="${c}" r="${c-(hero?14:10)}" fill="none" stroke="var(--ink)" stroke-width="2"/>
+      <g class="pict"></g>
+      <line class="needle" x1="${c}" y1="${c}" x2="${c}" y2="${hero?18:13}"
+        stroke="var(--ink)" stroke-width="${hero?3:2.5}" stroke-linecap="round"/>
+    </svg>`;
+  const svg = face.querySelector('svg'), pict = svg.querySelector('.pict'),
+        needle = svg.querySelector('.needle'), out = root.querySelector('output');
+  const d = { root, key, update(){
+    const v = S[key];
+    needle.setAttribute('transform', `rotate(${-135 + v/10*270} ${c} ${c})`);
+    svg.querySelectorAll('.det').forEach(el => {
+      el.setAttribute('fill', +el.dataset.i <= Math.round(v) ? 'var(--acc)' : 'var(--line)');
+    });
+    out.textContent = `${(Math.round(v*10)/10).toFixed(1)} / 10`;
+    /* the picture inside the face — the control drawing its own value */
+    if(faceKind==='glow'){
+      pict.innerHTML = `<circle cx="${c}" cy="${c}" r="${6 + v*1.9}" fill="var(--acc)" opacity="${0.12 + v/10*0.5}"/>`;
+    } else if(faceKind==='rings'){
+      const n = 1 + Math.round(v/2.5);
+      pict.innerHTML = Array.from({length:n}, (_,i) =>
+        `<circle cx="${c}" cy="${c}" r="${5 + i*(22/Math.max(n,2))}" fill="none" stroke="var(--acc)"
+           stroke-width="1.5" opacity="${0.75 - i*0.14}"/>`).join('');
+    } else if(faceKind==='dots'){
+      const lit = Math.round(v/10*12);
+      pict.innerHTML = Array.from({length:12}, (_,i) => {
+        const a = (i/12*360 - 90) * Math.PI/180, r = c-(hero?26:18);
+        return `<circle cx="${c + r*Math.cos(a)}" cy="${c + r*Math.sin(a)}" r="2.6"
+          fill="${i<lit ? 'var(--acc)' : 'var(--line)'}"/>`;
+      }).join('');
+    }
+  }};
+  vdrag(face, () => S[key], v => { S[key] = v; refresh(); });
+  DIALS.push(d);
+  return d;
+}
+mkDial('d-warmth','warmth','glow');
+mkDial('d-pace','pace','rings');
+mkDial('d-detail','detail','dots');
+mkDial('d-formality','formality');
+mkDial('d-confidence','confidence');
+mkDial('d-intensity','intensity','glow');
+
+/* ————— switches ————— */
+function mkSwitch(id, key){
+  const el = document.getElementById(id);
+  el.addEventListener('click', () => { S[key] = !S[key]; refresh(); });
+  return { update(){ el.classList.toggle('on', S[key]); } };
+}
+const SWS = [ mkSwitch('sw-examples','examples'), mkSwitch('sw-hedge','hedge'),
+              mkSwitch('sw-citations','citations') ];
+
+/* ————— steppers ————— */
+function mkStep(id, key, min, max){
+  const el = document.getElementById(id), num = el.querySelector('b');
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    S[key] = Math.max(min, Math.min(max, S[key] + +b.dataset.d)); refresh();
+  }));
+  return { update(){ num.textContent = S[key]; } };
+}
+const STEPS = [ mkStep('st-howmany','howMany',1,9), mkStep('st-structure','structure',1,7),
+                mkStep('st-sources','sources',1,9) ];
+
+/* ————— format segmented ————— */
+$('#seg-format').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  S.format = b.dataset.f; refresh();
+});
+
+/* ————— length range: two handles snapping on four detents ————— */
+const rtrack = $('#rtrack');
+function mkRangeHandle(el, key){
+  el.addEventListener('pointerdown', e => {
+    e.preventDefault(); el.setPointerCapture(e.pointerId);
+    const move = ev => {
+      const r = rtrack.getBoundingClientRect();
+      const pct = (ev.clientX - r.left) / r.width * 100;
+      let best = 0, bd = 1e9;
+      LENPOS.forEach((p,i) => { const d = Math.abs(p-pct); if(d<bd){bd=d; best=i;} });
+      if(key==='lengthLo') S.lengthLo = Math.min(best, S.lengthHi);
+      else S.lengthHi = Math.max(best, S.lengthLo);
+      refresh();
+    };
+    const up = () => { el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up); el.removeEventListener('pointercancel', up); };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up);
+  });
+}
+mkRangeHandle($('.rh[data-h=lo]'), 'lengthLo');
+mkRangeHandle($('.rh[data-h=hi]'), 'lengthHi');
+
+/* ————— audience strip: the select wire ————— */
+$('#aud').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  S.audience = b.dataset.a; refresh();
+  /* show the wire acting: pulse what it re-frames */
+  ['d-warmth'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+  });
+});
+const strip = $('#strip');
+strip.addEventListener('pointerenter', () => $('#d-warmth').classList.add('wiredHi'));
+strip.addEventListener('pointerleave', () => $('#d-warmth').classList.remove('wiredHi'));
+document.addEventListener('pointerdown', e => {
+  if(!strip.contains(e.target)) $('#d-warmth').classList.remove('wiredHi');
+});
+
+/* ————— semantic wave (canvas, rAF, pure function of S) ————— */
+const scope = $('#scope'), sctx = scope.getContext('2d');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const accVoice = getComputedStyle(document.documentElement).getPropertyValue('--acc-voice').trim();
+function drawScope(t){
+  const W = scope.width, H = scope.height, mid = H/2;
+  sctx.clearRect(0,0,W,H);
+  /* faint ruled field */
+  sctx.strokeStyle = 'rgba(43,42,39,.08)'; sctx.lineWidth = 1;
+  for(let gy=0; gy<=4; gy++){ sctx.beginPath(); sctx.moveTo(0, gy*H/4); sctx.lineTo(W, gy*H/4); sctx.stroke(); }
+  const A = 10 + S.warmth/10 * (H*0.30);          // warmth → amplitude
+  const k = 1.2 + S.pace/10 * 3.2;                // pace → frequency
+  const det = S.detail/10;                        // detail → fine ripple
+  const jit = (10-S.confidence)/10;               // low confidence → wobble
+  const q = S.formality>5 ? (S.formality-5)*4 : 0;  // high formality → the wave snaps to a grid
+  for(let layer=0; layer<3; layer++){
+    sctx.beginPath();
+    const ph = t*0.0011 + layer*0.9;
+    for(let x=0; x<=W; x+=2){
+      const u = x/W * Math.PI*2 * k;
+      let y = Math.sin(u+ph)*A;
+      y += Math.sin(u*6 + ph*2.1) * A*0.35*det;
+      y += Math.sin(u*11 - ph*1.4) * Math.sin(u*3.7+ph) * A*0.30*jit;
+      y *= 1 - layer*0.22;
+      if(q) y = Math.round(y/q)*q;
+      x===0 ? sctx.moveTo(x, mid+y) : sctx.lineTo(x, mid+y);
+    }
+    sctx.strokeStyle = accVoice;
+    sctx.globalAlpha = [0.9, 0.38, 0.16][layer];
+    sctx.lineWidth = [2.4, 2, 1.6][layer];
+    sctx.stroke();
+    sctx.globalAlpha = 1;
+  }
+}
+if(reduceMotion){ drawScope(0); }
+else (function loop(t){ drawScope(t||0); requestAnimationFrame(loop); })();
+
+/* ————— instruction capsule (SVG, redrawn on change) ————— */
+const capSvg = $('#capsule');
+function drawCapsule(){
+  const lines = emitAll(), done = lines.length / MAX_LINES;
+  const w = 130 + S.lengthHi*46, h = 92, x = (320-w)/2, y = (128-h)/2, rx = 26;
+  const dash = done >= 0.99 ? 'none' : `${4 + done*22} ${9 - done*7.5}`;
+  let inner = '';
+  /* structure → skeleton dividers */
+  for(let i=1; i<S.structure; i++){
+    const ly = y + h*i/S.structure;
+    inner += `<line x1="${x+14}" y1="${ly}" x2="${x+w-14}" y2="${ly}"
+      stroke="var(--acc-shape)" stroke-width="1.5" opacity=".55"/>`;
+  }
+  /* format → the fill texture of each section */
+  const secH = h/S.structure;
+  for(let s=0; s<S.structure; s++){
+    const sy = y + secH*s;
+    if(S.format==='PROSE'){
+      for(let r=0; r<Math.max(1,Math.floor(secH/12)); r++){
+        const ry = sy + 8 + r*11;
+        if(ry > sy+secH-5) break;
+        inner += `<path d="M ${x+16} ${ry} q ${w/4} -3 ${w/2-16} 0 q ${w/4} 3 ${w/2-16} 0"
+          fill="none" stroke="var(--acc-shape)" stroke-width="1.3" opacity="${0.25+done*0.4}"/>`;
+      }
+    } else if(S.format==='LIST'){
+      for(let r=0; r<Math.max(1,Math.floor(secH/12)); r++){
+        const ry = sy + 9 + r*11;
+        if(ry > sy+secH-4) break;
+        inner += `<circle cx="${x+20}" cy="${ry}" r="2" fill="var(--acc-shape)" opacity="${0.35+done*0.4}"/>
+          <line x1="${x+28}" y1="${ry}" x2="${x+w*0.72}" y2="${ry}"
+          stroke="var(--acc-shape)" stroke-width="2" opacity="${0.25+done*0.4}"/>`;
+      }
+    } else { /* TABLE */
+      const cols = 3;
+      for(let cix=1; cix<cols; cix++){
+        inner += `<line x1="${x+14 + (w-28)*cix/cols}" y1="${sy+4}" x2="${x+14 + (w-28)*cix/cols}"
+          y2="${sy+secH-4}" stroke="var(--acc-shape)" stroke-width="1.2" opacity="${0.3+done*0.35}"/>`;
+      }
+    }
+  }
+  /* citations → anchor dots along the keel */
+  if(S.citations){
+    for(let i=0; i<S.sources; i++){
+      inner += `<rect x="${x+w-18 - i*11}" y="${y+h-9}" width="6" height="6" rx="1.5"
+        transform="rotate(45 ${x+w-15-i*11} ${y+h-6})" fill="var(--acc-shape)"/>`;
+    }
+  }
+  capSvg.innerHTML = `
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}"
+      fill="var(--acc-shape)" opacity="${0.05 + done*0.09}"/>
+    ${inner}
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="none"
+      stroke="var(--acc-shape)" stroke-width="2.5" ${dash==='none'?'':`stroke-dasharray="${dash}"`}/>`;
+  $('#capCap').textContent = `${Math.round(done*100)}% FORMED`;
+  return { lines, done };
+}
+
+/* ————— drawer + master ————— */
+$('#drawerBtn').addEventListener('click', () => { $('#drawer').classList.toggle('open'); refresh(); });
+$('#viewBtn').addEventListener('click', () => {
+  $('#drawer').classList.add('open');
+  $('#drawer').scrollIntoView({behavior: reduceMotion?'auto':'smooth', block:'nearest'});
+});
+$('#runBtn').addEventListener('click', () => {
+  $('#toast').textContent = 'queued — review is a separate phase';
+  setTimeout(() => $('#toast').textContent = '', 2600);
+});
+const vmeter = $('#vmeter');
+vmeter.innerHTML = '<i></i>'.repeat(12);
+
+const BC = ['#8f9aa3','#d76519','#24986a','#3f78df']; // bucket edge colors from the card palette
+function refresh(){
+  DIALS.forEach(d => d.update());
+  SWS.forEach(s => s.update());
+  STEPS.forEach(s => s.update());
+  /* gates made visible: dimming, exactly like ref 08's RATE/NUDGE under SYNC */
+  $('#g-howmany').classList.toggle('gated', !S.examples);
+  $('#g-sources').classList.toggle('gated', !S.citations);
+  /* format buttons */
+  $$('#seg-format button').forEach(b => b.classList.toggle('on', b.dataset.f===S.format));
+  $$('#aud button').forEach(b => b.classList.toggle('on', b.dataset.a===S.audience));
+  /* length range */
+  const lo = LENPOS[S.lengthLo], hi = LENPOS[S.lengthHi];
+  $('.rh[data-h=lo]').style.left = lo+'%';
+  $('.rh[data-h=hi]').style.left = hi+'%';
+  const fill = $('.rfill'); fill.style.left = lo+'%'; fill.style.width = (hi-lo)+'%';
+  $$('.rlabels span').forEach((sp,i) => sp.classList.toggle('lit', i>=S.lengthLo && i<=S.lengthHi));
+  /* capsule + master meter + drawer */
+  const { lines, done } = drawCapsule();
+  $('#pct').textContent = Math.round(done*100)+'%';
+  $('#spk').textContent = lines.length+' SPEAKING';
+  vmeter.querySelectorAll('i').forEach((seg,i) => seg.classList.toggle('lit', i < Math.round(done*12)));
+  $('#drawerN').textContent = $('#drawer').classList.contains('open')
+    ? lines.length+' sentences · 4 sections'
+    : 'folded while shaping — the picture above is the feedback';
+  $('#dbody').innerHTML = B.map((name,bi) => {
+    const rows = lines.filter(l => l.b===bi);
+    return `<div class="bucket"><h3>${name}</h3>${
+      rows.length ? rows.map(l => `<p style="--bc:${BC[bi]}">${l.t}</p>`).join('')
+                  : '<p class="none">nothing yet</p>'}</div>`;
+  }).join('');
+  if(reduceMotion) drawScope(0);
+}
+refresh();
+</script>

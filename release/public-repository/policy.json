@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "repository": {
+    "fullName": "limweili/eido-releases",
+    "owner": "limweili",
+    "name": "eido-releases",
+    "visibility": "public",
+    "defaultBranch": "main",
+    "description": "Public Eido desktop releases. Free GPL-3.0-only software; corresponding source at github.com/limweili/eido.",
+    "archived": false,
+    "features": {
+      "issues": true,
+      "projects": false,
+      "wiki": false,
+      "discussions": false
+    },
+    "mergePolicy": {
+      "allowSquashMerge": true,
+      "allowMergeCommit": false,
+      "allowRebaseMerge": false,
+      "deleteBranchOnMerge": true
+    }
+  },
+  "template": {
+    "directory": "release/public-repository/template",
+    "commitMessage": "chore: publish Eido GPLv3 release policy",
+    "allowedPaths": [
+      ".github/ISSUE_TEMPLATE/config.yml",
+      ".nojekyll",
+      "LICENSE",
+      "README.md",
+      "RELEASE_POLICY.md",
+      "SECURITY.md",
+      "SOURCE_AND_LICENSE_NOTICE.md",
+      "SUPPORT.md",
+      "index.html"
+    ],
+    "sha256": {
+      ".github/ISSUE_TEMPLATE/config.yml": "3be2d71cf179290a4bea606d17eaf0cdc523b199ad003462b08c4e99473d393a",
+      ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "LICENSE": "fb981668c18a279e285fc4d83fba1e836cc84dd4daa73c9697d3cfd2d8aca6e0",
+      "README.md": "a324de689aab69b7436378b992df662af84dd6f0491668d91271b0d6ced3ad49",
+      "RELEASE_POLICY.md": "2ca2e680962ac945b1b750e9d65954ea3a88f159bfdb0e633be0cba76becc682",
+      "SECURITY.md": "2751b647309ae297c8ede9925a241a743e6a16822b358ae71bf5f7f16615f2a9",
+      "SOURCE_AND_LICENSE_NOTICE.md": "40aec660b8f09425bccda19bf7e6e4150ff3753f2188f0935735692cb662dd04",
+      "SUPPORT.md": "0108337ed6aa3bb581bce8e6b4451a7604e13dfa4ab36908b4359681cefbc0c4",
+      "index.html": "e90ae69bbfcb1f8761f45b89b9a53b6ec357fcc9081fa33b45352d6dfb06af52"
+    }
+  },
+  "content": {
+    "requireNoReleases": false,
+    "requireNoTags": false,
+    "forbiddenExtensions": [
+      ".7z",
+      ".app",
+      ".asar",
+      ".blockmap",
+      ".dmg",
+      ".exe",
+      ".map",
+      ".msi",
+      ".msix",
+      ".node",
+      ".pkg",
+      ".sqlite",
+      ".sqlite3",
+      ".zip"
+    ],
+    "forbiddenPathPatterns": [
+      "eido-v3-ideas.json",
+      "package-lock.json",
+      "src/",
+      "dist/",
+      "private/"
+    ]
+  },
+  "immutableReleases": {
+    "enabled": true
+  },
+  "actions": {
+    "enabled": true,
+    "allowedActions": "selected",
+    "shaPinningRequired": true,
+    "githubOwnedAllowed": true,
+    "verifiedAllowed": false,
+    "patternsAllowed": [],
+    "defaultWorkflowPermissions": "read",
+    "canApprovePullRequestReviews": false,
+    "retentionDays": 90
+  },
+  "mainRuleset": {
+    "name": "protect-main",
+    "target": "branch",
+    "enforcement": "active",
+    "conditions": {
+      "include": [
+        "refs/heads/main"
+      ],
+      "exclude": []
+    },
+    "bypassActors": [],
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "requiredApprovingReviewCount": 0,
+          "dismissStaleReviewsOnPush": true,
+          "requireCodeOwnerReview": false,
+          "requireLastPushApproval": false,
+          "requiredReviewThreadResolution": true
+        }
+      }
+    ]
+  },
+  "promotionEnvironment": {
+    "name": "release-promotion",
+    "preventSelfReview": false,
+    "requiredReviewers": [
+      "limweili"
+    ],
+    "protectedBranches": true,
+    "customBranchPolicies": false,
+    "requiredSecrets": []
+  },
+  "ownerEvidence": {
+    "promotionEnvironmentAdminBypassDisabled": {
+      "required": true,
+      "observer": "limweili",
+      "settingsUrl": "https://github.com/limweili/eido-releases/settings/environments/release-promotion",
+      "evidenceKind": "github-environment-settings-capture",
+      "control": "promotionEnvironmentAdminBypassDisabled",
+      "captureUrlPrefix": "https://github.com/user-attachments/assets/",
+      "maxAgeHours": 24,
+      "maxFutureSkewMinutes": 5
+    }
+  },
+  "sourceEnvironment": {
+    "repository": "limweili/eido",
+    "name": "release-publish",
+    "protection": {
+      "protectedBranches": false,
+      "customBranchPolicies": true,
+      "allowedBranches": [
+        "main"
+      ]
+    },
+    "requiredVariables": {
+      "EIDO_RELEASE_APP_ID": null,
+      "EIDO_RELEASE_REPOSITORY": "limweili/eido-releases"
+    },
+    "requiredSecrets": [
+      "EIDO_RELEASE_APP_PRIVATE_KEY"
+    ]
+  },
+  "githubApp": {
+    "slug": "eido-release-publisher-limweili",
+    "repositorySelection": "selected",
+    "repositories": [
+      "limweili/eido-releases"
+    ],
+    "forbiddenRepositories": [
+      "limweili/eido"
+    ],
+    "permissions": {
+      "contents": "write",
+      "metadata": "read"
+    },
+    "events": []
+  },
+  "privateVulnerabilityReporting": {
+    "enabled": true
+  }
+}

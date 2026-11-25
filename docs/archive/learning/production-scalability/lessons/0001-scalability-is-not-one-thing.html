@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scalability Is Not One Thing</title>
+    <link rel="stylesheet" href="../assets/course.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="eyebrow">Lesson 0001</div>
+        <h1>Scalability Is Not One Thing</h1>
+        <p class="lede">Your founder job is not to ask agents for "production-grade scalability." Your job is to name which kind of scale pressure the feature creates.</p>
+      </header>
+
+      <section class="rule">
+        <p><strong>One sentence to remember:</strong> mature repos scale by turning expensive questions into explicit projections, indexes, run records, or service boundaries.</p>
+      </section>
+
+      <h2>The Five Scalability Lenses</h2>
+      <div class="swimlane">
+        <div class="lane">
+          <strong>Editor State</strong>
+          <p>tldraw: many records and relationships stay responsive through typed stores, migrations, bindings, culling, and incremental derivations.</p>
+        </div>
+        <div class="lane">
+          <strong>Render Simplicity</strong>
+          <p>Excalidraw: the canvas feels fast because the scene, static render, interactive overlay, and restore path are kept simple.</p>
+        </div>
+        <div class="lane">
+          <strong>Execution</strong>
+          <p>n8n: the authored workflow is separate from run data, waiting state, execution stack, partial runs, and item lineage.</p>
+        </div>
+        <div class="lane">
+          <strong>Graph Meaning</strong>
+          <p>Neo4j: relationships have direction, type, and properties. The edge is not decoration; it is a queryable object.</p>
+        </div>
+        <div class="lane">
+          <strong>System Boundary</strong>
+          <p>Penpot: expensive, collaborative, or operational work moves into workers, backends, pub/sub, storage, async tasks, and exporters.</p>
+        </div>
+      </div>
+
+      <h2>How They Differ</h2>
+      <p>tldraw and Excalidraw both care about canvas feel, but they make different bets. tldraw is deeper: a reactive document store, shape utilities, binding utilities, schema migration, and derived indexes. Excalidraw is lighter: scene maps, visible element filtering, a static canvas, an interactive canvas, and repair on restore.</p>
+      <p>n8n and Neo4j both use graphs, but the word "graph" means different things. n8n's graph is operational: what runs, waits, resumes, retries, and produces data. Neo4j's graph is semantic: what connects, what kind of relationship it is, what properties the relationship carries, and how traversal should answer a question.</p>
+      <p>Penpot is the reminder that product scale eventually becomes system scale. Once Eido needs teams, sync, exports, background AI work, or hosted collaboration, some work should leave the main browser thread and some should leave the browser entirely.</p>
+
+      <h2>The Eido Rule</h2>
+      <p>Eido should keep one property graph with three projections:</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Canvas View</h3>
+          <p>Cards, positions, selection, zoom, culling, edge drawing, hit testing, and text editing.</p>
+          <span class="tag">tldraw</span><span class="tag">Excalidraw</span>
+        </div>
+        <div class="card">
+          <h3>Semantic View</h3>
+          <p>Context compilation, edge weight, polarity, constraints, relevance, and explanations.</p>
+          <span class="tag">Neo4j</span>
+        </div>
+        <div class="card">
+          <h3>Execution View</h3>
+          <p>Runs, output versions, graph snapshots, partial re-runs, waiting state, and provenance.</p>
+          <span class="tag">n8n</span>
+        </div>
+      </div>
+
+      <p>That is why the canvas must not become the graph database. It should render the graph. The compiler should query the graph. The run engine should execute against graph snapshots. The persistence layer should retain the pieces with different lifetimes.</p>
+
+      <h2>Practice</h2>
+      <p>Choose the architecture bucket. The option names are intentionally short; the feedback is where the teaching lives.</p>
+      <div class="quiz" id="lesson-quiz">
+        <div class="quiz-question" data-correct="scene" data-note="Dragging is a canvas hot path. Ask for a scene projection or graph adjacency index, not a full Board scan.">
+          <strong>A new feature scans all Connections on every card drag.</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q1" value="scene"> Scene plan</label>
+            <label><input type="radio" name="q1" value="run"> Run record</label>
+            <label><input type="radio" name="q1" value="edge"> Graph edge</label>
+            <label><input type="radio" name="q1" value="worker"> Worker job</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-question" data-correct="run" data-note="Output versions need provenance. Borrow n8n's authored-graph vs run-state split.">
+          <strong>An output version should explain what generated it and be re-runnable.</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q2" value="scene"> Scene plan</label>
+            <label><input type="radio" name="q2" value="run"> Run record</label>
+            <label><input type="radio" name="q2" value="edge"> Graph edge</label>
+            <label><input type="radio" name="q2" value="worker"> Worker job</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-question" data-correct="edge" data-note="Strong, weak, negative, and constraint relationships belong on first-class edge records.">
+          <strong>The compiler must know whether a relationship supports or contradicts a note.</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q3" value="scene"> Scene plan</label>
+            <label><input type="radio" name="q3" value="run"> Run record</label>
+            <label><input type="radio" name="q3" value="edge"> Graph edge</label>
+            <label><input type="radio" name="q3" value="worker"> Worker job</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-question" data-correct="worker" data-note="Exporting, indexing, sync packing, and heavy media work often deserve a worker or service boundary.">
+          <strong>Exporting a large board freezes the editing surface.</strong>
+          <div class="quiz-options">
+            <label><input type="radio" name="q4" value="scene"> Scene plan</label>
+            <label><input type="radio" name="q4" value="run"> Run record</label>
+            <label><input type="radio" name="q4" value="edge"> Graph edge</label>
+            <label><input type="radio" name="q4" value="worker"> Worker job</label>
+          </div>
+          <div class="feedback"></div>
+        </div>
+
+        <button type="button" onclick="checkQuiz('lesson-quiz')">Check answers</button>
+        <div class="feedback quiz-score"></div>
+      </div>
+
+      <h2>How To Talk To Agents</h2>
+      <p>Do not say only: "make this scalable." Say this:</p>
+      <pre><code>For this feature, first identify:
+- the hot path, if any
+- the Board records read and written
+- the source of truth
+- the derived index, scene projection, run record, or worker boundary
+- the performance gate that proves the design at 5,000 Cards and 10,000 Connections</code></pre>
+
+      <p>Then add the product constraint:</p>
+      <pre><code>Preserve Eido's one graph, three views model. The canvas renders the graph; it is not the graph database.</code></pre>
+
+      <h2>Recommended Reading</h2>
+      <p>Read the local synthesis next: <code>research/02-source-studies/05-synthesis-one-graph-three-views.md</code>. Keep the reference matrix open beside it: <a href="../reference/0001-scalability-pattern-matrix.html">Scalability Pattern Matrix</a>.</p>
+      <p>Ask your agent follow-up questions when a tradeoff feels fuzzy. That is part of the workflow: you hold the long-term product vision, and the agent should help translate it into architecture.</p>
+
+      <h2>Source Notes</h2>
+      <ul class="source-list">
+        <li>tldraw: <code>Store.ts</code>, <code>bindingsIndex.ts</code>, <code>notVisibleShapes.ts</code>, <code>ShapeUtil.ts</code>, <code>BindingUtil.ts</code> in the local tldraw repo.</li>
+        <li>Excalidraw: <code>Scene.ts</code>, <code>StaticCanvas.tsx</code>, <code>InteractiveCanvas.tsx</code>, <code>Renderer.ts</code>, <code>restore.ts</code> in the local Excalidraw repo.</li>
+        <li>n8n: <code>workflow.ts</code>, <code>workflow-execute.ts</code>, <code>recreate-node-execution-stack.ts</code>, and <code>run-execution-data.v1.ts</code> in the local n8n repo.</li>
+        <li>Neo4j: <code>Entity.java</code>, <code>Node.java</code>, <code>Relationship.java</code>, and <code>GraphAlgoFactory.java</code> in the local Neo4j repo.</li>
+        <li>Penpot: <code>docs/technical-guide/developer/architecture</code> in the local Penpot repo.</li>
+      </ul>
+    </main>
+    <script src="../assets/quiz.js"></script>
+  </body>
+</html>

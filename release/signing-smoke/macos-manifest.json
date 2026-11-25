@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "macos-signing-smoke",
+  "scope": "#469",
+  "promotable": false,
+  "platform": "darwin",
+  "arch": "arm64",
+  "appId": "dev.eido.signing-smoke.macos",
+  "productName": "Eido macOS Signing Smoke",
+  "version": "0.0.0",
+  "profileAuthority": {
+    "state": "installed",
+    "dataRoot": "disposable",
+    "certification": "not-certified"
+  }
+}

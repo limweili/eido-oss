@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOD UI — component library</title>
+<link rel="stylesheet" href="mod-ui-font.css">
+<link rel="stylesheet" href="mod-ui.css">
+<style>
+  /* ============ gallery chrome (specimen page only) ============ */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--mui-ground);
+    color: var(--mui-ink);
+    font-family: var(--mui-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 56px 32px 120px;
+  }
+
+  /* ---- masthead: Frekvens seasoning ---- */
+  .masthead {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+    margin-bottom: 18px;
+  }
+  .mast-block {
+    flex: none;
+    width: 96px;
+    background: var(--mui-ink);
+    border-radius: 4px;
+    background-image: radial-gradient(circle 2px at 6px 6px, var(--mui-ground) 98%, transparent);
+    background-size: 12px 12px;
+    background-position: 3px 3px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mast-block::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--mui-red);
+  }
+  .mast-text h1 {
+    margin: 0;
+    font-size: 58px;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+  .mast-text h1 .thin { color: var(--mui-ink-faint); }
+  .mast-sub {
+    margin-top: 12px;
+    font-family: var(--mui-mono);
+    font-size: 10px;
+    letter-spacing: var(--mui-ls-wide);
+    text-transform: uppercase;
+    color: var(--mui-ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mast-sub .sq { width: 8px; height: 8px; flex: none; }
+  .mast-sub .sq.red { background: var(--mui-red); }
+  .mast-sub .sq.yellow { background: var(--mui-yellow); }
+  .mast-rule {
+    height: 2px;
+    background: var(--mui-ink);
+    margin: 26px 0 0;
+  }
+
+  /* ---- sections ---- */
+  section { margin-top: 64px; }
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    border-bottom: 1px solid var(--mui-line);
+    padding-bottom: 10px;
+    margin-bottom: 24px;
+  }
+  .sec-head .idx {
+    font-family: var(--mui-mono);
+    font-size: 11px;
+    letter-spacing: var(--mui-ls);
+    color: var(--mui-red);
+  }
+  .sec-head h2 {
+    margin: 0;
+    font-family: var(--mui-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: var(--mui-ls-wide);
+    text-transform: uppercase;
+  }
+  .sec-head .note {
+    margin-left: auto;
+    font-family: var(--mui-mono);
+    font-size: 9px;
+    letter-spacing: var(--mui-ls);
+    text-transform: uppercase;
+    color: var(--mui-ink-faint);
+    text-align: right;
+  }
+
+  /* ---- specimen boards ---- */
+  .board {
+    border: 1px solid var(--mui-line);
+    border-radius: var(--mui-r-well);
+    padding: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: flex-end;
+  }
+  .board + .board { margin-top: 16px; }
+  .specimen { display: flex; flex-direction: column; gap: 12px; }
+  .specimen-stage { display: flex; align-items: flex-end; gap: 8px; }
+  .specimen-tag {
+    font-family: var(--mui-mono);
+    font-size: 9px;
+    letter-spacing: var(--mui-ls);
+    text-transform: uppercase;
+    color: var(--mui-ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .specimen-tag::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--mui-ink);
+    flex: none;
+  }
+
+  /* the 72px-pitch grid demo (64px cells + 8px gaps) */
+  .cellgrid {
+    display: grid;
+    grid-auto-rows: var(--mui-cell);
+    gap: var(--mui-gap);
+  }
+  .cellgrid > * { min-width: 0; min-height: 0; }
+  .c1 { width: var(--mui-cell); height: var(--mui-cell); }
+  .span-2w { grid-column: span 2; }
+  .span-3w { grid-column: span 3; }
+  .span-4w { grid-column: span 4; }
+  .span-2h { grid-row: span 2; }
+
+  /* token tiles */
+  .tokens {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+    gap: 10px;
+  }
+  .token-tile {
+    border: 1px solid var(--mui-line);
+    border-radius: var(--mui-r-well);
+    overflow: hidden;
+    background: var(--mui-panel);
+  }
+  .token-tile .chip { height: 52px; }
+  .token-tile .tt {
+    padding: 8px 10px;
+    font-family: var(--mui-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mui-ink-soft);
+    line-height: 1.5;
+  }
+  .token-tile .tt b { display: block; color: var(--mui-ink); font-weight: 500; }
+  .accent-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .accent-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    position: relative;
+  }
+  .accent-dot.is-default::after {
+    content: "";
+    position: absolute; inset: -5px;
+    border: 1.5px solid var(--mui-ink);
+    border-radius: 50%;
+  }
+
+  /* node specimen row */
+  .nodecol {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 18px 14px;
+    background: var(--mui-panel);
+    border: 1px solid var(--mui-line);
+    border-radius: var(--mui-r-well);
+    width: max-content;
+  }
+  .nodecol-row { display: flex; align-items: center; gap: 10px; }
+  .chiprow {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 18px;
+    background: var(--mui-panel);
+    border: 1px solid var(--mui-line);
+    border-radius: var(--mui-r-well);
+    width: max-content;
+  }
+
+  /* frozen hover chrome (for review/screenshot) — the identity dot is
+     always visible on its own; only the action cluster needs forcing */
+  .force-chrome .mui-chrome { opacity: 1; }
+
+  /* static popup replica (the well, shown in-flow) */
+  .popup-demo { position: static; }
+
+  /* button + card + motion specimens */
+  .btnrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .cardstack {
+    display: grid;
+    grid-template-columns: repeat(2, 250px);
+    gap: 10px;
+    align-items: start;
+  }
+  .motion-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 250px;
+  }
+
+  footer {
+    margin-top: 90px;
+    padding-top: 14px;
+    border-top: 1px solid var(--mui-line);
+    font-family: var(--mui-mono);
+    font-size: 9px;
+    letter-spacing: var(--mui-ls);
+    text-transform: uppercase;
+    color: var(--mui-ink-faint);
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ================= masthead ================= -->
+  <header>
+    <div class="masthead">
+      <div class="mast-block" aria-hidden="true"></div>
+      <div class="mast-text">
+        <h1>MOD&nbsp;UI<br><span class="thin">Component library</span></h1>
+        <div class="mast-sub">
+          <span class="sq red"></span><span class="sq yellow"></span>
+          <span>EIDO · MOD BUILDER · INSTRUMENT-FLAT · SPEC 04</span>
+        </div>
+      </div>
+    </div>
+    <div class="mast-rule"></div>
+  </header>
+
+  <!-- ================= 00 tokens ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">00</span><h2>Tokens</h2>
+      <span class="note">warm paper ground · ink · one signal red</span>
+    </div>
+    <div class="tokens" id="tokenTiles"></div>
+
+    <div style="display:flex; gap:56px; margin-top:28px; flex-wrap:wrap; align-items:flex-start;">
+      <div class="specimen">
+        <div class="specimen-stage accent-row" id="accentRow"></div>
+        <div class="specimen-tag">control accents · eido card palette · ring = default</div>
+      </div>
+      <div class="specimen">
+        <div class="specimen-stage" style="gap:10px; align-items:center;">
+          <button type="button" class="mui-chip-toggle">ONE CALL</button>
+          <button type="button" class="mui-chip-toggle is-on">STAGED</button>
+          <span class="mui-chip-value" style="--accent:#a946c8;">72%</span>
+          <span class="mui-chip-state">UNWIRED</span>
+          <span class="mui-chip-state is-alert">CONFLICT</span>
+          <span class="mui-chip-feedback" style="position:static;">ADDED</span>
+        </div>
+        <div class="specimen-tag">chips · raised key = press it · flat capsule = read it<br>toggle · value · state · state alert · feedback</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 01 dial ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">01</span><h2>Dial</h2>
+      <span class="note">ink core · light needle · accent arc · % readout<br>stepped → ticks on the arc</span>
+    </div>
+    <div class="board mui-dotfield">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: var(--mui-cell);">
+          <div class="c1" id="dial-xs-host"></div>
+        </div>
+        <div class="specimen-tag">1×1 · label → hover chip</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="dial-md-host"></div>
+        </div>
+        <div class="specimen-tag">2×2 · smooth</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="dial-steps-host"></div>
+        </div>
+        <div class="specimen-tag">2×2 · steps 5 · arc ticks</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w span-2h" style="grid-row: span 3;" id="dial-lg-host"></div>
+        </div>
+        <div class="specimen-tag">3×3 · hero size</div>
+      </div>
+    </div>
+    <div class="board mui-dotfield" id="dial-accent-board" style="align-items:flex-start;"></div>
+  </section>
+
+  <!-- ================= 02 slider ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">02</span><h2>Slider</h2>
+      <span class="note">capsule track · round handle · accent fill<br>stepped → detent dots in the track</span>
+    </div>
+    <div class="board mui-dotfield">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: var(--mui-cell);">
+          <div class="c1" id="slider-xs-host"></div>
+        </div>
+        <div class="specimen-tag">1×1 · track only</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w" id="slider-sm-host"></div>
+        </div>
+        <div class="specimen-tag">3×1 · smooth</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(5, var(--mui-cell));">
+          <div class="span-4w" style="grid-column: span 5;" id="slider-steps-host"></div>
+        </div>
+        <div class="specimen-tag">5×1 · steps 4 → 0 / 25 / 50 / 75 / 100</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(5, var(--mui-cell)); grid-auto-rows: calc(var(--mui-cell) * 1.25);">
+          <div style="grid-column: span 5;" id="slider-lg-host"></div>
+        </div>
+        <div class="specimen-tag">5×1¼ · steps 10 · alt accent</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 switch / count / words ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">03</span><h2>Switch · Count · Words</h2>
+      <span class="note">steps do not apply to these kinds</span>
+    </div>
+    <div class="board mui-dotfield">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: var(--mui-cell);">
+          <div class="c1" id="switch-xs-host"></div>
+        </div>
+        <div class="specimen-tag">1×1 · off</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w" id="switch-on-host"></div>
+        </div>
+        <div class="specimen-tag">2×1 · on</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w" id="count-host"></div>
+        </div>
+        <div class="specimen-tag">2×1 · count</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w" id="words-host"></div>
+        </div>
+        <div class="specimen-tag">4×1 · words</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: var(--mui-cell);">
+          <div class="c1" id="count-xs-host"></div>
+        </div>
+        <div class="specimen-tag">1×1 · count</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 04 hover chrome / config / color well ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">04</span><h2>Identity · Config · Color well</h2>
+      <span class="note">identity dot (always visible) → color well · on hover: sliders glyph → settings, × when removable<br>settings = title / description / steps — color is direct, via the dot</span>
+    </div>
+    <div class="board mui-dotfield" style="min-height: 300px; align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="chrome-demo-host"></div>
+        </div>
+        <div class="specimen-tag">identity dot persistent · sliders / × frozen on</div>
+      </div>
+      <div class="specimen">
+        <div class="specimen-stage" style="align-items: flex-start;">
+          <div class="mui-popup popup-demo mui-popup--well" id="well-demo"></div>
+        </div>
+        <div class="specimen-tag">color well · opens from the identity dot</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="config-demo-host"></div>
+        </div>
+        <div class="specimen-tag">settings popup open · live-applies · one at a time</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 05 nodes ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">05</span><h2>Nodes</h2>
+      <span class="note">output jack on every control · input dots for visualizers</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="node-idle-host"></div>
+        </div>
+        <div class="specimen-tag">output node · idle (hover it)</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="node-hover-host"></div>
+        </div>
+        <div class="specimen-tag">hover · accent fill + label chip</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="node-conn-host"></div>
+        </div>
+        <div class="specimen-tag">connected · filled</div>
+      </div>
+      <div class="specimen">
+        <div class="nodecol" id="nodecol-host"></div>
+        <div class="specimen-tag">ModUI.nodeDot() · visualizer input column</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 06 buttons ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">06</span><h2>Buttons</h2>
+      <span class="note">the one button standard · every clickable wears this<br>quiet ink-wash hover · press scales to .97</span>
+    </div>
+    <div class="board mui-dotfield">
+      <div class="specimen">
+        <div class="specimen-stage btnrow" id="btnrow"></div>
+        <div class="specimen-tag">default · primary · icon · sm · sm icon</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 07 cards ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">07</span><h2>Cards</h2>
+      <span class="note">a compiler line as a solid accent card · eyebrow + value pill / sentence / meta<br>text by luminance (inkFor) · OFF = accent wash + OFF pill · no fabricated sentence</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cardstack" id="cardstack"></div>
+        <div class="specimen-tag">amber → ink text · dark + blue → paper text · OFF wash</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 08 motion ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">08</span><h2>Motion</h2>
+      <span class="note">picked up · displaces · settles with weight<br>flip over 220ms, settle easing · click a card to swap</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="motion-pair" id="motion-pair"></div>
+        <div class="specimen-tag">flip swap · --mui-t-move + --mui-ease-settle</div>
+      </div>
+      <div class="specimen">
+        <div style="width: 250px; padding: 14px 0;">
+          <div id="lifted-host"></div>
+        </div>
+        <div class="specimen-tag">.mui-lifted · scale 1.02 + the one sanctioned shadow</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 09 pad ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">09</span><h2>Pad</h2>
+      <span class="note">two sliders fused into one gesture · crosshair = the value<br>two named jacks (y top · x center) · min 2×2 — boards enforce</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="pad-sm-host"></div>
+        </div>
+        <div class="specimen-tag">2×2 · minimum · hover chip carries the value</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w span-2h" id="pad-md-host"></div>
+        </div>
+        <div class="specimen-tag">3×2 · crosshair + readout</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w" style="grid-row: span 3;" id="pad-lg-host"></div>
+        </div>
+        <div class="specimen-tag">4×3 · axis-end names appear</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w" style="grid-row: span 3;" id="pad-steps-host"></div>
+        </div>
+        <div class="specimen-tag">4×3 · steps 4×4 · snap dots replace texture dots</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 10 range ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">10</span><h2>Range</h2>
+      <span class="note">a range constrains, it does not set · band-drag slides the window<br>round signal jack — the window payload is spoken in words, never a glyph</span>
+    </div>
+    <div class="board mui-dotfield">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w" id="range-sm-host"></div>
+        </div>
+        <div class="specimen-tag">3×1 · smooth · 30–70</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(5, var(--mui-cell));">
+          <div style="grid-column: span 5;" id="range-steps-host"></div>
+        </div>
+        <div class="specimen-tag">5×1 · steps 4 · detents through the band</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(5, var(--mui-cell));">
+          <div style="grid-column: span 5;" id="range-stops-host"></div>
+        </div>
+        <div class="specimen-tag">5×1 · named stops speak · A SENTENCE–A PARAGRAPH</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 11 filter ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">11</span><h2>Filter</h2>
+      <span class="note">the constraint drawn in ink · wash under the pass region<br>mode chip cycles · plain words, never "low-pass"</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w span-2h" id="filter-nmt-host"></div>
+        </div>
+        <div class="specimen-tag">3×2 · no more than</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w span-2h" id="filter-al-host"></div>
+        </div>
+        <div class="specimen-tag">3×2 · at least</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w span-2h" id="filter-btw-host"></div>
+        </div>
+        <div class="specimen-tag">3×2 · between · plateau slides</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w" id="filter-min-host"></div>
+        </div>
+        <div class="specimen-tag">2×1 · minimum</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w span-2h" id="filter-stops-host"></div>
+        </div>
+        <div class="specimen-tag">4×2 · named stops · ≤ A PARAGRAPH</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="filter-abbrev-host"></div>
+        </div>
+        <div class="specimen-tag">2×2 · named-stop fallback · numeric + hover chip</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 12 curve ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">12</span><h2>Curve</h2>
+      <span class="note">a series over the answer · click adds · drag places · dblclick deletes<br>x snaps to five speakable detents · endpoints pinned · round signal jack (sends a shape)</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w span-2h" id="curve-3-host"></div>
+        </div>
+        <div class="specimen-tag">4×2 · minimum · 3 points</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(5, var(--mui-cell));">
+          <div style="grid-column: span 5;" class="span-2h" id="curve-5-host"></div>
+        </div>
+        <div class="specimen-tag">5×2 · 5 points — the cap</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w span-2h" id="curve-steps-host"></div>
+        </div>
+        <div class="specimen-tag">4×2 · y steps 4 · task timebase</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 13 jack glyphs ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">13</span><h2>Jack silhouettes</h2>
+      <span class="note">two silhouettes, only: round = signal · square = artifact<br>payload nuance lives in words on the hover / drag chips</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="nodecol" id="glyphcol-host"></div>
+        <div class="specimen-tag">idle · hover · connected — per payload type</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 14 viz shell + rail ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">14</span><h2>Viz shell · Input rail</h2>
+      <span class="note">a visualizer is a lens: no identity dot, every hue inherited<br>rails on three edges · three slot modes · unwired = faint ink</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start; gap: 56px;">
+      <div class="specimen">
+        <div style="width: 264px; height: 168px;" id="viz-fixed-host"></div>
+        <div class="specimen-tag">fixed-labeled · left rail · permanent micro labels</div>
+      </div>
+      <div class="specimen">
+        <div style="width: 264px; height: 190px;" id="viz-var-host"></div>
+        <div class="specimen-tag">variable-inheriting · − + chrome frozen · per-slot × on hover</div>
+      </div>
+      <div class="specimen">
+        <div style="width: 264px; height: 132px;" id="viz-beam-host"></div>
+        <div class="specimen-tag">fixed-inheriting · left + right edges (beam grammar)</div>
+      </div>
+      <div class="specimen">
+        <div style="width: 264px; height: 168px; margin-top: 14px;" id="viz-top-host"></div>
+        <div class="specimen-tag">top rail · chips fall below (matrix column rail)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 15 select ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">15</span><h2>Select</h2>
+      <span class="note">one-of-N, nominal · pick shown by fill, never an indicator<br>segmented ≤4 · stack 5+ · per-option frames · JACKLESS by design</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w" id="select-seg-host"></div>
+        </div>
+        <div class="specimen-tag">3×1 · 3 options · segmented capsule</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w" style="grid-row: span 3;" id="select-stack-host"></div>
+        </div>
+        <div class="specimen-tag">3×3 · 6 options · stack · no jack on the edge</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 16 order ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">16</span><h2>Order</h2>
+      <span class="note">drag-to-rank · lift, siblings displace, settle with weight<br>rank-1 wears the accent · jack = displacement from authored order</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w" style="grid-row: span 3;" id="order-host"></div>
+        </div>
+        <div class="specimen-tag">3×3 · 4 items · authored order · SHUFFLE 0</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w" style="grid-row: span 3;" id="order-drag-host"></div>
+        </div>
+        <div class="specimen-tag">mid-drag · lifted token + displaced sibling (frozen)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 17 mixer ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">17</span><h2>Mixer</h2>
+      <span class="note">shares always sum to 100 · drag one, the others yield live<br>one jack per channel — the variable multi-jack</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="mixer-2-host"></div>
+        </div>
+        <div class="specimen-tag">2×2 · minimum · 2 channels</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w" style="grid-row: span 3;" id="mixer-5-host"></div>
+        </div>
+        <div class="specimen-tag">3×3 · 5 channels · channels compress</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 18 named stops (rider) ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">18</span><h2>Named stops · dial + slider</h2>
+      <span class="note">a stepped dial/slider may name its stops · the readout speaks them<br>overflow falls back to numeric + hover chip · dissolves the old Blend</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w span-2h" id="dial-stops-host"></div>
+        </div>
+        <div class="specimen-tag">2×2 · dial · steps 3 · "THOROUGH"</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w" id="slider-stops-host"></div>
+        </div>
+        <div class="specimen-tag">4×1 · slider · steps 2 end-named · the old Blend, dissolved</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 19 curve · POSITION + renamable detents ========= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">19</span><h2>Curve · NOW input · moment names</h2>
+      <span class="note">the NOW jack (was POSITION): wired, it draws the accent hairline; unwired it idles hollow with its 9px label<br>MOMENT NAMES speak the creator's stage words · RUNS foot chip</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w span-2h" id="curve-pos-host"></div>
+        </div>
+        <div class="specimen-tag">4×2 · NOW wired · hairline at "organising" · readout NOW n/10</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w span-2h" id="curve-named-host"></div>
+        </div>
+        <div class="specimen-tag">4×2 · NOW idle (hollow + label) · moments named exploring/organising/committing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 20 fork ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">20</span><h2>Fork</h2>
+      <span class="note">compiled routing · an ink junction fanning to 2–3 paths<br>the LEAN handle picks the favored path · one scalar jack · check-block config</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(3, var(--mui-cell));">
+          <div class="span-3w span-2h" id="fork-2-host"></div>
+        </div>
+        <div class="specimen-tag">3×2 · minimum · 2 paths · leans LOOK IT UP</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(4, var(--mui-cell));">
+          <div class="span-4w span-2h" id="fork-3-host"></div>
+        </div>
+        <div class="specimen-tag">4×2 · 3 paths · the unsure middle is the pressure valve</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 21 revise ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">21</span><h2>Revise</h2>
+      <span class="note">compiled feedback · a count of passes with nested arcs above<br>0 = OFF · no score numbers on the face — only passes · strictness foot chip</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start;">
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w" id="revise-2-host"></div>
+        </div>
+        <div class="specimen-tag">2×1 · minimum · ×2 PASSES · THOROUGH</div>
+      </div>
+      <div class="specimen">
+        <div class="cellgrid" style="grid-template-columns: repeat(2, var(--mui-cell));">
+          <div class="span-2w" id="revise-0-host"></div>
+        </div>
+        <div class="specimen-tag">2×1 · 0 passes · OFF · no arcs</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 22 fidelity chip ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">22</span><h2>Runs chip</h2>
+      <span class="note">ONE CALL · STAGED · AUTO — cycles on click, mirrored in config<br>on the parts that choose how they run · the mod-level WHEN IT RUNS lever is workbench-side</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start; gap: 40px;">
+      <div class="specimen">
+        <div class="chiprow" id="fidelity-row"></div>
+        <div class="specimen-tag">the three states · default AUTO · click to cycle</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 23 two cable families · step ================= -->
+  <section>
+    <div class="sec-head">
+      <span class="idx">23</span><h2>Two cable families · Step</h2>
+      <span class="note">signal jacks round (scalar/span/series) · artifact jacks SQUARE — non-mating<br>the step is the third UI class: verb · prose · artifact in ▣ / out ▣ · signal-in · fidelity</span>
+    </div>
+    <div class="board mui-dotfield" style="align-items: flex-start; gap: 56px;">
+      <div class="specimen">
+        <div class="nodecol" id="family-col-host"></div>
+        <div class="specimen-tag">signal (round) vs artifact (square) · out · in with the inward cue</div>
+      </div>
+      <div class="specimen">
+        <div style="width: 236px; height: 150px;" id="step-host"></div>
+        <div class="specimen-tag">3×2 · EXPLORE · IN/OUT ▣ labeled · BREADTH tune-in · RUNS chip → CALL 1</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>MOD UI · LIB 05</span>
+    <span>REFS 08 · 09 · 10 · 12 — INSTRUMENT-FLAT</span>
+  </footer>
+</div>
+
+<script src="mod-ui.js"></script>
+<script>
+(function () {
+  'use strict';
+  var S = window.__specimens = {};   /* test hooks */
+
+  function mount(hostId, ctrl) {
+    var host = document.getElementById(hostId);
+    ctrl.el.style.width = '100%';
+    ctrl.el.style.height = '100%';
+    host.appendChild(ctrl.el);
+    return ctrl;
+  }
+
+  /* ---- 00 tokens ---- */
+  var TOKENS = [
+    ['GROUND', '#e8e4dc', 'page / board'],
+    ['PANEL', '#f1eee8', 'control chip'],
+    ['TRACK', '#dcd7cc', 'capsule wells'],
+    ['INK', '#232019', 'structure / text'],
+    ['INK SOFT', '#7b756a', 'labels'],
+    ['RED', '#d8452f', 'system signal'],
+    ['YELLOW', '#e9a820', 'rare state mark']
+  ];
+  var tiles = document.getElementById('tokenTiles');
+  TOKENS.forEach(function (t) {
+    var tile = document.createElement('div');
+    tile.className = 'token-tile';
+    tile.innerHTML = '<div class="chip" style="background:' + t[1] +
+      (t[1] === '#f1eee8' || t[1] === '#e8e4dc' ? ';border-bottom:1px solid var(--mui-line)' : '') +
+      '"></div><div class="tt"><b>' + t[0] + '</b>' + t[1] + '<br>' + t[2] + '</div>';
+    tiles.appendChild(tile);
+  });
+  var accentRow = document.getElementById('accentRow');
+  ModUI.PRESETS.forEach(function (hex) {
+    var d = document.createElement('span');
+    d.className = 'accent-dot' + (hex === ModUI.DEFAULT_ACCENT ? ' is-default' : '');
+    d.style.background = hex;
+    accentRow.appendChild(d);
+  });
+
+  /* ---- 01 dials ---- */
+  S.dialXs = mount('dial-xs-host', ModUI.control({
+    kind: 'dial', label: 'WARMTH', value: 72, accent: '#a946c8',
+    desc: 'How cosy the writing feels.'
+  }));
+  S.dialMd = mount('dial-md-host', ModUI.control({
+    kind: 'dial', label: 'WARMTH', value: 72, accent: '#a946c8',
+    desc: 'How cosy the writing feels.'
+  }));
+  /* the speech row (SC1): hosts feed the compiled sentence */
+  S.dialMd.setSpeech('Warmth: 72%.');
+  S.dialSteps = mount('dial-steps-host', ModUI.control({
+    kind: 'dial', label: 'DETAIL', value: 60, steps: 5, accent: '#b8552f',
+    desc: 'How fine-grained the answer gets.'
+  }));
+  S.dialLg = mount('dial-lg-host', ModUI.control({
+    kind: 'dial', label: 'INTENSITY', value: 38, accent: '#24986a',
+    desc: 'Overall strength of the whole mod.'
+  }));
+
+  var accentBoard = document.getElementById('dial-accent-board');
+  ['#222222', '#d66be8', '#48a2ef', '#eca23b', '#24986a'].forEach(function (hex, i) {
+    var wrap = document.createElement('div');
+    wrap.className = 'cellgrid';
+    wrap.style.gridTemplateColumns = 'repeat(2, var(--mui-cell))';
+    var cell = document.createElement('div');
+    cell.className = 'span-2w span-2h';
+    wrap.appendChild(cell);
+    accentBoard.appendChild(wrap);
+    var c = ModUI.control({ kind: 'dial', label: 'ACCENT', value: 15 + i * 18, accent: hex });
+    c.el.style.width = '100%';
+    c.el.style.height = '100%';
+    cell.appendChild(c.el);
+  });
+
+  /* ---- 02 sliders ---- */
+  S.sliderXs = mount('slider-xs-host', ModUI.control({
+    kind: 'slider', label: 'MIX', value: 64, accent: '#a946c8'
+  }));
+  S.sliderSm = mount('slider-sm-host', ModUI.control({
+    kind: 'slider', label: 'CLARITY', value: 44, accent: '#a946c8',
+    ends: { low: 'PLAIN', high: 'CLEVER' },
+    desc: 'Plain words over clever ones.'
+  }));
+  S.sliderSteps = mount('slider-steps-host', ModUI.control({
+    kind: 'slider', label: 'FORMALITY', value: 50, steps: 4, accent: '#24986a',
+    desc: 'Casual note to formal memo.'
+  }));
+  S.sliderLg = mount('slider-lg-host', ModUI.control({
+    kind: 'slider', label: 'PACE', value: 70, steps: 10, accent: '#eca23b',
+    desc: 'How quickly the piece moves.'
+  }));
+
+  /* ---- 03 switch / count / words ---- */
+  S.switchXs = mount('switch-xs-host', ModUI.control({
+    kind: 'switch', label: 'CITE', value: 0, accent: '#b8552f'
+  }));
+  S.switchOn = mount('switch-on-host', ModUI.control({
+    kind: 'switch', label: 'EXAMPLES', value: 100, accent: '#24986a',
+    desc: 'Include worked examples.'
+  }));
+  S.count = mount('count-host', ModUI.control({
+    kind: 'count', label: 'WAVES', value: 3, accent: '#d66be8',
+    desc: 'How many echo waves to show.'
+  }));
+  S.countXs = mount('count-xs-host', ModUI.control({
+    kind: 'count', label: 'ROWS', value: 5, accent: '#f1666d'
+  }));
+  S.words = mount('words-host', ModUI.control({
+    kind: 'words', label: 'AUDIENCE', value: 'curious beginners', accent: '#48a2ef',
+    desc: 'Who this is written for.'
+  }));
+
+  /* ---- 04 hover chrome / config / color well ---- */
+  S.chromeDemo = mount('chrome-demo-host', ModUI.control({
+    kind: 'dial', label: 'GRAIN', value: 64, accent: '#d66be8',
+    desc: 'Surface texture of the language.',
+    onRemove: function () {}          /* host-owned; no-op in the gallery */
+  }));
+  S.chromeDemo.el.classList.add('force-chrome');   /* frozen for review */
+
+  S.configDemo = mount('config-demo-host', ModUI.control({
+    kind: 'dial', label: 'TEXTURE', value: 55, steps: 4, accent: '#eca23b',
+    desc: 'Roughness of the surface language.'
+  }));
+
+  /* static replica of the color well (the live one is one-at-a-time) */
+  var wellDemo = document.getElementById('well-demo');
+  wellDemo.style.setProperty('--accent', '#eca23b');
+  var wellGrid = document.createElement('div');
+  wellGrid.className = 'mui-popup-swatches';
+  ModUI.PRESETS.forEach(function (hex) {
+    var sw = document.createElement('button');
+    sw.type = 'button';
+    sw.className = 'mui-swatch' + (hex === '#eca23b' ? ' is-active' : '');
+    sw.style.background = hex;
+    wellGrid.appendChild(sw);
+  });
+  wellDemo.appendChild(wellGrid);
+
+  /* ---- 05 nodes ---- */
+  S.nodeIdle = mount('node-idle-host', ModUI.control({
+    kind: 'dial', label: 'HEIGHT', value: 62, accent: '#a946c8'
+  }));
+  S.nodeHover = mount('node-hover-host', ModUI.control({
+    kind: 'dial', label: 'SPEED', value: 47, accent: '#b8552f'
+  }));
+  S.nodeHover.node.classList.add('is-hover');   /* frozen hover state for review */
+  S.nodeConn = mount('node-conn-host', ModUI.control({
+    kind: 'dial', label: 'RIPPLE', value: 81, accent: '#24986a'
+  }));
+  S.nodeConn.setConnected(true);
+
+  var nodecol = document.getElementById('nodecol-host');
+  [['HEIGHT', '#a946c8'], ['SPEED', '#b8552f'], ['RIPPLE', '#24986a'], ['STEADY', '#eca23b']]
+    .forEach(function (pair, i) {
+      var row = document.createElement('div');
+      row.className = 'nodecol-row';
+      var dot = ModUI.nodeDot({ label: pair[0], accent: pair[1] });
+      if (i === 1) dot.classList.add('is-hover');       /* one frozen hover */
+      if (i === 2) dot.setConnected(true);              /* one connected */
+      row.appendChild(dot);
+      nodecol.appendChild(row);
+      if (i === 0) S.freeDot = dot;
+    });
+
+  /* ---- 06 buttons ---- */
+  var btnrow = document.getElementById('btnrow');
+  function btn(label, cls) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mui-btn' + (cls ? ' ' + cls : '');
+    if (label) b.textContent = label;
+    btnrow.appendChild(b);
+    return b;
+  }
+  S.btnDefault = btn('View as text');
+  S.btnPrimary = btn('Compile', 'mui-btn--primary');
+  var icon = btn('', 'mui-btn--icon');
+  icon.innerHTML =
+    '<svg viewBox="0 0 14 14" width="13" height="13" aria-hidden="true">' +
+    '<path d="M2 4.5h10M2 9.5h10" stroke="currentColor" stroke-width="1.3"' +
+    ' stroke-linecap="round" fill="none"/>' +
+    '<circle cx="9.2" cy="4.5" r="2" fill="var(--mui-panel)" stroke="currentColor" stroke-width="1.3"/>' +
+    '<circle cx="4.8" cy="9.5" r="2" fill="var(--mui-panel)" stroke="currentColor" stroke-width="1.3"/></svg>';
+  icon.setAttribute('aria-label', 'Settings');
+  btn('Add row', 'mui-btn--sm');
+  var smIcon = btn('+', 'mui-btn--sm mui-btn--icon');
+  smIcon.setAttribute('aria-label', 'Add');
+
+  /* ---- 07 cards ---- */
+  var stack = document.getElementById('cardstack');
+  S.cardAmber = ModUI.card({
+    title: 'WARMTH', value: '72%', accent: '#eca23b',
+    sentence: 'Keep the tone cosy and personal, like a letter to a friend.',
+    meta: 'How cosy the writing feels.'
+  });
+  S.cardDark = ModUI.card({
+    title: 'FORMALITY', value: '25%', accent: '#222222',
+    sentence: 'Stay casual — contractions welcome, no memo voice.'
+  });
+  S.cardBlue = ModUI.card({
+    title: 'DETAIL', value: '60%', accent: '#b8552f',
+    sentence: 'Explain each step, but stop short of exhaustive footnotes.',
+    meta: 'How fine-grained the answer gets.'
+  });
+  /* a silent card never fabricates a sentence (grammar R6.2):
+     eyebrow = the part's name, pill OFF, sentence empty */
+  S.cardSilent = ModUI.card({
+    title: 'CITATIONS', value: 'OFF', accent: '#a946c8', silent: true,
+    sentence: ''
+  });
+  [S.cardAmber, S.cardDark, S.cardBlue, S.cardSilent].forEach(function (c) {
+    stack.appendChild(c.el);
+  });
+
+  /* ---- 08 motion: FLIP swap on click ---- */
+  var pair = document.getElementById('motion-pair');
+  S.motionA = ModUI.card({
+    title: 'APPROACH', value: '1', accent: '#24986a',
+    sentence: 'Open with the strongest example.'
+  });
+  S.motionB = ModUI.card({
+    title: 'APPROACH', value: '2', accent: '#48a2ef',
+    sentence: 'Then zoom out to the general rule.'
+  });
+  pair.appendChild(S.motionA.el);
+  pair.appendChild(S.motionB.el);
+
+  var css = getComputedStyle(document.documentElement);
+  var T_MOVE = parseFloat(css.getPropertyValue('--mui-t-move')) || 220;
+  var EASE_SETTLE = (css.getPropertyValue('--mui-ease-settle') || '').trim() ||
+                    'cubic-bezier(.2,.75,.25,1.08)';
+
+  S.flipSwap = function (liftedEl) {
+    var kids = Array.prototype.slice.call(pair.children);
+    var before = kids.map(function (el) { return el.getBoundingClientRect(); });
+    pair.appendChild(pair.firstElementChild);        /* reorder: swap the two */
+    kids.forEach(function (el, i) {
+      var after = el.getBoundingClientRect();
+      var dy = before[i].top - after.top;
+      if (!dy) return;
+      if (el === liftedEl) el.classList.add('mui-lifted');
+      var anim = el.animate(
+        [{ transform: 'translateY(' + dy + 'px)' + (el === liftedEl ? ' scale(1.02)' : '') },
+         { transform: 'translateY(0)' + (el === liftedEl ? ' scale(1.02)' : '') }],
+        { duration: T_MOVE, easing: EASE_SETTLE });
+      anim.onfinish = function () { el.classList.remove('mui-lifted'); };
+    });
+  };
+  pair.addEventListener('click', function (e) {
+    var card = e.target.closest('.mui-card');
+    if (card) S.flipSwap(card);
+  });
+
+  /* lifted specimen — frozen */
+  var lifted = ModUI.card({
+    title: 'BOUNDARIES', value: '3', accent: '#f1666d',
+    sentence: 'Never invent quotes or numbers.'
+  });
+  lifted.el.classList.add('mui-lifted');
+  document.getElementById('lifted-host').appendChild(lifted.el);
+
+  /* ---- 09 pads ---- */
+  S.padSm = mount('pad-sm-host', ModUI.control({
+    kind: 'pad', label: 'TONE', value: { x: 62, y: 38 }, accent: '#a946c8',
+    axes: { x: { label: 'WARMTH', low: 'cool', high: 'warm' },
+            y: { label: 'DETAIL', low: 'terse', high: 'detailed' } }
+  }));
+  S.padMd = mount('pad-md-host', ModUI.control({
+    kind: 'pad', label: 'TONE', value: { x: 62, y: 38 }, accent: '#a946c8',
+    axes: { x: { label: 'WARMTH', low: 'cool', high: 'warm' },
+            y: { label: 'DETAIL', low: 'terse', high: 'detailed' } }
+  }));
+  S.padLg = mount('pad-lg-host', ModUI.control({
+    kind: 'pad', label: 'VOICE', value: { x: 30, y: 74 }, accent: '#b8552f',
+    desc: 'Where the writing sits between poles.',
+    axes: { x: { label: 'FORMALITY', low: 'casual', high: 'formal' },
+            y: { label: 'ENERGY', low: 'calm', high: 'charged' } }
+  }));
+  S.padSteps = mount('pad-steps-host', ModUI.control({
+    kind: 'pad', label: 'TEXTURE', value: { x: 50, y: 75 }, accent: '#24986a',
+    axes: { x: { label: 'GRAIN', low: 'smooth', high: 'rough', steps: 4 },
+            y: { label: 'WEIGHT', low: 'light', high: 'dense', steps: 4 } }
+  }));
+
+  /* ---- 10 ranges ---- */
+  S.range = mount('range-sm-host', ModUI.control({
+    kind: 'range', label: 'FORMALITY', value: { lo: 30, hi: 70 }, accent: '#a946c8',
+    desc: 'Keep the voice inside this window.'
+  }));
+  S.rangeSteps = mount('range-steps-host', ModUI.control({
+    kind: 'range', label: 'SCOPE', value: { lo: 25, hi: 75 }, steps: 4, accent: '#24986a'
+  }));
+  S.rangeStops = mount('range-stops-host', ModUI.control({
+    kind: 'range', label: 'LENGTH', value: { lo: 33.33, hi: 66.67 }, accent: '#eca23b',
+    stops: ['a phrase', 'a sentence', 'a paragraph', 'a page']
+  }));
+
+  /* ---- 11 filters ---- */
+  S.filterNmt = mount('filter-nmt-host', ModUI.control({
+    kind: 'filter', label: 'JARGON', value: { lo: 0, hi: 40, mode: 'no-more-than' },
+    accent: '#f1666d', desc: 'Cap the technical vocabulary.'
+  }));
+  S.filterAl = mount('filter-al-host', ModUI.control({
+    kind: 'filter', label: 'EVIDENCE', value: { lo: 60, hi: 100, mode: 'at-least' },
+    accent: '#b8552f'
+  }));
+  S.filterBtw = mount('filter-btw-host', ModUI.control({
+    kind: 'filter', label: 'PACE', value: { lo: 30, hi: 70, mode: 'between' },
+    accent: '#a946c8'
+  }));
+  S.filterMin = mount('filter-min-host', ModUI.control({
+    kind: 'filter', label: 'HEDGING', value: { lo: 0, hi: 25, mode: 'no-more-than' },
+    accent: '#48a2ef'
+  }));
+  S.filterStops = mount('filter-stops-host', ModUI.control({
+    kind: 'filter', label: 'EXAMPLES', value: { lo: 0, hi: 50, mode: 'no-more-than' },
+    accent: '#eca23b',
+    stops: ['none', 'a phrase', 'a paragraph', 'a section', 'everywhere']
+  }));
+  S.filterAbbrev = mount('filter-abbrev-host', ModUI.control({
+    kind: 'filter', label: 'LENGTH', value: { lo: 0, hi: 100, mode: 'no-more-than' },
+    accent: '#b8552f',
+    stops: ['none', 'a phrase', 'a paragraph', 'a section', 'a full report']
+  }));
+  S.filterAbbrev.el.classList.add('force-chip');   /* frozen fallback chip */
+
+  /* ---- 12 curves ---- */
+  S.curve3 = mount('curve-3-host', ModUI.control({
+    kind: 'curve', label: 'WARMTH',
+    value: [{ t: 0, v: 20 }, { t: 50, v: 90 }, { t: 100, v: 40 }],
+    accent: '#a946c8', desc: 'Warmth over the answer.'
+  }));
+  S.curve5 = mount('curve-5-host', ModUI.control({
+    kind: 'curve', label: 'TENSION',
+    value: [{ t: 0, v: 10 }, { t: 25, v: 55 }, { t: 50, v: 35 },
+            { t: 75, v: 85 }, { t: 100, v: 20 }],
+    accent: '#f1666d'
+  }));
+  S.curveSteps = mount('curve-steps-host', ModUI.control({
+    kind: 'curve', label: 'RIGOUR', steps: 4, timebase: 'task',
+    value: [{ t: 0, v: 25 }, { t: 50, v: 100 }, { t: 100, v: 50 }],
+    accent: '#24986a'
+  }));
+
+  /* ---- 13 jack silhouettes — round signal, square artifact ---- */
+  var glyphcol = document.getElementById('glyphcol-host');
+  S.glyphs = {};
+  [['signal', 'WARMTH · SENDS 0–100', '#a946c8', 'scalar'],
+   ['artifact', 'DRAFT · SENDS WORK', '#eca23b', 'artifact']].forEach(function (spec) {
+    var row = document.createElement('div');
+    row.className = 'nodecol-row';
+    row.style.gap = '26px';
+    var kindLb = document.createElement('span');
+    kindLb.style.cssText = 'font-family:var(--mui-mono);font-size:9px;letter-spacing:.09em;' +
+      'text-transform:uppercase;color:var(--mui-ink-soft);width:52px;flex:none;';
+    kindLb.textContent = spec[0];
+    row.appendChild(kindLb);
+    /* idle · connected · hover (last, so its chip has open air) */
+    [['idle', null], ['connected', 'connected'], ['hover', 'is-hover']]
+      .forEach(function (st) {
+        var dot = ModUI.nodeDot({ label: spec[1], accent: spec[2], type: spec[3] });
+        if (st[1] === 'is-hover') dot.classList.add('is-hover');
+        if (st[1] === 'connected') dot.setConnected(true);
+        row.appendChild(dot);
+      });
+    /* air for the frozen hover chip */
+    var spacer = document.createElement('span');
+    spacer.style.cssText = 'width:96px;flex:none;';
+    row.appendChild(spacer);
+    glyphcol.appendChild(row);
+    S.glyphs[spec[0]] = row;
+  });
+
+  /* ---- 14 viz shell + rails ---- */
+  function dummySlot(name, accent, wiredId, type) {
+    var wired = wiredId || null;
+    return {
+      name: name, accent: accent, rest: 0, type: type || 'scalar',
+      get: function () { return wired; },
+      set: function (v) { wired = v; }
+    };
+  }
+  function mountViz(hostId, shell) {
+    var host = document.getElementById(hostId);
+    shell.el.style.width = '100%';
+    shell.el.style.height = '100%';
+    host.appendChild(shell.el);
+    return shell;
+  }
+
+  /* A — fixed-labeled (the wave's grammar) */
+  S.vizFixed = mountViz('viz-fixed-host', ModUI.vizShell({
+    title: 'DUMMY LENS',
+    question: 'How does the idea feel in motion?',
+    onRemove: function () {}
+  }));
+  S.railFixed = ModUI.rail({
+    edge: 'left', mode: 'fixed-labeled',
+    slots: [
+      dummySlot('HEIGHT', '#a946c8', 'w1'),
+      dummySlot('SPEED', '#b8552f', 'w2'),
+      dummySlot('DRIFT', '#eca23b', null)
+    ]
+  });
+  S.vizFixed.el.appendChild(S.railFixed.el);
+
+  /* B — variable-inheriting (the radar's grammar) */
+  var varSlots = [
+    dummySlot('WARMTH', '#a946c8', 'w1'),
+    dummySlot('PACE', '#eca23b', 'w2'),
+    dummySlot('', null, null),
+    dummySlot('', null, null)
+  ];
+  S.railVar = ModUI.rail({
+    edge: 'left', mode: 'variable-inheriting', min: 2, slots: varSlots
+  });
+  S.vizVar = mountViz('viz-var-host', ModUI.vizShell({
+    title: 'DUMMY RADAR',
+    question: 'What shape is the idea?',
+    onMinus: function () { S.railVar.removeSlot(); },
+    onAdd: function () { S.railVar.addSlot(dummySlot('', null, null)); },
+    onRemove: function () {}
+  }));
+  S.vizVar.el.appendChild(S.railVar.el);
+  S.vizVar.el.classList.add('force-chrome');
+
+  /* C — fixed-inheriting, left + right (the beam's grammar) */
+  S.vizBeam = mountViz('viz-beam-host', ModUI.vizShell({
+    title: 'DUMMY BEAM',
+    question: 'Which way does the trade-off lean?',
+    onRemove: function () {}
+  }));
+  S.railBeamL = ModUI.rail({
+    edge: 'left', mode: 'fixed-inheriting',
+    slots: [dummySlot('BREVITY', '#b8552f', 'w1')]
+  });
+  S.railBeamR = ModUI.rail({
+    edge: 'right', mode: 'fixed-inheriting',
+    slots: [dummySlot('DETAIL', '#24986a', 'w2')]
+  });
+  S.vizBeam.el.appendChild(S.railBeamL.el);
+  S.vizBeam.el.appendChild(S.railBeamR.el);
+
+  /* D — top rail (the matrix's column rail) */
+  S.vizTop = mountViz('viz-top-host', ModUI.vizShell({
+    title: 'DUMMY MATRIX',
+    question: 'How do sources bear on targets?',
+    onRemove: function () {}
+  }));
+  S.railTop = ModUI.rail({
+    edge: 'top', mode: 'fixed-inheriting',
+    slots: [
+      dummySlot('NOVEL', '#d66be8', 'w1', 'scalar'),
+      dummySlot('SCOPE', '#48a2ef', 'w2', 'span'),
+      dummySlot('ARC', '#24986a', 'w3', 'series')
+    ]
+  });
+  S.vizTop.el.appendChild(S.railTop.el);
+
+  /* ---- 15 select ---- */
+  S.selectSeg = mount('select-seg-host', ModUI.control({
+    kind: 'select', label: 'AUDIENCE', value: 1, accent: '#b8552f',
+    options: ['Founder', 'Teammate', 'Client'],
+    frames: ['Write for a busy founder.',
+             'Write for a teammate who knows the context.',
+             'Write for a client seeing this cold.']
+  }));
+  S.selectStack = mount('select-stack-host', ModUI.control({
+    kind: 'select', label: 'FORMAT', value: 2, accent: '#eca23b',
+    options: ['Memo', 'Essay', 'Checklist', 'Brief', 'Letter', 'Spec'],
+    frames: ['', '', 'Answer as a checklist.', '', '', '']
+  }));
+
+  /* ---- 16 order ---- */
+  S.order = mount('order-host', ModUI.control({
+    kind: 'order', label: 'PRIORITIES', accent: '#a946c8',
+    items: ['Clarity', 'Depth', 'Brevity', 'Speed'],
+    desc: 'What wins when goals conflict.'
+  }));
+  /* mid-drag replica, frozen: token 2 lifted between slots, sibling
+     displaced (classes + transforms only — no live drag state) */
+  S.orderDrag = mount('order-drag-host', ModUI.control({
+    kind: 'order', label: 'PRIORITIES', accent: '#24986a',
+    items: ['Clarity', 'Depth', 'Brevity', 'Speed']
+  }));
+  requestAnimationFrame(function () {
+    var toks = S.orderDrag.el.querySelectorAll('.mui-order-token');
+    if (toks.length >= 3) {
+      var pitch = toks[1].offsetTop - toks[0].offsetTop;
+      toks[2].classList.add('is-lift');
+      toks[2].style.transform =
+        'translateY(' + (-pitch * 1.12) + 'px) scale(1.02)';
+      toks[1].style.transform = 'translateY(' + pitch + 'px)';
+    }
+  });
+
+  /* ---- 17 mixer ---- */
+  S.mixer2 = mount('mixer-2-host', ModUI.control({
+    kind: 'mixer', label: 'BALANCE', accent: '#f1666d',
+    channels: ['Head', 'Heart'], value: { Head: 70, Heart: 30 }
+  }));
+  S.mixer5 = mount('mixer-5-host', ModUI.control({
+    kind: 'mixer', label: 'WEIGHING', accent: '#b8552f',
+    channels: ['Evidence', 'Examples', 'Intuition', 'Theory', 'Story'],
+    value: { Evidence: 40, Examples: 25, Intuition: 15, Theory: 12, Story: 8 },
+    desc: 'How the answer weighs its sources.'
+  }));
+
+  /* ---- 18 named stops (rider) ---- */
+  S.dialStops = mount('dial-stops-host', ModUI.control({
+    kind: 'dial', label: 'DEPTH', value: 66.67, steps: 3, accent: '#24986a',
+    stops: ['skim', 'solid', 'thorough', 'exhaustive']
+  }));
+  S.sliderStops = mount('slider-stops-host', ModUI.control({
+    kind: 'slider', label: 'REGISTER', value: 50, steps: 2, accent: '#d66be8',
+    stops: ['playful', 'balanced', 'formal']
+  }));
+
+  /* ---- 19 curve · NOW input + moment names ---- */
+  S.curvePos = mount('curve-pos-host', ModUI.control({
+    kind: 'curve', label: 'BREADTH', timebase: 'task', fidelity: 'in-stages',
+    value: [{ t: 0, v: 90 }, { t: 50, v: 60 }, { t: 100, v: 20 }],
+    accent: '#b8552f', desc: 'How widely the work ranges as it proceeds.',
+    xdetents: ['exploring', 'organising', 'committing']
+  }));
+  S.curveNamed = mount('curve-named-host', ModUI.control({
+    kind: 'curve', label: 'RIGOUR', timebase: 'task',
+    value: [{ t: 0, v: 30 }, { t: 50, v: 70 }, { t: 100, v: 95 }],
+    accent: '#24986a',
+    xdetents: ['exploring', 'organising', 'committing']
+  }));
+  /* wire NOW on the first specimen so the hairline shows (the
+     workbench owns real wiring; here we feed a static "organising" 50) */
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () { S.curvePos.setInput('position', 50); });
+  });
+
+  /* ---- 20 fork ---- */
+  S.fork2 = mount('fork-2-host', ModUI.control({
+    kind: 'fork', label: 'RESEARCH', value: 68, accent: '#b8552f', fidelity: 'auto',
+    lookAt: 'whether this needs looking things up',
+    paths: [
+      { name: 'Look it up', prose: 'research first, cite what you find' },
+      { name: 'Just answer', prose: 'answer directly from what you know' }
+    ],
+    desc: 'Decide whether to look things up first.'
+  }));
+  S.fork3 = mount('fork-3-host', ModUI.control({
+    kind: 'fork', label: 'EFFORT', value: 50, accent: '#a946c8',
+    lookAt: 'how hard the question is',
+    paths: [
+      { name: 'Quick answer', prose: 'answer in one pass' },
+      { name: 'Not sure', prose: 'sketch, then check' },
+      { name: 'Step by step', prose: 'take it step by step' }
+    ]
+  }));
+
+  /* ---- 21 revise ---- */
+  S.revise2 = mount('revise-2-host', ModUI.control({
+    kind: 'revise', label: 'POLISH', value: 2, accent: '#a946c8',
+    metric: 'clear enough to skim', strict: 'thorough', redo: 'fix',
+    desc: 'Read the draft back and revise before returning.'
+  }));
+  S.revise0 = mount('revise-0-host', ModUI.control({
+    kind: 'revise', label: 'POLISH', value: 0, accent: '#eca23b',
+    metric: 'clear enough to skim', strict: 'light', redo: 'fix'
+  }));
+
+  /* ---- 22 fidelity chip ---- */
+  var fidRow = document.getElementById('fidelity-row');
+  S.fidOnePass = ModUI.fidelityChip({ value: 'one-pass' });
+  S.fidInStages = ModUI.fidelityChip({ value: 'in-stages' });
+  S.fidAuto = ModUI.fidelityChip({ value: 'auto' });
+  [S.fidOnePass, S.fidInStages, S.fidAuto].forEach(function (c) { fidRow.appendChild(c.el); });
+
+  /* ---- 23 two cable families + step ---- */
+  var famcol = document.getElementById('family-col-host');
+  [['SIGNAL · OUT', 'scalar', 'out', '#a946c8', false],
+   ['ARTIFACT · OUT', 'artifact', 'out', '#eca23b', true],
+   ['ARTIFACT · IN', 'artifact', 'in', '#eca23b', true]].forEach(function (spec) {
+    var row = document.createElement('div');
+    row.className = 'nodecol-row';
+    row.style.gap = '26px';
+    var lb = document.createElement('span');
+    lb.style.cssText = 'font-family:var(--mui-mono);font-size:9px;letter-spacing:.09em;' +
+      'text-transform:uppercase;color:var(--mui-ink-soft);width:96px;flex:none;';
+    lb.textContent = spec[0];
+    row.appendChild(lb);
+    var dot = ModUI.nodeDot({ label: spec[0], accent: spec[3], type: spec[1], dir: spec[2] });
+    if (spec[4]) dot.setConnected(true);   /* artifacts shown connected for weight */
+    row.appendChild(dot);
+    var spacer = document.createElement('span');
+    spacer.style.cssText = 'width:120px;flex:none;';
+    row.appendChild(spacer);
+    famcol.appendChild(row);
+  });
+  S.step = ModUI.stepShell({
+    verb: 'explore', accent: '#eca23b',
+    prose: 'range widely — ten unlike directions before settling',
+    signals: [{ label: 'BREADTH', accent: '#b8552f' }],
+    fidelity: 'in-stages',
+    question: 'What real call does this run?',
+    onRemove: function () {}
+  });
+  (function () {
+    var host = document.getElementById('step-host');
+    S.step.el.style.width = '100%';
+    S.step.el.style.height = '100%';
+    host.appendChild(S.step.el);
+    /* the foot is a RUNS value chip fed by the host's resolver */
+    S.step.setRuns('→ CALL 1');
+  })();
+
+  /* open the config popup on the demo specimen after layout settles.
+     The popup positions itself against the viewport, so bring the
+     specimen on-screen first, then return to the top. */
+  window.addEventListener('load', function () {
+    requestAnimationFrame(function () {
+      document.getElementById('config-demo-host').scrollIntoView({ block: 'center' });
+      S.configDemo.openConfig();
+      window.scrollTo(0, 0);
+    });
+  });
+})();
+</script>
+</body>
+</html>

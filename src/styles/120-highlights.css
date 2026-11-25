@@ -1,0 +1,339 @@
+
+/* ---- Highlighter tags & Highlights panel --------------------------------- */
+
+.highlighter-btn-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.highlighter-tag-ink {
+  position: absolute;
+  right: var(--e-sp-2);
+  bottom: 2px;
+  left: var(--e-sp-2);
+  height: 2px;
+  border-radius: var(--e-r-inner);
+  background: var(--active-tag-color, transparent);
+  pointer-events: none;
+}
+
+.highlighter-pen-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e-sp-2);
+  pointer-events: none;
+}
+.highlighter-pen-bar .pen-tag-chip {
+  pointer-events: auto;
+}
+.highlighter-howto {
+  border: 1px solid var(--e-line);
+  border-radius: 999px;
+  background: var(--e-surface-floating);
+  padding: var(--e-sp-1) var(--e-sp-3);
+}
+.tag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tag-dot, var(--e-ink-faint));
+  flex: none;
+}
+.tag-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The pen chip: the one thing shown while highlighting — what the pen paints with. */
+.pen-tag-chip {
+  border-radius: 999px;
+  background: var(--e-surface-floating);
+  color: var(--e-ink);
+  max-width: 220px;
+}
+.pen-tag-chip:hover,
+.pen-tag-chip[aria-expanded="true"] {
+  border-color: var(--tag-dot, var(--e-line-strong));
+  background: var(--tag-bg, var(--e-surface-floating));
+}
+.pen-tag-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--e-ink-soft);
+  transition: transform var(--e-t-fast) var(--e-ease-out);
+}
+.pen-tag-chip[aria-expanded="true"] .pen-tag-chevron {
+  transform: rotate(180deg);
+}
+
+/* The tag menu: search or create on top, one row per tag, how-to as the footer. */
+.tag-menu {
+  width: min(260px, calc(100vw - (var(--e-sp-2) * 2)));
+  padding: 6px;
+  text-align: left;
+}
+.tag-menu-search {
+  min-width: 0;
+}
+.tag-menu-list {
+  display: grid;
+  gap: var(--e-sp-1);
+  margin-top: var(--e-sp-2);
+  max-height: 220px;
+  overflow-y: auto;
+}
+.tag-menu-row {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  border-radius: var(--e-r-inner);
+}
+.tag-menu-pick {
+  flex: 1;
+  min-width: 0;
+  padding: var(--e-sp-1) var(--e-sp-2);
+}
+.tag-menu-pick .tag-name {
+  flex: 1;
+}
+.tag-menu-row.active .tag-menu-pick {
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+}
+.tag-menu-pick svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.tag-menu-more {
+  opacity: 0;
+  flex: none;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.tag-menu-row:hover .tag-menu-more,
+.tag-menu-more:focus-visible {
+  opacity: 1;
+}
+.tag-menu-create {
+  color: var(--e-ink-soft);
+  padding: var(--e-sp-1) var(--e-sp-2);
+}
+.tag-menu-create-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  min-width: 0;
+  background: var(--tag-bg, transparent);
+  border-radius: 999px;
+  padding: 2px var(--e-sp-2);
+  color: var(--e-ink);
+}
+.tag-menu-empty {
+  padding: var(--e-sp-2);
+}
+.tag-menu-foot {
+  margin-top: var(--e-sp-2);
+  padding: var(--e-sp-2) var(--e-sp-1) 0;
+  border-top: 1px solid var(--e-line);
+}
+
+/* Tag options: the drill-in page for one tag — name, color, delete. */
+.tag-manage-head {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-bottom: var(--e-sp-2);
+}
+.tag-manage-title {
+  color: var(--e-ink-soft);
+}
+.tag-manage-label {
+  color: var(--e-ink-soft);
+  margin: var(--e-sp-3) 0 var(--e-sp-2);
+}
+.tag-manage-delete {
+  margin-top: var(--e-sp-3);
+  padding: var(--e-sp-1) var(--e-sp-2);
+}
+.tag-manage-count {
+  margin-left: auto;
+  color: var(--e-ink);
+}
+
+.highlights-panel {
+  position: absolute;
+  z-index: var(--e-z-panel);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(360px, 100%);
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-left: 1px solid var(--e-line);
+  border-radius: 0;
+  background: var(--e-surface-panel);
+  color: var(--e-ink);
+  overflow: hidden;
+}
+.highlights-head {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-4);
+  border-bottom: 1px solid var(--e-line);
+}
+.highlights-head h2 {
+  margin: 0;
+  flex: 1;
+}
+.highlights-count {
+  flex: none;
+}
+.highlights-close {
+  flex: none;
+}
+.highlights-empty {
+  padding: var(--e-sp-6) var(--e-sp-4);
+  text-align: center;
+}
+.highlights-empty h3 {
+  margin: 0 0 var(--e-sp-2);
+}
+.highlights-empty p {
+  margin: 0;
+  color: var(--e-ink-soft);
+}
+.highlights-groups {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--e-sp-4);
+  display: grid;
+  gap: var(--e-sp-5);
+  align-content: start;
+}
+.highlights-group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  min-height: 22px;
+  margin-bottom: var(--e-sp-2);
+}
+.highlights-group-name {
+  color: var(--e-ink-soft);
+}
+.highlights-group-count {
+  flex: none;
+}
+.highlights-group-head .e-icon-button {
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.highlights-group:hover .highlights-group-head .e-icon-button,
+.highlights-group-head .e-icon-button:focus-visible {
+  opacity: 1;
+}
+.highlights-danger-action {
+  color: var(--e-avoid-ink);
+}
+.highlights-group-empty {
+  margin: 0;
+  color: var(--e-ink-soft);
+}
+.highlights-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--e-sp-2);
+}
+.highlight-row {
+  position: relative;
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-card);
+  transition: border-color var(--e-t-fast) var(--e-ease-out);
+}
+.highlight-row:hover {
+  border-color: var(--e-line-strong);
+}
+.highlight-row:has(> .highlight-row-text:focus-visible) {
+  border-color: var(--e-go);
+}
+.highlight-row-text {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: var(--e-sp-2) calc(var(--e-sp-2) + var(--e-sp-1));
+  color: var(--e-ink);
+}
+.highlight-row-text:focus-visible {
+  outline: none;
+}
+.highlight-row-quote {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  background: var(--tag-bg, transparent);
+  border-radius: var(--e-r-inner);
+  color: var(--e-ink);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  width: fit-content;
+  max-width: 100%;
+  padding-inline: var(--e-sp-1);
+}
+.highlight-row-source {
+  display: block;
+  margin-top: var(--e-sp-2);
+  color: var(--e-ink-soft);
+  padding-right: calc((var(--e-sp-5) * 3) + var(--e-sp-2));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.highlight-row-actions {
+  position: absolute;
+  right: var(--e-sp-2);
+  bottom: var(--e-sp-2);
+  display: flex;
+  gap: var(--e-sp-1);
+  opacity: 0;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.highlight-row:hover .highlight-row-actions,
+.highlight-row-actions:focus-within {
+  opacity: 1;
+}
+.highlight-row-actions .e-icon-button {
+  background: var(--e-surface-card);
+}
+
+@media (pointer: coarse) {
+  .tag-menu-more,
+  .highlights-group-head .e-icon-button,
+  .highlight-row-actions {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 720px) {
+  .highlights-panel {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: min(72vh, 640px);
+    border-top: 1px solid var(--e-line-strong);
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: var(--e-r-well) var(--e-r-well) 0 0;
+  }
+}

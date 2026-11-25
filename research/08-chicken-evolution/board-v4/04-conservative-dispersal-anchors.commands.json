@@ -1,0 +1,239 @@
+[
+  {
+    "version": 1,
+    "id": "v4-dispersal-group",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "group",
+      "groupTitle": "SELECTED DISPERSAL MINIMUMS · ANCHORS, NOT ROUTES",
+      "compressionPrompt": "Preserve each anchor's identity method, date type, local behavioral inference, and limit. Treat the layout as a catalogue of regional minimums: do not infer an origin, route between regions, continuous wave front, or direct specimen date from an associated phase.",
+      "position": { "x": 10772, "y": -10000 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-title",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "title",
+      "body": "Selected dispersal anchors · chronology without regional route arrows",
+      "position": { "x": 10772, "y": -60 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-route-caveat",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Route-map rule · conservative by design**\n\nEach card is an independently supported minimum appearance or use signal. Positions are visual chronology only. Connections from this card classify anchors; they do not assert travel between regions, one corridor, an origin point, or a continuous wave front. Associated phases are not direct specimen dates.",
+      "position": { "x": 10800, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-ban-non-wat",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Ban Non Wat · northeast Thailand**\n\nAssociated phase about 1650–1250 BCE. Earliest currently auditable, unambiguous chicken assemblage in the broad reassessment; management is consistent with farming context. The bones are not directly dated, and domestic status is contextual—not proof of one origin site. [Peters et al. 2022](https://doi.org/10.1073/pnas.2121978119)",
+      "position": { "x": 11280, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-later-second-millennium",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Central China + South Asia + Mesopotamia**\n\nSecure presence in contexts of the later second millennium BCE. This combined chronological anchor does not rehabilitate much older northern-China claims and does not draw a measured route among the three regions. [Peters et al. 2022](https://doi.org/10.1073/pnas.2121978119)",
+      "position": { "x": 11720, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-melanesia",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Melanesia · later second millennium BCE horizon**\n\nArchaeological contexts support early eastward human transport after the Southeast Asian appearance. Exact first-arrival route and tempo remain sampling-dependent. [Peters et al. 2022](https://doi.org/10.1073/pnas.2121978119)",
+      "position": { "x": 12160, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-ethiopia",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Ethiopia · about 800–600 BCE**\n\nDirectly dated chickens provide an early African minimum. This is a regional anchor from available evidence, not a demonstrated route from South Asia or the Mediterranean. [Peters et al. 2022](https://doi.org/10.1073/pnas.2121978119)",
+      "position": { "x": 11280, "y": 520 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-europe-africa",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Europe + Northwest Africa · Iron Age arrivals**\n\nDirect AMS dating of 23 bones from 16 sites exposed frequent legacy misdating. Early birds were often complete, old, or specially deposited; routine consumption followed centuries later in many places. Routes may include Greek and Phoenician exchange but do not collapse to one corridor. [Best et al. 2022](https://doi.org/10.15184/aqy.2021.90)",
+      "position": { "x": 11720, "y": 520 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-maresha",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Maresha, Israel · fourth–second centuries BCE**\n\nHellenistic demographic and butchery evidence makes mass exploitation for food visible. This is a use milestone, not a migration edge or the first chicken in the wider region. [Perry-Gal et al. 2015](https://doi.org/10.1073/pnas.1504236112)",
+      "position": { "x": 12160, "y": 520 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-central-asia",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Southern Central Asia · eggshell production signal**\n\nZooMS and eggshell microscopy identify chickens from the last centuries BCE through medieval times. Earliest directly dated contexts include Paykend, 515–392 BCE, and Bash Tepa, 385–206 BCE. Recurrent eggshell supports frequent, perhaps out-of-season laying—not a recovered causal allele. [Peters et al. 2024](https://doi.org/10.1038/s41467-024-46093-2)",
+      "position": { "x": 12600, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-karako-kagi",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Karako-Kagi, Japan · 381–204 BCE**\n\nZooMS identity plus direct dating establishes an immature chicken. Immaturity in a settlement context supports local successive breeding rather than import of adult birds alone. [Eda et al. 2023](https://doi.org/10.3389/feart.2023.1104535)",
+      "position": { "x": 13040, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-karakami",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Karakami, Japan · a different local pathway**\n\nZooMS identifies six mature chickens, five probably male; all five immature bird bones were neither chicken nor another galliform. Presence is clear, but this site supplies no successive-breeding evidence. [Eda et al. 2025](https://doi.org/10.1002/oa.70027)",
+      "position": { "x": 13040, "y": 520 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-gungok",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Gungok-ri, Korea · 80–361 CE**\n\nZooMS identifies five chickens among 14 phasianid remains. Direct dates and enriched nitrogen isotopes support human feeding or management; this is a combined identity, chronology, and diet inference. [Kim et al. 2026](https://doi.org/10.1016/j.jasrep.2025.105561)",
+      "position": { "x": 13480, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-borgund",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Borgund, Norway · about 887–986 CE**\n\nDirect and associated dates support the earliest secure local chicken. Mature age profiles and context favor eggs, feathers, display, or social value over intensive meat production; the transport route remains unresolved. [Walker et al. 2025](https://doi.org/10.1002/oa.70018)",
+      "position": { "x": 13920, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-aland",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Åland + Baltic · heterogeneous ancestry**\n\nOne Åland haplogroup-B specimen dates directly to 266–541 CE, the earliest direct Finnish chicken and earliest non-E1 ancient European specimen in that dataset. Small, nonrandom samples and limited amplification make this a regional signal, not a replacement route. [Olli et al. 2026](https://doi.org/10.1038/s41437-026-00842-9)",
+      "position": { "x": 13920, "y": 520 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-indian-ocean",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Comoros + Madagascar · about 750–900 CE**\n\nThe broad synthesis places chickens in these Indian Ocean contexts long after the earliest Ethiopian anchor. The interval is a regional minimum from present evidence, not a traced Horn-of-Africa or South-Asian route. [Peters et al. 2022](https://doi.org/10.1073/pnas.2121978119)",
+      "position": { "x": 14360, "y": 120 }
+    }
+  },
+  { "version": 1, "id": "v4-dispersal-id-group", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-group" }, "identity": { "preset": "sky", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-dispersal-id-caveat", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-route-caveat" }, "identity": { "preset": "charcoal", "fill": "body" } } },
+  { "version": 1, "id": "v4-dispersal-id-ban", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-ban-non-wat" }, "identity": { "preset": "amber", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-dispersal-id-later", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-later-second-millennium" }, "identity": { "preset": "amber", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-melanesia", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-melanesia" }, "identity": { "preset": "sky", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-ethiopia", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-ethiopia" }, "identity": { "preset": "green", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-europe", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-europe-africa" }, "identity": { "preset": "green", "fill": "body" } } },
+  { "version": 1, "id": "v4-dispersal-id-maresha", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-maresha" }, "identity": { "preset": "orange", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-central-asia", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-central-asia" }, "identity": { "preset": "mint", "fill": "body" } } },
+  { "version": 1, "id": "v4-dispersal-id-karako", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-karako-kagi" }, "identity": { "preset": "mint", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-karakami", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-karakami" }, "identity": { "preset": "slate", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-gungok", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-gungok" }, "identity": { "preset": "mint", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-borgund", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-borgund" }, "identity": { "preset": "blue", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-aland", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-aland" }, "identity": { "preset": "purple", "fill": "soft" } } },
+  { "version": 1, "id": "v4-dispersal-id-indian-ocean", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-indian-ocean" }, "identity": { "preset": "sky", "fill": "soft" } } },
+  {
+    "version": 1,
+    "id": "v4-dispersal-member-caveat",
+    "name": "group.membership.set",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-dispersal-route-caveat" }, "group": { "createdByCommandId": "v4-dispersal-group" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-dispersal-arrange",
+    "name": "cards.arrange",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "frames": [
+        { "card": { "createdByCommandId": "v4-dispersal-group" }, "position": { "x": 10772, "y": 74 }, "size": { "width": 3976, "height": 716 } },
+        { "card": { "createdByCommandId": "v4-dispersal-title" }, "position": { "x": 10772, "y": -60 }, "size": { "width": 1040, "height": 82 } },
+        { "card": { "createdByCommandId": "v4-dispersal-route-caveat" }, "position": { "x": 10800, "y": 120 }, "size": { "width": 400, "height": 280 } },
+        { "card": { "createdByCommandId": "v4-dispersal-ban-non-wat" }, "position": { "x": 11280, "y": 120 }, "size": { "width": 360, "height": 260 } },
+        { "card": { "createdByCommandId": "v4-dispersal-later-second-millennium" }, "position": { "x": 11720, "y": 120 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-melanesia" }, "position": { "x": 12160, "y": 120 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-ethiopia" }, "position": { "x": 11280, "y": 520 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-europe-africa" }, "position": { "x": 11720, "y": 520 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-maresha" }, "position": { "x": 12160, "y": 520 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-central-asia" }, "position": { "x": 12600, "y": 120 }, "size": { "width": 360, "height": 280 } },
+        { "card": { "createdByCommandId": "v4-dispersal-karako-kagi" }, "position": { "x": 13040, "y": 120 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-karakami" }, "position": { "x": 13040, "y": 520 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-gungok" }, "position": { "x": 13480, "y": 120 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-borgund" }, "position": { "x": 13920, "y": 120 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-aland" }, "position": { "x": 13920, "y": 520 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-dispersal-indian-ocean" }, "position": { "x": 14360, "y": 120 }, "size": { "width": 360, "height": 240 } }
+      ]
+    }
+  },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-ban", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-ban-non-wat" }, "strength": "weak", "polarity": "helps", "reason": "catalogues one associated-phase minimum; no regional movement path implied" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-later", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-later-second-millennium" }, "strength": "weak", "polarity": "helps", "reason": "catalogues grouped later-second-millennium presences; no arrows among regions" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-melanesia", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-melanesia" }, "strength": "weak", "polarity": "helps", "reason": "catalogues one eastward-transport horizon without selecting a route" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-ethiopia", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-ethiopia" }, "strength": "weak", "polarity": "helps", "reason": "catalogues one directly dated regional minimum; no source corridor implied" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-europe", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-europe-africa" }, "strength": "weak", "polarity": "helps", "reason": "catalogues direct AMS arrivals and delayed use, not a single expansion front" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-maresha", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-maresha" }, "strength": "weak", "polarity": "helps", "reason": "catalogues a local food-use milestone rather than migration" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-central-asia", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-central-asia" }, "strength": "weak", "polarity": "helps", "reason": "catalogues a production-behavior signal without tracing an arrival corridor" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-karako", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-karako-kagi" }, "strength": "weak", "polarity": "helps", "reason": "catalogues a direct local breeding signal; no mainland route implied" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-karakami", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-karakami" }, "strength": "weak", "polarity": "helps", "reason": "catalogues contrasting local age structure without a transport arrow" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-gungok", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-gungok" }, "strength": "weak", "polarity": "helps", "reason": "catalogues combined ZooMS, direct-date, and isotope evidence; no regional route implied" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-borgund", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-borgund" }, "strength": "weak", "polarity": "helps", "reason": "catalogues a late northern minimum while leaving transport unresolved" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-aland", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-aland" }, "strength": "weak", "polarity": "helps", "reason": "catalogues regional ancestry heterogeneity, not a lineage-replacement route" } },
+  { "version": 1, "id": "v4-dispersal-edge-caveat-indian-ocean", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-dispersal-route-caveat" }, "to": { "createdByCommandId": "v4-dispersal-indian-ocean" }, "strength": "weak", "polarity": "helps", "reason": "catalogues Indian Ocean regional minimums without choosing a corridor" } }
+]

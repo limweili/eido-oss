@@ -1,0 +1,26 @@
+{
+  "name": "issue-247-image-payload-reference",
+  "provenance": {
+    "issue": 247,
+    "url": "https://github.com/limweili/eido/issues/247",
+    "source": "Issue #247 problem statement and Lane D acceptance contract",
+    "recordedAt": "2026-07-07"
+  },
+  "units": {
+    "megabytes": "Issue-reported MB values, recorded without recomputing or normalizing units.",
+    "seconds": "Issue-reported wall-clock seconds for local reference only.",
+    "policy": "Reference evidence only. CI must not assert live timing values from this file; deterministic payload-byte math is gated in src/performance/persistencePayload.test.ts."
+  },
+  "measurements": {
+    "activeSaveSizeMb": 84.67,
+    "imageDataUrlPayloadOccurrencesMb": 72.77,
+    "uniqueImagePayloadMb": 36.39,
+    "activeBoardImagePayloadMb": 36.46,
+    "strippedSaveSizeMb": 11.89,
+    "apiInitialFullSaveSeconds": 30.89,
+    "apiInitialStrippedSaveSeconds": 7.38,
+    "fullFirstContentfulPaintSecondsApprox": 4.5,
+    "strippedFirstContentfulPaintSecondsApprox": 1.1,
+    "isolatedThirtyImageThumbnailLoadSecondsApprox": 9.8
+  }
+}

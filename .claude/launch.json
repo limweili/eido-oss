@@ -1,0 +1,55 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "proto",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd docs/design/prototypes && exec python3 -m http.server 8123"
+      ],
+      "cwd": ".",
+      "port": 8123
+    },
+    {
+      "name": "eido",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "exec npm run dev -- --port 5188 --strictPort"
+      ],
+      "cwd": ".",
+      "port": 5188
+    },
+    {
+      "name": "design-system",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "const h=require('http'),f=require('fs'),p=require('path');const root=p.resolve('docs/design');h.createServer((q,s)=>{const u=decodeURIComponent(q.url.split('?')[0]);let fp=p.join(root,u==='/'?'design-system/eido-design-system.html':u);if(!fp.startsWith(root)){s.writeHead(403);return s.end()}f.readFile(fp,(e,d)=>{if(e){s.writeHead(404);return s.end('not found')}const t={'.html':'text/html','.css':'text/css','.js':'text/javascript','.png':'image/png','.webp':'image/webp'}[p.extname(fp)]||'application/octet-stream';s.writeHead(200,{'content-type':t});s.end(d)})}).listen(8642,()=>console.log('serving on 8642'))"
+      ],
+      "cwd": ".",
+      "port": 8642
+    },
+    {
+      "name": "eido-dev-scratch-save",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "EIDO_DATA_FILE='tmp/eido-dev-scratch-save.json' exec npm run dev -- --port 5277 --strictPort"
+      ],
+      "cwd": ".",
+      "port": 5277
+    },
+    {
+      "name": "linkup-proof",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "EIDO_DATA_FILE='tmp/linkup-proof.json' exec npm run dev -- --port 5301 --strictPort"
+      ],
+      "cwd": ".",
+      "port": 5301
+    }
+  ]
+}

@@ -1,0 +1,1690 @@
+
+/* ---------- Cards ---------- */
+.card {
+  position: relative;
+  background: var(--e-surface-card);
+  border: var(--e-card-border-width) solid var(--e-line-strong);
+  border-radius: var(--e-r-card);
+  box-shadow: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  color: var(--e-ink);
+  font-size: var(--e-fs-ui);
+}
+/* Selection and drag chrome lives on paint-only planes. Mutating the rich
+   Card's border or shadow makes Chromium repaint every visible glyph. */
+.card::before {
+  position: absolute;
+  z-index: 0;
+  right: var(--e-sp-3);
+  bottom: 0;
+  left: var(--e-sp-3);
+  height: var(--e-card-border-width);
+  box-shadow: var(--e-shadow-lift);
+  opacity: 0;
+  pointer-events: none;
+  content: '';
+  transition: none;
+}
+.card.palette-open {
+  overflow: visible;
+}
+/* When the user has dragged a card to expand, the body fills and scrolls. Most
+   text editors fill that body; note cards opt into text+asset flow instead. */
+.card.fixed-h .card-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+}
+.card.fixed-h .card-body textarea {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.card.note.fixed-h .note-body {
+  display: block;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.card.note.fixed-h .note-body textarea {
+  display: block;
+  flex: none;
+  /* Backstop for #207: a stale inline height can never clip the editor below
+     the visible card body — the textarea always at least fills the scroller. */
+  min-height: 100%;
+  overflow: hidden;
+}
+.card.note.fixed-h .note-body .note-render {
+  min-height: 0;
+}
+.card.askAi.fixed-h .card-body > :is(.note-render, .markdown-card-editor-transition) {
+  /* The body owns scrolling. Its contained passive/editor prose must keep its
+     natural block size so flex sizing cannot clip the tail instead of adding
+     it to the body's scroll range. */
+  flex: none;
+}
+.card.conversation.fixed-h .card-body {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.card.conversation.fixed-h .card-body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.card.conversation.fixed-h .card-body > :is(.note-render, .markdown-card-editor-transition) {
+  /* The native Card surface keeps layout/paint containment for cheap canvas
+     motion. Give both Conversation representations an intrinsic block size
+     so activation preserves the body's scroll range and remembered progress. */
+  height: max-content;
+}
+.card.askAi:not(.fixed-h) > .card-body,
+.card.conversation:not(.fixed-h) > .card-body {
+  display: flex;
+  flex-direction: column;
+}
+.card.askAi {
+  container-type: inline-size;
+}
+
+/* Container queries measure the border-box Card's content box. With the
+   shared 1px border on both sides, 268px here means an outer Card width below
+   the requested 270px threshold. The label stays in the DOM for assistive
+   technology and only Ask AI's running state is compacted. */
+@container (inline-size < 268px) {
+  .card.askAi.fixed-h > .card-body {
+    padding-block: var(--e-sp-1);
+  }
+
+  .card.askAi > .card-foot {
+    gap: var(--e-sp-1);
+  }
+
+  .card.askAi .ask-ai-state-word.e-state-word--running .ask-ai-state-word__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    margin: calc(-1 * var(--e-card-border-width));
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .card.askAi .ask-ai-state-word.e-state-word--running .e-state-word__pulse {
+    margin-left: 0;
+  }
+}
+.card.fixed-h .result-text {
+  max-height: none;
+}
+/* Natural-height Cards stop before the pane's lower edge or the next Card in
+   their growth path. Their body becomes the scroller; a manually resized Card
+   keeps its explicit height and existing fixed-height behaviour. */
+.card:not(.fixed-h) {
+  min-height: min(250px, var(--e-card-growth-max-height, 250px));
+  max-height: var(--e-card-growth-max-height, none);
+}
+.card:not(.fixed-h) > .card-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+/* A resized Conversation Result lets its transcript grow to fill the card, keeping
+   the interjection input pinned just below it rather than floating mid-card. */
+.card.fixed-h .transcript {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
+.react-flow__node.dragging > .card::before {
+  opacity: 1;
+}
+.card-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--e-line);
+  border-radius: calc(var(--e-r-card) - 1px) calc(var(--e-r-card) - 1px) 0 0;
+  background: transparent;
+}
+@media (pointer: coarse) {
+  /* Chromium expands coarse taps toward nearby controls. Preserve the
+     selected Card's existing top drag rail as an exact head hit target so a
+     touch drag cannot be retargeted onto the title button's `nodrag` surface. */
+  .board-flow.tool-select .card.selected > .card-head::before {
+    content: '';
+    position: absolute;
+    z-index: calc(var(--e-z-canvas-chrome) - 1);
+    top: calc(var(--e-sp-6) * -1);
+    left: 50%;
+    width: calc(var(--e-sp-5) + var(--e-sp-4));
+    height: calc(var(--e-sp-5) + var(--e-sp-4));
+    transform: translateX(-50%);
+    touch-action: none;
+  }
+}
+.card.fill-half .card-head {
+  background: var(--card-header-soft, transparent);
+}
+.card.fill-full .card-head {
+  color: var(--card-header-ink, var(--e-on-solid));
+  background: var(--card-header-color, transparent);
+  border-bottom-color: transparent;
+}
+.card.fill-full .card-body {
+  background: var(--card-header-body, transparent);
+  color: var(--identity-body-ink);
+}
+.card.fill-full .card-body .note-render {
+  color: var(--identity-body-ink);
+}
+.card.fill-full .card-body .markdown-card-editor-content {
+  color: var(--identity-body-ink);
+}
+.card.fill-full .card-body .result-text,
+.card.fill-full .card-body :is(.note-render, .result-text) td:not([data-tool-cell='true']) {
+  color: var(--identity-body-ink);
+}
+.card.fill-full .card-body > .card-kind {
+  color: var(--identity-body-ink-soft);
+}
+.card.fill-full .card-body .note-render blockquote {
+  color: var(--identity-body-ink-soft);
+}
+.card.fill-full .card-body .result-text blockquote {
+  color: var(--identity-body-ink-soft);
+}
+.card.fill-full .card-body .note-render > .result-empty {
+  color: var(--identity-body-ink-soft);
+}
+.card.fill-full .card-body .result-text > .result-empty {
+  color: var(--identity-body-ink-soft);
+}
+.card.fill-full .card-body .transcript > .result-empty {
+  color: var(--identity-body-ink-soft);
+}
+.card.fill-full .card-body .model-pick-label,
+.card.fill-full .card-run-dock .model-pick-label {
+  color: var(--identity-body-ink-soft);
+}
+/* A callout inside a coloured Card lies on the Card's colour, so that is the
+   material its tint mixes into and those are the inks it speaks in. Without
+   this it arrived as a cream block from the default Card, which is the one
+   thing §6.7a says a callout must never do.
+
+   The base is the Card's colour stepped back toward the Card's paper, not the
+   colour neat. Neat, an 18% wash could not move a saturated body far enough
+   to become its own plane: the well came out a shade off the body and read as
+   a translucent sheet laid over it rather than a solid panel (founder report
+   2026-08-18). Every colour here is fully opaque; the step is what makes it
+   look it. */
+.card.fill-full .card-run-dock .e-callout {
+  --callout-base: color-mix(in srgb, var(--card-header-body) 40%, var(--e-surface-card));
+  color: var(--identity-body-ink);
+}
+.card.fill-full .card-run-dock .e-callout__mark {
+  color: var(--identity-body-attention-ink);
+}
+.card.fill-full .card-run-dock .e-callout--avoid .e-callout__mark {
+  color: var(--identity-body-avoid-ink);
+}
+.card.fill-full .card-run-dock .e-callout--go .e-callout__mark {
+  color: var(--identity-body-go-ink);
+}
+.card.fill-full .card-run-dock .e-callout--convo .e-callout__mark {
+  color: var(--identity-body-convo-ink);
+}
+.card.fill-full .card-body .note-render a {
+  color: var(--identity-body-go-ink);
+}
+.card.fill-full .card-body .result-text a {
+  color: var(--identity-body-go-ink);
+}
+.card.fill-full .card-title-display,
+.card.fill-full .card-title-input,
+.card.fill-full .card-title-input::placeholder {
+  color: var(--card-header-ink, var(--e-on-solid));
+}
+.card.fill-pattern .card-head {
+  background: var(--card-header-pattern-head, transparent);
+}
+.card.fill-pattern .card-body {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--card-header-pattern) 0 1px,
+    transparent 1px 8px
+  );
+}
+.card.fill-pattern > .card-body:not(:has(~ .card-foot)),
+.card.fill-full > .card-body:not(:has(~ .card-foot)) {
+  border-radius: 0 0 calc(var(--e-r-card) - 1px) calc(var(--e-r-card) - 1px);
+}
+.card-kind {
+  color: var(--e-ink-soft);
+}
+.card-eyebrow {
+  margin-bottom: var(--e-sp-2);
+}
+.color-wrap {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+}
+.card-head .kind-dot {
+  position: relative;
+  z-index: var(--e-z-canvas-chrome);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--e-ink);
+  padding: 0;
+  flex: 0 0 auto;
+  transition: transform var(--e-t-fast) var(--e-ease-out);
+}
+.card-head .kind-dot::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+}
+.card-head .kind-dot.has-color {
+  background: var(--card-header-color);
+  box-shadow: none;
+}
+/* Live activation may take a beat after an S/O shell receives intent. The
+   Board owns the wrapper marker; the existing identity dot presents it.
+   Reusing the sanctioned opacity-only pulse keeps the Card and its colour
+   unchanged, with no layout or glyph repaint work. */
+.react-flow__node[data-live-transition='loading'] .card-head .kind-dot {
+  animation: pulse var(--e-t-stream) ease-in-out infinite;
+}
+:root[data-reduced-motion="true"] .react-flow__node[data-live-transition='loading'] .card-head .kind-dot {
+  animation: none !important;
+  opacity: 1;
+}
+.card-head .kind-dot:hover {
+  transform: scale(var(--e-scale-grow));
+}
+.card-head .kind-dot:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  .card-head .kind-dot::after {
+    /* End at the title's leading edge while keeping the full 40px target.
+       Shifting the box toward the card rail partitions adjacent controls. */
+    inset: -3px -8px -27px -22px;
+    border-radius: 0;
+  }
+}
+.card-color-popover {
+  padding: var(--e-sp-3);
+}
+.card-color-popover .e-colour-picker__mode.no-color {
+  background:
+    linear-gradient(45deg, transparent 45%, var(--e-ink-soft) 46%, var(--e-ink-soft) 54%, transparent 55%),
+    var(--e-surface-card);
+}
+.card-color-popover .e-colour-picker__mode.half-fill {
+  background:
+    linear-gradient(90deg, var(--card-header-color, transparent) 0 50%, transparent 50%),
+    var(--e-surface-card);
+}
+.card-color-popover .e-colour-picker__mode.full-fill {
+  background:
+    linear-gradient(180deg, var(--card-header-color, transparent) 0 45%, var(--card-header-body, transparent) 45%),
+    var(--e-surface-card);
+}
+.card-color-popover .e-colour-picker__mode.pattern-fill {
+  background-color: var(--e-surface-card);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--card-header-pattern, transparent) 0 1px,
+    transparent 1px 8px
+  );
+}
+.card-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  opacity: 0;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.card:hover .card-head-actions,
+.card.selected .card-head-actions,
+.card:focus-within .card-head-actions {
+  opacity: 1;
+}
+.card.mod .kind-dot:not(.has-color) {
+  background: var(--e-mod);
+}
+/* Mod cards hug their face like the reference prototype; only an explicit
+   resize (fixed-h) sets a height. 120px is the reference's resize floor. */
+.card.mod:not(.fixed-h) {
+  min-height: 120px;
+  max-height: none;
+}
+/* Containment is unconditional: a face may scroll inside its card but it may
+   never paint past the foot, whatever height the card has. */
+.card.mod .mod-face-host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.card.mod .mod-face {
+  flex: 1 1 auto;
+}
+/* An explicitly sized card stretches its tall wells (the reference's is-sized
+   grammar); rows keep a 110px floor and scroll past it instead of clipping. */
+.card.mod.fixed-h :is(
+  .mod-row:has(> .i-pad),
+  .mod-row:has(> .i-radar),
+  .mod-row:has(> .i-mx-wrap),
+  .mod-row--mixer
+) {
+  flex: 1 1 auto;
+  min-height: 110px;
+}
+.card.mod.fixed-h :is(.i-pad, .i-radar, .i-bd) {
+  height: auto;
+  flex: 1 1 auto;
+  min-height: 110px;
+}
+.card.conversation:not(.fill-full) .card-head {
+  border-bottom-color: color-mix(in srgb, var(--e-convo) 35%, transparent);
+}
+.card.conversation .kind-dot:not(.has-color) {
+  background: var(--e-convo);
+}
+.card.agent-unadopted .card-head {
+  border-bottom-color: var(--e-agent-unadopted-accent);
+  border-bottom-style: dashed;
+}
+.card.fill-full .card-head .kind-dot.has-color {
+  background: var(--card-header-ink);
+}
+.card.group {
+  background: color-mix(in srgb, var(--e-surface-card) var(--e-group-surface-opacity), transparent);
+  border: 1.5px dashed var(--e-line-strong);
+  box-shadow: none;
+}
+.card.group.selected:not(.fill-half):not(.fill-full):not(.fill-pattern) {
+  background:
+    color-mix(
+      in srgb,
+      var(--e-surface-card) var(--e-group-selected-surface-opacity),
+      transparent
+    );
+}
+/* During Reading motion, the canvas safety representation owns the default
+   Group wash. Keeping the same translucent wash in both layers would stack
+   their alpha and make the Group flash opaque until the viewport settled. */
+.board-flow[data-motion-underlay-active='true']
+  .card.group:not(.fill-half):not(.fill-full):not(.fill-pattern) {
+  background: transparent;
+}
+.card.group.fill-half {
+  background: var(--card-header-soft, transparent);
+}
+.card.group.fill-full {
+  background: var(--card-header-body, transparent);
+}
+.card.group.fill-pattern {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--card-header-pattern) 0 1px,
+    transparent 1px 8px
+  );
+}
+.card.group:not(.fill-half):not(.fill-full):not(.fill-pattern) .card-head {
+  background: transparent;
+  border-bottom-color: var(--e-line);
+  border-bottom-style: dashed;
+}
+.react-flow__node-group,
+.react-flow__node-group.selected,
+.react-flow__node-group:focus,
+.react-flow__node-group:focus-visible {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+.card-resize-layer {
+  position: absolute;
+  z-index: var(--e-z-canvas-chrome);
+  inset: 0;
+  contain: layout style;
+  pointer-events: none;
+}
+.card-resize-handle {
+  width: var(--e-card-resize-handle-size) !important;
+  height: var(--e-card-resize-handle-size) !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  appearance: none;
+  background: var(--e-go) !important;
+  z-index: var(--e-z-canvas-chrome);
+  pointer-events: auto;
+  scale: var(--e-card-resize-inverse-zoom);
+  animation: card-resize-handle-enter var(--e-t-fast) var(--e-ease-settle) both;
+  transition:
+    opacity var(--e-t-fast) var(--e-ease-out),
+    scale var(--e-t-fast) var(--e-ease-settle);
+}
+.card-resize-handle:focus-visible {
+  border-color: var(--e-on-solid) !important;
+  outline: none;
+}
+.card-resize-handle::before {
+  content: '';
+  position: absolute;
+  border-radius: 0;
+}
+.card-resize-handle.top.left::before {
+  inset: -16.5px -1.5px -1.5px -16.5px;
+}
+.card-resize-handle.top.right::before {
+  inset: -16.5px -16.5px -1.5px -1.5px;
+}
+.card-resize-handle.bottom.left::before {
+  inset: -1.5px -1.5px -16.5px -16.5px;
+}
+.card-resize-handle.bottom.right::before {
+  inset: -1.5px -16.5px -16.5px -1.5px;
+}
+@media (pointer: coarse) {
+  .card-resize-handle.top.left::before {
+    inset: -32.5px -1.5px -1.5px -32.5px;
+  }
+  .card-resize-handle.top.right::before {
+    inset: -32.5px -32.5px -1.5px -1.5px;
+  }
+  .card-resize-handle.bottom.left::before {
+    inset: -1.5px -1.5px -32.5px -32.5px;
+  }
+  .card-resize-handle.bottom.right::before {
+    inset: -1.5px -32.5px -32.5px -1.5px;
+  }
+}
+.card-resize-handle[data-resizing='true'] {
+  transition: none;
+}
+.card-resize-handle[data-entrance-retired='true'] {
+  animation: none;
+}
+@keyframes card-resize-handle-enter {
+  from {
+    opacity: 0;
+    scale: calc(var(--e-card-resize-inverse-zoom) * 0.5);
+  }
+  to {
+    opacity: 1;
+    scale: var(--e-card-resize-inverse-zoom);
+  }
+}
+.card-resize-readout {
+  position: absolute;
+  z-index: var(--e-z-canvas-chrome);
+  pointer-events: none;
+  padding: 2px 7px;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-floating);
+  box-shadow: var(--e-shadow-lift);
+  color: var(--e-ink);
+  white-space: nowrap;
+  scale: var(--e-card-resize-inverse-zoom);
+  transition: opacity var(--e-t-exit) var(--e-ease-in);
+}
+.card-resize-readout[data-state='exiting'] {
+  opacity: 0;
+}
+.card-resize-readout[data-corner='top-left'] {
+  top: 0;
+  left: 0;
+  translate: calc(-100% - 8px) calc(-100% - 8px);
+  transform-origin: bottom right;
+}
+.card-resize-readout[data-corner='top-right'] {
+  top: 0;
+  left: 100%;
+  translate: 8px calc(-100% - 8px);
+  transform-origin: bottom left;
+}
+.card-resize-readout[data-corner='bottom-left'] {
+  top: 100%;
+  left: 0;
+  translate: calc(-100% - 8px) 8px;
+  transform-origin: top right;
+}
+.card-resize-readout[data-corner='bottom-right'] {
+  top: 100%;
+  left: 100%;
+  translate: 8px 8px;
+  transform-origin: top left;
+}
+
+/* Card titles edit in place under an e-edit underline — the app-wide standard
+   set by the Mod card. Display and edit states share one flush box, so
+   entering edit never shifts geometry. */
+.card-title-input {
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--e-ink);
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  caret-color: var(--e-go);
+  outline: none;
+  transition: border-color var(--e-t-fast) var(--e-ease-out);
+}
+.card-title-input:focus {
+  border-bottom-color: var(--e-go);
+}
+.card-title-input::placeholder {
+  color: var(--e-ink-soft);
+}
+.card-title-display {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--e-sp-2);
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--e-ink);
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  transition: border-color var(--e-t-fast) var(--e-ease-out);
+}
+.card-title-display:hover {
+  border-bottom-color: var(--e-line-strong);
+}
+.card-title-display::before {
+  content: '';
+  position: absolute;
+  inset-block: -3px;
+  inset-inline: 0;
+}
+.card-title-display span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-title-display:not(.has-title) {
+  color: var(--e-ink-soft);
+}
+.card-title-display:focus-visible {
+  border-bottom-color: var(--e-go);
+  outline: none;
+}
+@media (pointer: coarse) {
+  .card-title-display::before {
+    inset-block: -11px;
+  }
+}
+.card-body {
+  padding: 12px 14px 14px;
+}
+
+.link-preview-frame {
+  position: relative;
+  min-height: calc(var(--e-sp-7) * 2 + var(--e-sp-5));
+  margin-top: var(--e-sp-3);
+  overflow: hidden;
+  border: var(--e-card-border-width) solid var(--e-line);
+  border-radius: var(--e-r-inner);
+  background: var(--e-surface-field);
+}
+
+.link-preview-card {
+  display: flex;
+  min-height: inherit;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--e-surface-card);
+  color: var(--e-ink);
+  text-decoration: none;
+  transition:
+    background var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.local-html-preview-card {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.local-html-preview-placeholder {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  place-items: center;
+  border-bottom: var(--e-card-border-width) solid var(--e-line);
+  background: var(--e-surface-field);
+  color: var(--e-ink-soft);
+}
+
+.local-html-preview-placeholder svg {
+  width: var(--e-sp-7);
+  height: var(--e-sp-7);
+  stroke-width: 1.75;
+}
+
+.link-preview-card:hover {
+  background: var(--e-wash);
+}
+
+.link-preview-card:focus-visible {
+  outline: var(--e-card-border-width) solid var(--e-go);
+  outline-offset: calc(var(--e-card-border-width) * -1);
+  box-shadow: inset 0 0 0 var(--e-card-border-width) var(--e-go);
+}
+
+.link-preview-card:active {
+  transform: scale(var(--e-scale-press));
+}
+
+.link-preview-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-bottom: var(--e-card-border-width) solid var(--e-line);
+  background: var(--e-surface-field);
+  object-fit: cover;
+}
+
+.link-preview-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-3);
+}
+
+/* The title line. It carries a favicon that only the chip shape shows (see
+   the tile ladder below); everywhere else the line is the title alone, which
+   is exactly what it was before the mark joined it. */
+.link-preview-headline {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: var(--e-sp-2);
+}
+
+.link-preview-headline .link-preview-title {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* The mark shares the site row's box so both read as the same object; the
+   class pair is what hides it, since .link-preview-site-mark's own display
+   is declared later in this sheet. */
+.link-preview-site-mark.link-preview-compact-mark {
+  display: none;
+}
+
+/* The action rail is pinned to the frame's own top-right corner (see
+   .link-preview-actions below), not the copy block's. Only the title ever
+   sits under it -- the description and site row are further down -- and only
+   when there is no image ahead of it to push it clear: the base preview's
+   image is a fixed 16:9 ratio, so once present it always has real height. So
+   only the title line gives up width, and only in that one case, instead of
+   the whole copy block giving up width for its entire height regardless of
+   whether the rail is anywhere near it. The gutter is reserved whether or not
+   the rail is showing: the rail appears on hover, and text that re-wrapped
+   under the pointer would be worse than a gutter that is sometimes empty. */
+.link-preview-frame.has-actions .link-preview-card:not(:has(.link-preview-image)) .link-preview-headline {
+  padding-right: calc(var(--e-sp-7) + var(--e-sp-3));
+}
+
+.link-preview-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.link-preview-title,
+.link-preview-description {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+}
+
+.link-preview-title {
+  color: var(--e-ink);
+  -webkit-line-clamp: 2;
+}
+
+.link-preview-description.e-prose {
+  color: var(--e-ink-soft);
+  -webkit-line-clamp: 3;
+}
+
+.link-preview-loading {
+  align-self: flex-start;
+  margin: auto 0;
+}
+
+.link-preview-site {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-top: auto;
+  color: var(--e-ink-soft);
+}
+
+.link-preview-site-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-preview-site-mark {
+  display: inline-flex;
+  width: var(--e-sp-5);
+  height: var(--e-sp-5);
+  flex: 0 0 var(--e-sp-5);
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--e-r-inner);
+  background: var(--e-surface-field);
+  color: var(--e-ink-soft);
+}
+
+.link-preview-site-mark img,
+.link-preview-site-mark svg,
+.link-preview-open-icon svg {
+  width: var(--e-sp-4);
+  height: var(--e-sp-4);
+}
+
+.link-preview-site-mark svg,
+.link-preview-open-icon svg,
+.link-preview-retry svg,
+.link-preview-remove svg {
+  stroke-width: 1.75;
+}
+
+/* Same box as .link-preview-site-mark (width/height/flex-basis all
+   var(--e-sp-5)) so the glyph's inset from its own edge reads at the same
+   place the favicon's does, instead of sitting flush with zero inset. */
+.link-preview-open-icon {
+  display: inline-flex;
+  width: var(--e-sp-5);
+  height: var(--e-sp-5);
+  flex: 0 0 var(--e-sp-5);
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+/* Refresh and Remove ride the preview the way the image tiles' key rides a
+   thumbnail: out of sight while the preview is just being read, present the
+   moment the founder reaches for it. Keyboard focus counts as reaching for
+   it, so the rail is never something only a pointer can find. */
+.link-preview-actions {
+  position: absolute;
+  z-index: var(--e-z-canvas-chrome);
+  top: var(--e-sp-3);
+  right: var(--e-sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+
+.link-preview-frame:hover .link-preview-actions,
+.link-preview-frame:focus-within .link-preview-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Attachment panels ---------- */
+/* A Note's attachments are pinned to the bottom of the Card as horizontal
+   carousels, images first and previews second. Two rules keep them honest:
+   the Card's WIDTH decides only how much of a track is visible, and the Card's
+   HEIGHT is the only thing a panel's own height reads. */
+.card-attachment-panel {
+  position: relative;
+  display: flex;
+  height: var(--e-attachment-panel-height-min);
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-top: var(--e-card-border-width) solid var(--e-line);
+  background: var(--e-surface-recessed);
+}
+/* The share can only resolve against a Card with a definite height. An
+   auto-height Card measures itself from its content, so growing its panel
+   would grow the thing the panel is a share of; it stays at the floor until
+   the user gives the Card a height of its own. */
+.card.fixed-h > .card-attachment-panel {
+  height: min(
+    clamp(
+      var(--e-attachment-panel-height-min),
+      var(--e-attachment-panel-height-share),
+      var(--e-attachment-panel-height-max)
+    ),
+    calc(100% - var(--e-attachment-panel-reserved-chrome))
+  );
+}
+/* Two panels each still asking for the whole reservation is the one case the
+   cap above cannot save on its own: honouring it for both at once asks for
+   twice the room it promises. They divide it instead of each claiming a
+   whole one -- a lone panel never matches this pair of selectors, so it
+   keeps the cap exactly as written above. */
+.card.fixed-h > .card-attachment-panel:has(+ .card-attachment-panel),
+.card.fixed-h > .card-attachment-panel:has(+ .card-attachment-panel) + .card-attachment-panel {
+  height: min(
+    clamp(
+      var(--e-attachment-panel-height-min),
+      var(--e-attachment-panel-height-share),
+      var(--e-attachment-panel-height-max)
+    ),
+    calc((100% - var(--e-attachment-panel-reserved-chrome)) / 2)
+  );
+}
+.card > .card-attachment-panel:last-of-type {
+  border-end-start-radius: var(--e-r-card);
+  border-end-end-radius: var(--e-r-card);
+}
+.card-attachment-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-1) var(--e-sp-2);
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  /* The snapport has to be inset by the track's own gutter, or the track can
+     never rest where it starts. A tile snaps its START edge to the start of the
+     snapport, and the first tile begins one padding-inline in, so with a
+     snapport that is the whole padding box the nearest snap position at the
+     left end is scrollLeft: 8, not 0. The track therefore settled with the
+     leading gutter scrolled away and the first tile clipped by the panel edge.
+     Insetting the snapport by exactly the padding makes scrollLeft: 0 the snap
+     position for the first tile, and the same inset at the end keeps the last
+     tile's trailing gutter. */
+  scroll-padding-inline: var(--e-sp-2);
+  scrollbar-width: thin;
+  list-style: none;
+}
+.card-attachment-item {
+  position: relative;
+  height: 100%;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: var(--e-card-border-width) solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-card);
+  scroll-snap-align: start;
+}
+/* The tile the last gesture landed on: the same go boundary the image gallery
+   uses to mark its current thumbnail, so one vocabulary covers both. */
+.card-attachment-item.is-active {
+  border-color: var(--e-go);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--e-go) 12%, transparent);
+}
+/* Evenly sized tiles: the tile's height comes from the panel and its width
+   from this one ratio, so a row of mixed portrait and landscape images still
+   reads as a row. Nothing inside is cropped; contain letterboxes instead. The
+   explicit max-width is the same ceiling the ratio already reaches at the
+   panel's own height ceiling; it exists so a very wide source image cannot
+   inflate the flex item past that ceiling through its own intrinsic size. */
+.card-attachment-item--image {
+  aspect-ratio: 4 / 3;
+  max-width: var(--e-attachment-image-width-max);
+}
+.card-attachment-open {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--e-surface-field);
+}
+.card-attachment-open img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+/* Deleting stays one click away, but it stops spending a caption row on every
+   tile: the key rides the tile on hover and on keyboard focus. */
+.card-attachment-item .asset-remove {
+  position: absolute;
+  z-index: var(--e-z-canvas-chrome);
+  top: var(--e-sp-1);
+  right: var(--e-sp-1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.card-attachment-item:hover .asset-remove,
+.card-attachment-item:focus-within .asset-remove {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* Preview tiles share the track evenly and take up any room left over, so one
+   preview on a wide Card reads as a link bar rather than a tile beside an empty
+   shelf. They never shrink below the token width, so a Card too narrow for the
+   set scrolls instead of squeezing; and never past the track itself, so a Card
+   narrower than one tile still shows that tile whole. */
+.card-attachment-item--preview {
+  flex: 1 1 var(--e-attachment-preview-width);
+  min-width: min(var(--e-attachment-preview-width), 100%);
+  max-width: min(var(--e-attachment-preview-width-max), 100%);
+}
+.card-attachment-item--preview .link-preview-frame {
+  height: 100%;
+  min-height: 0;
+  margin-top: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  /* Lets the rule below ask the frame's own rendered height, not the
+     Card's or the panel's, so it answers correctly for two previews sharing
+     one panel. The frame already gets a definite height from its ancestors
+     (the panel's own height, ultimately), so containing its size here does
+     not change how tall it renders. */
+  container-type: size;
+}
+.card-attachment-item--preview .link-preview-card {
+  height: 100%;
+  border-radius: 0;
+}
+/* ---------- The preview tile's layout ladder ---------- */
+/* A tile's box moves in both axes -- the panel's height sets how tall it is,
+   the number of previews sharing the carousel sets how wide -- so one fixed
+   arrangement is always wrong somewhere. The tile reads its OWN box (the frame
+   is a size container, above, so the answer is per tile and not per panel) and
+   takes one of four shapes:
+
+     wide (inline-size >= 360px)     image on the LEFT, text on the RIGHT.
+     narrow, tall (block > 144px)    image on TOP, text BELOW.
+     short (block <= 144px)          no room for an image at all: it is dropped
+                                     and the text takes the whole tile.
+     shorter still                   the text fits what fits, in priority
+                                     order: the description goes at 96px and
+                                     the site row at 72px, where the favicon
+                                     joins the title and the tile reads as a
+                                     link chip.
+
+   Each number mirrors its --e-link-preview-* token literally, because custom
+   properties are not usable inside a container-query condition. */
+/* Every shape is a variation on these; the queries below come after them so
+   the shape a tile is in always wins. */
+/* The text is the part that must survive: it takes the height its own lines
+   need and gives none of it back, and it absorbs whatever the image leaves
+   over so the site row still sits on the tile's bottom edge. */
+.card-attachment-item--preview .link-preview-copy {
+  flex: 1 0 auto;
+  min-height: 0;
+  gap: var(--e-sp-1);
+  padding: var(--e-sp-2);
+}
+/* Title line and site row are fixed furniture; the description is the row
+   that yields, so a squeeze never eats the domain. */
+.card-attachment-item--preview .link-preview-headline,
+.card-attachment-item--preview .link-preview-site {
+  flex: 0 0 auto;
+}
+.card-attachment-item--preview .link-preview-description {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+.card-attachment-item--preview .link-preview-description.e-prose {
+  -webkit-line-clamp: 2;
+}
+/* Same reasoning as the base preview's rule further up: only the title line
+   gives up width, and only where the rail actually lands on it. This is the
+   case that holds at every size -- a preview with no image in its markup at
+   all. The two queries below add the cases where an image exists but is not
+   above the title: dropped (short) or beside the text (wide). */
+.card-attachment-item--preview .link-preview-frame.has-actions .link-preview-card:not(:has(.link-preview-image)) .link-preview-headline {
+  padding-right: calc(var(--e-sp-7) + var(--e-sp-2));
+}
+@container (block-size <= 144px) {
+  .card-attachment-item--preview .link-preview-frame.has-actions .link-preview-headline {
+    padding-right: calc(var(--e-sp-7) + var(--e-sp-2));
+  }
+}
+@container (inline-size >= 360px) {
+  .card-attachment-item--preview .link-preview-frame.has-actions .link-preview-headline {
+    padding-right: calc(var(--e-sp-7) + var(--e-sp-2));
+  }
+}
+/* Narrow and tall. The image is the part that yields: it keeps the paper's
+   own cover ratio, never takes more than half the tile, and shrinks out of
+   the text's way from there, so a tile just past the threshold shows a
+   proper strip of image rather than a full-height one over clipped text. */
+.card-attachment-item--preview .link-preview-image,
+.card-attachment-item--preview .local-html-preview-placeholder {
+  width: 100%;
+  height: auto;
+  max-height: var(--e-link-preview-stack-image-block-max);
+  flex: 0 1 auto;
+  min-height: 0;
+  border-bottom: 0;
+  aspect-ratio: var(--e-link-preview-stack-image-ratio);
+}
+/* Short and narrow: no room for an image on top. It is dropped outright
+   rather than cropped to a band of pixels -- the tile at the panel's floor
+   is text, and the text is what has to stay readable there. 144px mirrors
+   --e-link-preview-stack-image-block. */
+@container (inline-size < 360px) and (block-size <= 144px) {
+  .card-attachment-item--preview .link-preview-image,
+  .card-attachment-item--preview .local-html-preview-placeholder {
+    display: none;
+  }
+}
+/* Wide: the image moves out of the text's way instead of out of the tile. It
+   is sized by the tile's own height as a 4:3 thumbnail, never more than two
+   fifths of the width, so the text keeps a readable measure beside it. */
+@container (inline-size >= 360px) and (block-size > 72px) {
+  .card-attachment-item--preview .link-preview-card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  /* The copy's "never shrink" above is a rule about the block axis. Sideways
+     it must shrink, or its own longest line would decide the tile's width. */
+  .card-attachment-item--preview .link-preview-copy {
+    flex: 1 1 auto;
+  }
+  .card-attachment-item--preview .link-preview-image,
+  .card-attachment-item--preview .local-html-preview-placeholder {
+    width: auto;
+    height: 100%;
+    max-width: var(--e-link-preview-row-image-inline-max);
+    max-height: none;
+    flex: 0 1 auto;
+    aspect-ratio: var(--e-link-preview-row-image-ratio);
+  }
+}
+/* At the panel's own floor the tile is text and nothing else, and three
+   two-line rows do not fit in it: the description gives up its second line
+   first, because the title above it and the domain below it are both worth
+   more than the description's second sentence. 120px is
+   --e-attachment-panel-height-min, the panel floor itself (a tile at that
+   floor measures a little under it, once the track's padding and the tile's
+   border are spent), mirrored here for the same reason as the rest. */
+@container (block-size <= 120px) {
+  .card-attachment-item--preview .link-preview-description.e-prose {
+    -webkit-line-clamp: 1;
+  }
+}
+/* No room for the description at all, and the title comes down to its first
+   line; 96px mirrors --e-link-preview-description-block. */
+@container (block-size <= 96px) {
+  .card-attachment-item--preview .link-preview-description {
+    display: none;
+  }
+  .card-attachment-item--preview .link-preview-title {
+    -webkit-line-clamp: 1;
+  }
+}
+/* No room for the site row either, so the favicon joins the title rather than
+   leaving with the domain: at its smallest the tile is still recognisably
+   this site's link. 72px mirrors --e-link-preview-chip-block. */
+@container (block-size <= 72px) {
+  .card-attachment-item--preview .link-preview-image,
+  .card-attachment-item--preview .local-html-preview-placeholder,
+  .card-attachment-item--preview .link-preview-site {
+    display: none;
+  }
+  .card-attachment-item--preview .link-preview-site-mark.link-preview-compact-mark {
+    display: inline-flex;
+  }
+  .card-attachment-item--preview .link-preview-headline {
+    align-items: center;
+  }
+  .card-attachment-item--preview .link-preview-copy {
+    justify-content: center;
+  }
+}
+/* Refresh leads, Remove follows, and both keep the tile's own Card surface
+   because the rail floats over whatever the page's cover image happens to be:
+   a ghost key on an arbitrary photo is not a legible key. In a short panel
+   they read better side by side than stacked. Hover and focus reveal them
+   (see .link-preview-actions above). */
+.card-attachment-item--preview .link-preview-actions {
+  top: var(--e-sp-1);
+  right: var(--e-sp-1);
+  flex-direction: row;
+  gap: 0;
+  padding: 2px;
+  border: var(--e-card-border-width) solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-card);
+}
+
+/* The quick "+" to attach a Mod to an Ask AI run. */
+.add-mod-btn {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--e-mod);
+  background: color-mix(in srgb, var(--e-mod) 12%, var(--e-wash-base));
+  color: var(--e-mod);
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.add-mod-btn span {
+  display: block;
+  line-height: 1;
+  transform: translateY(-0.5px);
+}
+.add-mod-btn:hover {
+  background: var(--e-mod);
+  color: var(--e-on-solid);
+}
+.card textarea:not(.e-textarea) {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--e-ink);
+  min-height: 64px;
+}
+.card textarea:not(.e-textarea)::placeholder {
+  color: var(--e-ink-soft);
+}
+.note-format-foot {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+mark.painted-highlight {
+  border-radius: var(--e-r-inner);
+  padding: 0 2px;
+  margin: 0 calc(var(--e-sp-1) / -2);
+  color: var(--e-ink);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: filter 0.12s;
+}
+.board-flow.tool-highlight mark.painted-highlight:hover {
+  filter: saturate(1.35) brightness(0.97);
+}
+/* Highlighted text roots anchor the floating erase × to their own content, so it
+   scrolls with the text and stays inside the card. */
+.note-render,
+.result-text,
+.result-highlight-root,
+.transcript {
+  position: relative;
+}
+/* The erase ×: one per card, shown at the top-right of the hovered highlight's
+   last line. Hugs the inside of the highlight's box (scrollable card bodies
+   can't clip it) and lingers briefly after the pointer leaves, long enough to
+   reach and click it. It is the only way to erase — highlights themselves are
+   not click targets. */
+.highlight-erase {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--e-line-strong);
+  background: var(--e-surface-card);
+  color: var(--e-ink-soft);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.highlight-erase.show {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.14s ease;
+}
+.highlight-erase:hover {
+  color: var(--e-ink);
+  border-color: var(--e-ink-faint);
+  background: var(--e-surface-floating);
+}
+.plain-text-render {
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.card-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  padding: 7px 10px;
+  border-top: 1px solid var(--e-line);
+  flex-wrap: wrap;
+}
+
+.run-state {
+  font-size: 12px;
+  color: var(--e-ink-soft);
+  margin-left: auto;
+}
+.run-state.running {
+  color: var(--e-go-ink);
+}
+.run-state.failed {
+  color: var(--e-avoid-ink);
+}
+
+.card-error {
+  color: var(--e-avoid-ink);
+  font-size: 12px;
+  padding: 0 10px 8px;
+  line-height: 1.4;
+}
+/* The dock supplies the run callouts' sides; each callout only owns the step
+   that separates it from the dock item above. */
+.card-run-callout {
+  margin: var(--e-sp-2) 0 0;
+}
+
+/* result */
+.result-text {
+  white-space: pre-wrap;
+  max-height: 320px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  contain: layout paint style;
+}
+.card.result .result-text {
+  max-height: none;
+  overflow: visible;
+}
+.result-empty {
+  color: var(--e-ink-soft);
+  font-style: italic;
+}
+.followup-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-3);
+  margin-top: 12px;
+  overflow: visible;
+}
+.followup-bubble {
+  position: relative;
+  max-width: 85%;
+  padding: 7px var(--e-sp-3);
+  background: var(--e-surface-card);
+  color: var(--e-ink);
+}
+.followup-bubble.user {
+  align-self: flex-end;
+  border-radius: 12px 12px 4px 12px;
+  background: var(--e-surface-field);
+}
+.followup-bubble.assistant {
+  align-self: flex-start;
+  border: 1px solid var(--e-line-strong);
+  border-radius: 12px 12px 12px 4px;
+}
+/* Conversation Results use the same texting grammar as follow-up threads.
+   Shape and side carry the visible speaker distinction; accessible names keep
+   each transcript turn attributable without repeating speaker labels. */
+.card.result .transcript > .bubble {
+  align-self: flex-start;
+  max-width: 85%;
+  padding: 7px var(--e-sp-3);
+  border: 1px solid var(--e-line-strong);
+  border-radius: 12px 12px 12px 4px;
+  background: var(--e-surface-card);
+  color: var(--e-ink);
+}
+.card.result .transcript > .bubble.user {
+  align-self: flex-end;
+  max-width: 85%;
+  border: 0;
+  border-radius: 12px 12px 4px 12px;
+  background: var(--e-surface-field);
+}
+.followup-status {
+  margin-top: var(--e-sp-1);
+  color: var(--e-ink-soft);
+  font-size: var(--e-fs-micro);
+}
+.followup-bubble .result-empty {
+  color: var(--e-ink-soft);
+}
+.followup-status.warn {
+  color: var(--e-avoid-ink);
+}
+.followup-bubble-actions {
+  display: flex;
+  gap: var(--e-sp-1);
+  margin-top: var(--e-sp-1);
+}
+.followup-compose {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--e-sp-2);
+}
+.followup-ask {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border-top: 1px solid var(--e-line);
+  background: var(--e-surface-card);
+  /* The composer is the card's last child whenever a Result Card can be asked
+     a follow-up, so it owns the bottom corners. Without this its opaque fill
+     paints square over the card's rounded ones, which the selection outline
+     then traces. Same rule and same reason as `.card-foot` above, which is the
+     last child when there is no composer. */
+  border-radius: 0 0 calc(var(--e-r-card) - 1px) calc(var(--e-r-card) - 1px);
+}
+.followup-compose .e-field {
+  flex: 1;
+  min-width: 0;
+}
+.followup-compose .followup-input {
+  min-height: initial;
+  resize: none;
+  overflow-y: hidden;
+}
+.followup-send {
+  flex: none;
+  border-radius: 50%;
+}
+.card.result .interjection {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-top: 12px;
+}
+.card.result .interjection .e-field {
+  flex: 1;
+  min-width: 0;
+  border-radius: 999px;
+  padding-inline: 14px;
+}
+.card.result .interjection-send {
+  flex: none;
+  border-radius: 50%;
+}
+.result-provisional-callout {
+  margin-top: var(--e-sp-3);
+}
+.group-version-review .card-meta {
+  margin-bottom: var(--e-sp-2);
+}
+
+.group-version-actions .e-state-word {
+  margin-left: auto;
+}
+
+.version-switcher {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.ver-chip {
+  border: 0;
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-recessed);
+  color: var(--e-ink-soft);
+  cursor: pointer;
+  padding: 2px 8px;
+  position: relative;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+.ver-chip::before {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  content: '';
+}
+.ver-chip:hover {
+  background: color-mix(in srgb, var(--e-surface-recessed) 90%, var(--e-ink));
+  color: var(--e-ink);
+}
+.ver-chip:active {
+  transform: scale(var(--e-scale-press));
+}
+.ver-chip.active {
+  outline: 1.5px solid var(--e-ink);
+  outline-offset: 1px;
+}
+.ver-chip.kept {
+  background: var(--e-go);
+  color: var(--e-on-solid);
+}
+.ver-chip.kept:hover {
+  background: color-mix(in srgb, var(--e-go) 88%, var(--e-ink));
+  color: var(--e-on-solid);
+}
+.ver-chip.provisional {
+  background: color-mix(in srgb, var(--e-attention) 18%, var(--e-wash-base));
+  color: var(--e-attention-ink);
+}
+.ver-chip.provisional:hover {
+  background: color-mix(in srgb, var(--e-attention) 26%, var(--e-wash-base));
+  color: var(--e-attention-ink);
+}
+
+/* model picker on the Ask AI card */
+.model-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-top: var(--e-sp-2);
+}
+/* The dock: the picker and any run callouts, as one opaque plane immediately
+   above the action foot. The prompt body scrolls independently, so the dock
+   owns its own top and side rails and nothing from the prose can slide through
+   the gap between the picker and a callout. */
+.card.askAi .card-run-dock {
+  align-self: stretch;
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: calc(26px + var(--e-sp-2));
+  overflow-y: auto;
+  position: relative;
+  z-index: var(--e-z-canvas-chrome);
+  padding: var(--e-sp-2) 14px 0;
+  background-color: var(--e-surface-card);
+}
+/* Inside the dock the picker is the first row, so the step that used to hold
+   it off the prose above is the dock's job now, not its own. */
+.card.askAi .model-pick {
+  margin-top: 0;
+  min-width: 0;
+}
+.card.askAi.fill-full .card-run-dock {
+  background-color: var(--card-header-body);
+}
+.card.askAi.fill-pattern .card-run-dock {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--card-header-pattern) 0 1px,
+    transparent 1px 8px
+  );
+}
+.conversation-controls {
+  align-self: stretch;
+  min-width: 0;
+  margin-top: auto;
+}
+.model-pick-label {
+  flex: none;
+  color: var(--e-ink-soft);
+  white-space: nowrap;
+}
+.model-pick > .e-picker {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+
+/* which model produced the shown version (Result card) */
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-bottom: 8px;
+}
+.model-badge {
+  font-size: 11px;
+  color: var(--e-ink-soft);
+  background: color-mix(in srgb, var(--e-go) 12%, var(--e-wash-base));
+  border: 1px solid var(--e-line-strong);
+  border-radius: 999px;
+  padding: 2px var(--e-sp-2);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--e-sp-2);
+  color: var(--e-ink-soft);
+  flex-wrap: wrap;
+}
+.card-meta > * {
+  display: inline-flex;
+  align-items: center;
+}
+.card-meta > :not(:last-child)::after {
+  margin-inline: var(--e-sp-2);
+  color: var(--e-ink-faint);
+  content: '·';
+}
+.card-meta__model {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.source-change {
+  display: inline-flex;
+}
+.source-change-trigger.e-button--ghost {
+  color: var(--e-attention-ink);
+  font-weight: 700;
+}
+.source-change-popover {
+  width: min(260px, calc(100vw - 32px));
+  padding: 10px;
+  color: var(--e-ink);
+  text-align: start;
+}
+.source-change-note {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  color: var(--e-ink-soft);
+  margin-bottom: 8px;
+}
+.source-change-note strong {
+  color: var(--e-attention-ink);
+}
+.source-change-sources {
+  display: grid;
+  margin-bottom: 8px;
+}
+.source-change-list.e-menu {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+.source-change-deleted-row {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  min-height: 28px;
+  padding: 4px 8px;
+}
+.source-change-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.source-change-reason {
+  flex: none;
+  color: var(--e-ink-soft);
+}
+.source-change-reason.deleted {
+  color: var(--e-avoid-ink);
+}
+
+/* the frozen prompt inside the version snapshot */
+.version-context-text {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 12px;
+  line-height: 1.5;
+  max-height: 320px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 10px;
+  background: var(--e-surface-card);
+  border: 1px solid var(--e-line);
+  border-radius: 8px;
+  color: var(--e-ink);
+}

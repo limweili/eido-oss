@@ -1,0 +1,317 @@
+
+/* Port-vs-body on invisible proxies (C3, #320). Centre each oversized handle
+   circle ON its edge midpoint — React Flow's default translate(±50%, -50%)
+   pushes the circle half a handle outside the edge — so the DOM circle and
+   the painted disc share a centre and native snap anchors at the disc
+   position. */
+.board-flow .react-flow__node-gestureProxy .react-flow__handle {
+  transform: translate(0, -50%);
+}
+/* The painted discs are the press affordance, not the oversized handle box
+   — at EVERY zoom (#320 amendment 9: the painter draws discs on every
+   canvas-painted representation, Map and Overview alike). A proxy handle
+   takes a press only while the canvas resolver armed the matching side
+   (paintedPortGeometry disc under the pointer). Everywhere else on the proxy
+   a press falls through to the node body and drags/selects, so hit == paint
+   and an unarmed press can never start a connect through the invisible
+   handle box. */
+.board-flow .react-flow__node-gestureProxy .react-flow__handle {
+  pointer-events: none;
+}
+.board-flow[data-canvas-port-target='source']
+  .react-flow__node-gestureProxy
+  .react-flow__handle-right,
+.board-flow[data-canvas-port-target='target']
+  .react-flow__node-gestureProxy
+  .react-flow__handle-left {
+  pointer-events: all;
+}
+
+/* Groups are normally body-transparent so their members remain direct
+   targets. During a connection drag only, let the Group surface own its hit
+   so it can show the same acceptance feedback as every other Card. */
+.board-flow[data-connection-drag-active='true'] .react-flow__node-group {
+  pointer-events: auto !important;
+}
+
+/* Connector nodes — the mod-card prototype is the app-wide standard. The
+   hollow ink ring holds 13px through normal detail, then grows with close-up
+   Cards to 24px. Its independent 24px target remains visually empty. */
+.react-flow__handle {
+  width: var(--e-connector-size);
+  height: var(--e-connector-size);
+  min-width: var(--e-connector-size);
+  min-height: var(--e-connector-size);
+  background: var(--e-surface-ground);
+  border: var(--e-connector-stroke) solid var(--e-ink);
+}
+
+.card-connector {
+  width: var(--e-connector-flow-size, var(--e-connector-size));
+  height: var(--e-connector-flow-size, var(--e-connector-size));
+  min-width: var(--e-connector-flow-size, var(--e-connector-size));
+  min-height: var(--e-connector-flow-size, var(--e-connector-size));
+  border-width: var(--e-connector-flow-stroke, var(--e-connector-stroke));
+  z-index: var(--e-z-canvas-chrome);
+  overflow: visible;
+  cursor: crosshair;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out),
+    box-shadow var(--e-t-fast) var(--e-ease-out);
+}
+
+.card-connector.react-flow__handle-left {
+  left: calc(0px - var(--e-card-border-width));
+  transform: translate(-50%, -50%);
+}
+
+.card-connector.react-flow__handle-right {
+  right: calc(0px - var(--e-card-border-width));
+  transform: translate(50%, -50%);
+}
+
+.card-connector::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--e-connector-hit-size);
+  height: var(--e-connector-hit-size);
+  border-radius: 50%;
+  content: '';
+  transform: translate(-50%, -50%) scale(var(--e-connector-hit-inner-scale, 1));
+}
+
+.card-connector:hover,
+.card-connector:focus-visible,
+.react-flow__node[data-connection-drop-target='target'] .card-connector.target,
+.react-flow__node[data-connection-drop-target='source'] .card-connector.source {
+  background: var(--e-go);
+  border-color: var(--e-go);
+  box-shadow: 0 0 0 var(--e-connector-flow-focus-ring, var(--e-connector-focus-ring)) var(--e-go);
+}
+
+/* React Flow stacks the edge svgs at z-index 2 and leaves the edge-label
+   layer at auto, so an interactive label would sit UNDER the lines it
+   annotates. Slot the label layer between lines and cards (same z-index as
+   both; DOM order breaks the tie): pills paint over their line and stay
+   under cards. The viewport portal carries the open connection editor. It is
+   a menu panel, so it must sit above every Card, and a Card's layer is a
+   stack position that grows with the Board. A fixed small number lost that
+   race, so the portal reads the canvas-floating plane, which sits one step
+   above the ceiling every Card layer is capped at. */
+.board-flow .react-flow__edgelabel-renderer {
+  z-index: 2;
+}
+.board-flow .react-flow__viewport-portal {
+  z-index: var(--e-z-canvas-floating);
+}
+
+/* ---------- Connection pill (positive +, negative −, mod ~) ---------- */
+/* The pill is the connection's editor handle: hovering the line or the pill
+   grows it, clicking it opens the popover. Growth is the inline transform's
+   scale (the transform also positions the pill), so CSS only transitions. */
+.connection-pill {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: var(--e-mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--e-go) 40%, transparent);
+  background: color-mix(in srgb, var(--e-go) 12%, var(--e-surface-card));
+  color: var(--e-go);
+  cursor: pointer;
+  isolation: isolate;
+  transition: transform var(--e-t-fast) var(--e-ease-out), opacity var(--e-t-fast) var(--e-ease-out);
+}
+.connection-pill::after {
+  position: absolute;
+  z-index: -1;
+  inset: -3px;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+  content: '';
+  opacity: 0;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.connection-pill.hovered::after,
+.connection-pill.open::after {
+  opacity: 1;
+}
+.connection-pill.pushes {
+  background: color-mix(in srgb, var(--e-avoid) 12%, var(--e-surface-card));
+  border-color: color-mix(in srgb, var(--e-avoid) 40%, transparent);
+  color: var(--e-avoid);
+}
+.connection-pill.modifies {
+  background: color-mix(in srgb, var(--e-mod) 12%, var(--e-surface-card));
+  border-color: color-mix(in srgb, var(--e-mod) 40%, transparent);
+  color: var(--e-mod);
+}
+.connection-pill.selected {
+  outline: 2px solid var(--e-go);
+  outline-offset: 1px;
+}
+.connection-pill:focus-visible {
+  outline: 2px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+/* ---------- Connect moment + polarity flip (#259 Phase 3) ---------- */
+/* Every animation here is ONE-SHOT: it runs when the store's transient beat
+   record exists, and the elements carrying it unmount when the beat retires.
+   A settled board has no animated connection DOM at all. Keyframe lists stop
+   short of 100% on purpose — the end state falls back to the element's own
+   inline style, so the animation cannot fight strength styling. */
+
+/* The new line snaps taut: briefly overdrawn, a subtle undershoot, settle. */
+@keyframes connection-settle {
+  0% {
+    stroke-width: 5.2;
+  }
+  55% {
+    stroke-width: 2.2;
+  }
+  82% {
+    stroke-width: 3.6;
+  }
+}
+.connection-line.settling {
+  animation: connection-settle 260ms ease-out;
+}
+
+/* One pulse travels the line toward the consuming card, then dies. The path
+   is stored pointing at the consumer (auto-orient), so 0% → 100% is always
+   the direction context will flow. forwards holds the faded-out end state
+   for the tick between animation end and the store retiring the beat. */
+@keyframes connection-pulse-travel {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.95;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+.connection-pulse {
+  animation: connection-pulse-travel 620ms 180ms cubic-bezier(0.3, 0, 0.4, 1) forwards;
+  opacity: 0;
+}
+
+/* Polarity flip: ~200ms character crossfade. The line's new character fades
+   in while an overlay drawn with the old character fades out. */
+@keyframes connection-flip-in {
+  0% {
+    opacity: 0;
+  }
+}
+.connection-line.flip-in {
+  animation: connection-flip-in 200ms ease;
+}
+@keyframes connection-flip-out {
+  100% {
+    opacity: 0;
+  }
+}
+.connection-flip-out {
+  animation: connection-flip-out 200ms ease forwards;
+}
+
+/* The drag line while wiring: the accent thread the connection will become.
+   non-scaling-stroke keeps it visible while zoomed far out. */
+.board-flow .react-flow__connection-path {
+  stroke: var(--e-go);
+  stroke-width: var(--e-connection-preview-stroke-width);
+  stroke-dasharray: var(--e-connection-preview-stroke-dasharray);
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: var(--e-connection-preview-opacity);
+}
+
+/* The beats collapse to a beat-less instant for reduced motion; animationend
+   still fires, so the store's beats retire the same way. */
+:root[data-reduced-motion="true"] .connection-line.settling,
+:root[data-reduced-motion="true"] .connection-pulse,
+:root[data-reduced-motion="true"] .connection-line.flip-in,
+:root[data-reduced-motion="true"] .connection-flip-out {
+  animation-duration: var(--e-t-fast);
+  animation-delay: 0ms;
+}
+
+/* ---------- Connection popover (the pill's editor) ---------- */
+.connection-popover {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 230px;
+}
+.connection-popover .popover-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 2px 0 8px;
+}
+.connection-popover .popover-title,
+.connection-popover .popover-label {
+  color: var(--e-ink-soft);
+  white-space: nowrap;
+}
+.connection-popover .popover-title {
+  padding: 4px 0;
+}
+.connection-popover .line-swatches {
+  display: flex;
+  gap: var(--e-sp-2);
+}
+.connection-popover .line-swatch {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--e-r-chip);
+  background: transparent;
+  color: var(--e-ink);
+  cursor: pointer;
+  transition: border-color var(--e-t-fast) var(--e-ease-out), background-color var(--e-t-fast) var(--e-ease-out);
+}
+.connection-popover .line-swatch svg {
+  width: 44px;
+  height: 8px;
+}
+.connection-popover .line-swatch:hover {
+  background: var(--e-wash);
+}
+.connection-popover .line-swatch.active {
+  border-color: var(--e-go);
+  background: color-mix(in srgb, var(--e-go) 8%, transparent);
+  color: var(--e-go);
+}
+.connection-popover .connection-reason {
+  width: 100%;
+}
+.connection-popover .popover-hint {
+  color: var(--e-ink-soft);
+}
+.connection-popover .connection-actions {
+  min-width: 0;
+  margin-top: var(--e-sp-1);
+  padding: 2px 0 0;
+  border-top: 1px solid var(--e-line);
+}

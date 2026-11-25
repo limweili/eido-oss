@@ -1,0 +1,281 @@
+[
+  {
+    "version": 1,
+    "id": "v4-methods-group",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "group",
+      "groupTitle": "METHODS + DEBATES + OPEN QUESTIONS",
+      "compressionPrompt": "Preserve date types, identity methods, confidence labels, competing models, refuted versus quarantined status, decisive tests, unrun question wording, and every DOI link. Never average incompatible clock models or upgrade associated context to direct dating.",
+      "position": { "x": 10772, "y": -10000 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-title",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "title",
+      "body": "Methods, live debates, and decision-shaped open questions",
+      "position": { "x": 10772, "y": 3260 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-evidence-hub",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Evidence card contract**\n\nKeep one falsifiable claim; entity and relationship; date value and date type; identity method; primary DOI; sample scope; directionality; confidence; strongest live alternative; and the cheapest decisive test. An old label, a layer date, a modern haplotype, and a causal experiment are not equivalent evidence.",
+      "position": { "x": 10800, "y": 3700 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-date-types",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Five dates that must stay separate**\n\n1. Fossil occurrence. 2. Molecular-clock node estimate. 3. Demographic split estimate. 4. Associated archaeological phase or context. 5. Direct specimen date, usually AMS. Each answers a different question and carries different failure modes.",
+      "position": { "x": 11240, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-fossil-anatomy",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Fossil anatomy + explicit placement**\n\nComparative morphology, CT, bone-by-bone segmentation, preservation scoring, and independent character coding distinguish a side branch from a direct-ancestor story. The Baminornis test is exemplary: pygostyle, synsacrum, or unscorable must remain live states. [Chen et al. 2025](https://doi.org/10.1038/s41586-024-08410-z); [Huang et al. 2026](https://doi.org/10.1016/j.cretres.2025.106244)",
+      "position": { "x": 11680, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-species-networks",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Species trees + network methods**\n\nA species tree addresses branching; local ancestry and admixture models address reticulation. Wild/captive provenance, multiple individuals per species, museum baselines, and gene-flow-aware roots are decisive for Gallus. [Tiley et al. 2020](https://doi.org/10.1186/s40657-020-00194-w); [Mariadassou et al. 2021](https://doi.org/10.1016/j.ympev.2020.107044); [Lawal et al. 2020](https://doi.org/10.1186/s12915-020-0738-1)",
+      "position": { "x": 12120, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-clocks",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Clock integrity**\n\nSequence choice, fossil calibration, relaxed rates, morphological models, fossil placement, and priors jointly produce node ages. Compare each chronology as one coherent model and test its fossil minima; never splice preferred dates into a synthetic timeline.",
+      "position": { "x": 12560, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-archaeology",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Archaeological authentication**\n\nComparative morphology, ZooMS, direct AMS, stratigraphy, context, osteometry, and contamination-aware DNA form a dependency chain. Identity and date should meet on the same specimen where possible; otherwise state exactly what is associated. [Peters et al. 2022](https://doi.org/10.1073/pnas.2121978119)",
+      "position": { "x": 13000, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-context-use",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Presence is not use**\n\nAge and sex profiles, isotopes, pathology, medullary bone, deposition, butchery, and eggshell proteomics distinguish breeding, managed feeding, eggs, meat, ritual, display, and transport. Arrival and routine consumption can be centuries apart. [Best et al. 2022](https://doi.org/10.15184/aqy.2021.90); [Peters et al. 2024](https://doi.org/10.1038/s41467-024-46093-2)",
+      "position": { "x": 13440, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-clock-debate",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Live crown-bird clock comparison**\n\nStiller’s family-level genomic clock estimates crown birds near 93 Ma and Galloanserae near 68 Ma. Brocklehurst–Field tip dating centers crown birds around 100 Ma. Wu’s genomic clock favors more sustained Late Cretaceous diversification; its homology, dating, and calibration choices drew formal technical challenges. These are model outputs, not three noisy readings of one timestamp. [Stiller et al. 2024](https://doi.org/10.1038/s41586-024-07323-1); [Brocklehurst & Field 2024](https://doi.org/10.1098/rspb.2023.2618); [Wu et al. 2024](https://doi.org/10.1073/pnas.2319696121); [Springer & Gatesy 2024](https://doi.org/10.1073/pnas.2406494121); [Claramunt et al. 2024](https://doi.org/10.1073/pnas.2405887121)",
+      "position": { "x": 12560, "y": 3860 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-north-china",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Northern China early Holocene · refuted as chicken evidence**\n\nAn ancient-DNA claim proposed early domestication. Reanalysis of 1,831 bird bones—including 429 previously labeled domestic chicken—retained none as chicken, while ecological reassessment independently challenged feasibility and identifications. Do not use these specimens to date domestication or dispersal. [Xiang et al. 2014](https://doi.org/10.1073/pnas.1411882111); [Eda et al. 2016](https://doi.org/10.1016/j.jas.2016.01.012); [Peters et al. 2016](https://doi.org/10.1016/j.quascirev.2016.04.004)",
+      "position": { "x": 13000, "y": 3860 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-yunnan",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Caiyuanzi + Yunnan material · quarantine, not dismissal**\n\nA formal comment argues for earlier chickens, but key remains are inadequately described or figured, lack secure morphological confirmation or direct dating, or rest on one ‘possibly domesticated’ bone. Publication, ZooMS, comparative morphology, and direct AMS would make the claim auditable. [Peng et al. 2022](https://doi.org/10.1073/pnas.2210996119); [Peters et al. 2022 reply](https://doi.org/10.1073/pnas.2213678119)",
+      "position": { "x": 13440, "y": 3860 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-el-arenal",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**El Arenal 1 · chicken claim no longer substantiated**\n\nThe 2007 chicken-contact claim used morphology, direct dating, and mtDNA. Authenticated Pacific DNA later found no diagnostic Polynesian haplotype in tested early South American material. Reassessment found available candidate bones consistent with or genetically identified as tinamou; the original dated specimen could not be relocated. This withdraws one chicken datum, not every contact hypothesis. [Storey et al. 2007](https://doi.org/10.1073/pnas.0703993104); [Thomson et al. 2014](https://doi.org/10.1073/pnas.1320412111); [Buhring et al. 2024](https://doi.org/10.1080/15564894.2023.2268551)",
+      "position": { "x": 13880, "y": 3860 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-ask-tail",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "askAi",
+      "body": "**UNRUN · Tail-character audit**\n\nBuild a character matrix for Archaeopteryx, Zhengheornis, Baminornis, Enantiornithes, and crown birds: caudal count, proportional length, terminal fusion, feather fan, synsacrum identity, and preservation confidence. Which single recoding changes the inferred order of tail evolution?",
+      "position": { "x": 11680, "y": 4380 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-ask-root",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "askAi",
+      "body": "**UNRUN · Gallus root sensitivity**\n\nCompare the complete Tiley and Mariadassou topologies. Which domestication claims change if green-first becomes red-first, which survive, and which verified wild or museum genomes would most reduce root uncertainty?",
+      "position": { "x": 12120, "y": 4380 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-ask-domestication",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "askAi",
+      "body": "**UNRUN · Genetic–archaeological interval**\n\nShow how a 9.5 ± 3.3 ka demographic split and a 1650–1250 BCE associated-phase lower bound can coexist. Separate sampling gaps, population structure, protracted management, and model misspecification; name the directly dated ancient genomes that would discriminate them.",
+      "position": { "x": 13000, "y": 4380 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-ask-tracts",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "askAi",
+      "body": "**UNRUN · Introgression audit**\n\nFor each non-red candidate region in Lawal 2020, separate evidence for admixture, donor identity, direction, timing, phenotype, and causal allele. Treat the green signal as one candidate tract and flag every arrow inferred only from modern samples.",
+      "position": { "x": 12560, "y": 4740 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-ask-use",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "askAi",
+      "body": "**UNRUN · What did early people value?**\n\nAcross Europe, Maresha, Central Asia, Karako-Kagi, Karakami, Gungok-ri, Borgund, and the Baltic, classify evidence for presence, breeding, feeding, eggs, meat, ritual or display, and genomic ancestry. Do not infer one use from another.",
+      "position": { "x": 13440, "y": 4380 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-ask-fossil-prediction",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "askAi",
+      "body": "**UNRUN · Predictive fossil search**\n\nBuild three internally coherent crown-bird chronologies from Stiller 2024, Brocklehurst–Field 2024, and Wu 2024. Test Asteriornis and Vegavis as minimums, then specify the age, geography, and anatomy of a fossil that would most favor one model over the others.",
+      "position": { "x": 12560, "y": 5100 }
+    }
+  },
+  { "version": 1, "id": "v4-methods-id-group", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-group" }, "identity": { "preset": "charcoal", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-hub", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-evidence-hub" }, "identity": { "preset": "charcoal", "fill": "body" } } },
+  { "version": 1, "id": "v4-methods-id-dates", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-date-types" }, "identity": { "preset": "slate", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-fossil", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-fossil-anatomy" }, "identity": { "preset": "amber", "fill": "soft" } } },
+  { "version": 1, "id": "v4-methods-id-networks", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-species-networks" }, "identity": { "preset": "purple", "fill": "soft" } } },
+  { "version": 1, "id": "v4-methods-id-clocks", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-clocks" }, "identity": { "preset": "blue", "fill": "soft" } } },
+  { "version": 1, "id": "v4-methods-id-archaeology", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-archaeology" }, "identity": { "preset": "mint", "fill": "soft" } } },
+  { "version": 1, "id": "v4-methods-id-context", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-context-use" }, "identity": { "preset": "orange", "fill": "soft" } } },
+  { "version": 1, "id": "v4-methods-id-clock-debate", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-clock-debate" }, "identity": { "preset": "coral", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-north-china", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-north-china" }, "identity": { "preset": "red", "fill": "body" } } },
+  { "version": 1, "id": "v4-methods-id-yunnan", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-yunnan" }, "identity": { "preset": "coral", "fill": "soft" } } },
+  { "version": 1, "id": "v4-methods-id-el-arenal", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-el-arenal" }, "identity": { "preset": "red", "fill": "soft" } } },
+  { "version": 1, "id": "v4-methods-id-ask-tail", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-ask-tail" }, "identity": { "preset": "amber", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-ask-root", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-ask-root" }, "identity": { "preset": "purple", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-ask-domestication", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-ask-domestication" }, "identity": { "preset": "mint", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-ask-tracts", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-ask-tracts" }, "identity": { "preset": "orchid", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-ask-use", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-ask-use" }, "identity": { "preset": "orange", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-methods-id-ask-fossil", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-ask-fossil-prediction" }, "identity": { "preset": "blue", "fill": "pattern" } } },
+  {
+    "version": 1,
+    "id": "v4-methods-member-hub",
+    "name": "group.membership.set",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-methods-evidence-hub" }, "group": { "createdByCommandId": "v4-methods-group" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-methods-arrange",
+    "name": "cards.arrange",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "frames": [
+        { "card": { "createdByCommandId": "v4-methods-group" }, "position": { "x": 10772, "y": 3394 }, "size": { "width": 3496, "height": 1976 } },
+        { "card": { "createdByCommandId": "v4-methods-title" }, "position": { "x": 10772, "y": 3260 }, "size": { "width": 940, "height": 82 } },
+        { "card": { "createdByCommandId": "v4-methods-evidence-hub" }, "position": { "x": 10800, "y": 3700 }, "size": { "width": 360, "height": 260 } },
+        { "card": { "createdByCommandId": "v4-methods-date-types" }, "position": { "x": 11240, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-fossil-anatomy" }, "position": { "x": 11680, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-species-networks" }, "position": { "x": 12120, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-clocks" }, "position": { "x": 12560, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-archaeology" }, "position": { "x": 13000, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-context-use" }, "position": { "x": 13440, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-clock-debate" }, "position": { "x": 12560, "y": 3860 }, "size": { "width": 360, "height": 300 } },
+        { "card": { "createdByCommandId": "v4-methods-north-china" }, "position": { "x": 13000, "y": 3860 }, "size": { "width": 360, "height": 280 } },
+        { "card": { "createdByCommandId": "v4-methods-yunnan" }, "position": { "x": 13440, "y": 3860 }, "size": { "width": 360, "height": 280 } },
+        { "card": { "createdByCommandId": "v4-methods-el-arenal" }, "position": { "x": 13880, "y": 3860 }, "size": { "width": 360, "height": 300 } },
+        { "card": { "createdByCommandId": "v4-methods-ask-tail" }, "position": { "x": 11680, "y": 4380 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-ask-root" }, "position": { "x": 12120, "y": 4380 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-ask-domestication" }, "position": { "x": 13000, "y": 4380 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-ask-tracts" }, "position": { "x": 12560, "y": 4740 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-ask-use" }, "position": { "x": 13440, "y": 4380 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-methods-ask-fossil-prediction" }, "position": { "x": 12560, "y": 5100 }, "size": { "width": 360, "height": 240 } }
+      ]
+    }
+  },
+  { "version": 1, "id": "v4-methods-edge-hub-dates", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-evidence-hub" }, "to": { "createdByCommandId": "v4-methods-date-types" }, "strength": "strong", "polarity": "helps", "reason": "date type is mandatory evidence metadata" } },
+  { "version": 1, "id": "v4-methods-edge-hub-fossil", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-evidence-hub" }, "to": { "createdByCommandId": "v4-methods-fossil-anatomy" }, "strength": "weak", "polarity": "helps", "reason": "one authoritative evidence lens" } },
+  { "version": 1, "id": "v4-methods-edge-hub-networks", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-evidence-hub" }, "to": { "createdByCommandId": "v4-methods-species-networks" }, "strength": "weak", "polarity": "helps", "reason": "one authoritative evidence lens" } },
+  { "version": 1, "id": "v4-methods-edge-hub-clocks", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-evidence-hub" }, "to": { "createdByCommandId": "v4-methods-clocks" }, "strength": "weak", "polarity": "helps", "reason": "one model-sensitive evidence lens" } },
+  { "version": 1, "id": "v4-methods-edge-hub-archaeology", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-evidence-hub" }, "to": { "createdByCommandId": "v4-methods-archaeology" }, "strength": "weak", "polarity": "helps", "reason": "one identity-plus-date evidence lens" } },
+  { "version": 1, "id": "v4-methods-edge-hub-context", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-evidence-hub" }, "to": { "createdByCommandId": "v4-methods-context-use" }, "strength": "weak", "polarity": "helps", "reason": "one behavior-and-use evidence lens" } },
+  { "version": 1, "id": "v4-methods-edge-clocks-debate", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-clocks" }, "to": { "createdByCommandId": "v4-methods-clock-debate" }, "strength": "weak", "polarity": "helps", "reason": "applies whole-model comparison to three live crown chronologies" } },
+  { "version": 1, "id": "v4-methods-edge-arch-north", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-archaeology" }, "to": { "createdByCommandId": "v4-methods-north-china" }, "strength": "strong", "polarity": "pushesAgainst", "reason": "reauthentication removes the early Holocene specimens from the chicken record" } },
+  { "version": 1, "id": "v4-methods-edge-arch-yunnan", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-archaeology" }, "to": { "createdByCommandId": "v4-methods-yunnan" }, "strength": "weak", "polarity": "helps", "reason": "specimen publication, ZooMS, morphology, and direct AMS define the audit path" } },
+  { "version": 1, "id": "v4-methods-edge-arch-el-arenal", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-archaeology" }, "to": { "createdByCommandId": "v4-methods-el-arenal" }, "strength": "strong", "polarity": "pushesAgainst", "reason": "reidentification and missing original specimen break the specific chicken datum" } },
+  { "version": 1, "id": "v4-methods-edge-fossil-ask-tail", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-fossil-anatomy" }, "to": { "createdByCommandId": "v4-methods-ask-tail" }, "strength": "weak", "polarity": "helps", "reason": "turns the anatomical dispute into a discriminating unrun question" } },
+  { "version": 1, "id": "v4-methods-edge-networks-ask-root", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-species-networks" }, "to": { "createdByCommandId": "v4-methods-ask-root" }, "strength": "weak", "polarity": "helps", "reason": "turns root conflict into a sampling and invariance test" } },
+  { "version": 1, "id": "v4-methods-edge-arch-ask-domestication", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-archaeology" }, "to": { "createdByCommandId": "v4-methods-ask-domestication" }, "strength": "weak", "polarity": "helps", "reason": "joins rather than conflates archaeological and demographic evidence" } },
+  { "version": 1, "id": "v4-methods-edge-networks-ask-tracts", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-species-networks" }, "to": { "createdByCommandId": "v4-methods-ask-tracts" }, "strength": "weak", "polarity": "helps", "reason": "turns generic reticulation into locus-by-locus causal questions" } },
+  { "version": 1, "id": "v4-methods-edge-context-ask-use", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-context-use" }, "to": { "createdByCommandId": "v4-methods-ask-use" }, "strength": "weak", "polarity": "helps", "reason": "tests competing values with local behavioral evidence" } },
+  { "version": 1, "id": "v4-methods-edge-debate-ask-fossil", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-methods-clock-debate" }, "to": { "createdByCommandId": "v4-methods-ask-fossil-prediction" }, "strength": "weak", "polarity": "helps", "reason": "discriminates clock models through prospective fossil prediction rather than averaging" } }
+]

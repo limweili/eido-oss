@@ -1,0 +1,17 @@
+#!/bin/sh
+# Runs the two checks that catch nearly everything the hosted gate catches,
+# before the push rather than five minutes after it. Roughly 35 seconds.
+#
+# Skip a single push with `git push --no-verify`, or the hook entirely with
+# EIDO_SKIP_PRECHECK=1. Install with `npm run hooks:install`.
+if [ -n "$EIDO_SKIP_PRECHECK" ]; then
+  echo "pre-push: skipped (EIDO_SKIP_PRECHECK is set)"
+  exit 0
+fi
+
+echo "pre-push: npm run check (skip with EIDO_SKIP_PRECHECK=1 or git push --no-verify)"
+if ! npm run check --silent; then
+  echo ""
+  echo "pre-push: check failed. Fix it, or push with --no-verify if you meant to."
+  exit 1
+fi

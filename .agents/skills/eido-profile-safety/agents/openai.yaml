@@ -1,0 +1,4 @@
+interface:
+  display_name: "Eido Profile Safety"
+  short_description: "Protect private Eido Profile data safely."
+  default_prompt: "Use $eido-profile-safety to make this Profile storage or recovery task safe."

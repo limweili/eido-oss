@@ -1,0 +1,51 @@
+research/repos/
+
+# Eido private local data. Installed Profiles and legacy browser saves live
+# outside the repo by default and must not be committed.
+.eido/
+**/.eido/
+eido-profile.sqlite
+eido-profile.sqlite-*
+*.eido-idea.json
+*.eido-profile
+*.eido.zip
+eido-v3-ideas*.json
+eido-v3-ideas*.tmp
+eido-v3-ideas.json.*
+recovered-board*.json
+*.before-recover*.json
+*.rebuilt*.json
+backups/
+
+# Local-only app data/test scratch space.
+.local/
+tmp/
+.env
+.env.*
+!.env.example
+
+# Agent tooling local state (regenerated; not project source).
+.worktrees/
+.codex/
+.polly/
+.multy/
+# Machine-local scan diagnostics; every worktree rewrites them differently.
+# Regenerate with the docs-sync / codebase-map skill scripts.
+docs/codebase/.docs-sync-scan.md
+docs/codebase/.codebase-map-scan.md
+# Local code-graph index. Auto-rebuilds via the codebase-memory MCP watcher;
+# not required in git. Binary blob that churns on every reindex.
+.codebase-memory/
+node_modules
+node_modules/
+dist/
+dist-electron/
+test-results/
+*.tsbuildinfo
+*.local
+
+# macOS
+.DS_Store
+
+# here.now publish state (local, never committed)
+.herenow/

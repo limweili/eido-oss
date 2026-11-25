@@ -1,0 +1,420 @@
+
+.board-wrap {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  background: var(--e-surface-ground);
+}
+.board-flow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  --xy-background-color: var(--e-surface-ground);
+  --xy-selection-background-color: color-mix(in srgb, var(--e-go) 10%, transparent);
+  --xy-selection-border: 1.5px dashed var(--e-go);
+  --xy-controls-button-background-color: var(--e-surface-panel);
+  --xy-controls-button-background-color-hover: var(--e-wash);
+  --xy-controls-button-color: var(--e-ink);
+  --xy-controls-button-color-hover: var(--e-ink);
+  --xy-controls-button-border-color: var(--e-line);
+  --xy-controls-box-shadow: none;
+}
+.board-flow .react-flow__selection {
+  border-radius: 2px;
+}
+/* The rubber band is the only dashed rectangle on the board. React Flow also
+   frames a committed multi-selection with the same dashed wash, which reads as
+   a second selection state on top of each Card's own border and paints a tint
+   over transparent Title cards. The frame stays in the tree because it is the
+   multi-selection drag target; it just carries no ink of its own. */
+.board-flow .react-flow__nodesselection-rect {
+  border: 0;
+  background: transparent;
+}
+.board-flow .react-flow__controls {
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--e-r-well);
+  background: var(--e-surface-panel);
+}
+.board-flow .react-flow__controls-button {
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--e-line-strong);
+  border-bottom-color: var(--e-line);
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+.board-flow .react-flow__controls-button:first-child {
+  border-radius: var(--e-r-well) var(--e-r-well) 0 0;
+}
+.board-flow .react-flow__controls-button:last-child {
+  border-radius: 0 0 var(--e-r-well) var(--e-r-well);
+}
+.board-flow .react-flow__controls-button + .react-flow__controls-button {
+  border-top: 0;
+}
+.board-flow .react-flow__controls-button:last-child {
+  border-bottom-color: var(--e-line-strong);
+}
+.board-flow .react-flow__controls-button:hover:not(:disabled) {
+  background: var(--e-wash);
+  color: var(--e-ink);
+}
+.board-flow .react-flow__controls-button:active:not(:disabled) {
+  transform: scale(var(--e-scale-press));
+}
+.board-flow .react-flow__controls-button:focus-visible {
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--e-go);
+  outline: none;
+}
+.board-flow .react-flow__controls-button:has(+ .react-flow__controls-button:focus-visible) {
+  border-bottom-color: transparent;
+}
+.board-flow .react-flow__controls-button:disabled {
+  pointer-events: auto;
+  border: 1px solid var(--e-line);
+  background: var(--e-surface-panel);
+  color: var(--e-ink-faint);
+  cursor: default;
+  opacity: 1;
+  transform: none;
+}
+.board-flow .react-flow__controls-button:has(+ .react-flow__controls-button:disabled) {
+  border-bottom-color: transparent;
+}
+.board-flow .react-flow__controls-button:disabled svg {
+  fill-opacity: 1;
+  opacity: 1;
+}
+.board-flow .react-flow__controls.horizontal .react-flow__controls-button {
+  border: 1px solid var(--e-line-strong);
+  border-right-color: var(--e-line);
+}
+.board-flow .react-flow__controls.horizontal .react-flow__controls-button:first-child {
+  border-radius: var(--e-r-well) 0 0 var(--e-r-well);
+}
+.board-flow .react-flow__controls.horizontal .react-flow__controls-button:last-child {
+  border-radius: 0 var(--e-r-well) var(--e-r-well) 0;
+}
+.board-flow .react-flow__controls.horizontal
+  .react-flow__controls-button
+  + .react-flow__controls-button {
+  border-top: 1px solid var(--e-line-strong);
+  border-left: 0;
+}
+.board-flow .react-flow__controls.horizontal .react-flow__controls-button:last-child {
+  border-right-color: var(--e-line-strong);
+}
+.board-flow .react-flow__controls.horizontal
+  .react-flow__controls-button:has(+ .react-flow__controls-button:focus-visible),
+.board-flow .react-flow__controls.horizontal
+  .react-flow__controls-button:has(+ .react-flow__controls-button:disabled) {
+  border-right-color: transparent;
+  border-bottom-color: var(--e-line-strong);
+}
+.board-flow .react-flow__controls.horizontal .react-flow__controls-button:focus-visible {
+  border: 1px solid var(--e-go);
+}
+.board-flow .react-flow__controls.horizontal .react-flow__controls-button:disabled {
+  border: 1px solid var(--e-line);
+}
+:root[data-reduced-motion="true"] .board-flow .react-flow__viewport {
+  transition: none !important;
+}
+/* React Flow sets `overflow: hidden` inline and then resets any wrapper scroll
+   in its onScroll handler. Rich-text editors can programmatically scroll every
+   ancestor while revealing a caret, so a partly offscreen card briefly scrolls
+   this wrapper before React Flow resets it. The canvas is transform-driven and
+   must never be a scroll container; `clip` prevents programmatic scrolling too. */
+.board-wrap .react-flow {
+  overflow: clip !important;
+}
+.board-overview-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.board-flow .react-flow__edges {
+  z-index: 2;
+}
+.board-flow .react-flow__nodes {
+  z-index: auto;
+}
+/* React Flow briefly hides nodes while re-measuring. Keeping rendered nodes
+   visible prevents active text editors from losing focus mid-click or keystroke. */
+.board-flow .react-flow__node {
+  contain: layout style;
+  visibility: visible !important;
+}
+/* The controlled node owns Reading crossfade opacity as a standard,
+   non-inherited style. Rich Card semantics never inherit a zoom-changing
+   custom property; pointer events remain intact throughout the crossfade. */
+.board-flow:not(.board-flow-playback) .eido-visual-card-node {
+  opacity: 1;
+}
+/* React Flow's shallow wrapper owns the immediate selection frame on the
+   Card's exact boundary. Semantic Card selection follows after a paint
+   barrier, so changing this class never wakes or rematches a giant rich-text
+   subtree. */
+.board-flow:not(.board-flow-playback) .eido-visual-card-node::after {
+  position: absolute;
+  z-index: calc(var(--e-z-canvas-chrome) - 1);
+  inset: 0;
+  border: var(--e-card-border-width) solid transparent;
+  border-radius: var(--e-r-card);
+  pointer-events: none;
+  content: '';
+  transition: none;
+}
+.board-flow:not(.board-flow-playback) .eido-visual-card-node.selected::after {
+  border-color: var(--e-go);
+}
+/* Held resize keeps the React Flow wrapper intentionally cold. Move only the
+   selection frame to the Card's contained hot-resize layer so the outline
+   follows the pointer without waking the semantic subtree. */
+.board-flow:not(.board-flow-playback)
+  .eido-visual-card-node.selected[data-resize-frame]::after {
+  border-color: transparent;
+}
+.card-resize-layer[data-resize-frame]::before {
+  position: absolute;
+  inset: calc(var(--e-card-border-width) * -1);
+  border: var(--e-card-border-width) solid var(--e-go);
+  border-radius: var(--e-r-card);
+  pointer-events: none;
+  content: '';
+}
+.card.group > .card-resize-layer[data-resize-frame]::before {
+  border-width: 1.5px;
+  border-style: dashed;
+}
+/* Group Cards keep their dashed grammar on the same shallow plane. */
+.board-flow:not(.board-flow-playback)
+  .react-flow__node-group.eido-visual-card-node::after {
+  inset: 0;
+  border-width: 1.5px;
+  border-style: dashed;
+}
+.board-flow.tool-select .react-flow__pane.selection,
+.board-flow.tool-select .react-flow__node,
+.board-flow.tool-select .react-flow__node *,
+.board-flow.tool-select .react-flow__edge.selectable,
+.board-flow.tool-select .react-flow__edge *,
+.board-flow.tool-select .react-flow__handle,
+.board-flow.tool-select .react-flow__resize-control,
+.board-flow.tool-select .card,
+.board-flow.tool-select .card-title-display,
+.board-flow.tool-select .note-render,
+.board-flow.tool-select .card textarea,
+.board-flow.tool-select .card-title-input,
+.board-flow.tool-select .model-pick .e-picker {
+  cursor: default;
+}
+.board-flow.tool-select .card-resize-handle.top.left,
+.board-flow.tool-select .card-resize-handle.bottom.right {
+  cursor: nwse-resize;
+}
+.board-flow.tool-select .card-resize-handle.top.right,
+.board-flow.tool-select .card-resize-handle.bottom.left {
+  cursor: nesw-resize;
+}
+.board-flow.tool-select .react-flow__node-note .note-body.editing,
+.board-flow.tool-select .card textarea.editing,
+.board-flow.tool-select .card textarea:focus,
+.board-flow.tool-select .card-title-input:focus {
+  cursor: text;
+}
+/* An editable Mod face gets its instrument cursors back: the select tool's
+   arrow grammar applies only while the face is still card-level chrome. */
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false'] :is(.bd-grip) {
+  cursor: row-resize;
+}
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false'] :is(.i-track, .i-filter) {
+  cursor: ew-resize;
+}
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false'] .i-dial-surface {
+  cursor: ns-resize;
+}
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false'] .i-pad {
+  cursor: crosshair;
+}
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false'] :is(.rd-vert, .i-order-token) {
+  cursor: grab;
+}
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false']
+  :is(.rd-vert.is-dragging, .i-order-token.is-lift) {
+  cursor: grabbing;
+}
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false'] :is(
+  button:not(:disabled),
+  .i-seg-cell,
+  .i-stack-row,
+  .row-x
+) {
+  cursor: pointer;
+}
+.board-flow.tool-select .react-flow__node .mod-face-host[aria-disabled='false']
+  [contenteditable='plaintext-only'] {
+  cursor: text;
+}
+/* React Flow owns an unselected press-drag, while selected Result text earns
+   `nodrag` at its one reading root. Keep selectability stable so selection
+   does not rematch a million-character descendant tree. */
+.board-flow.tool-select .card.result .result-text,
+.board-flow.tool-select .card.result .followup-thread .bubble-text {
+  user-select: text;
+}
+/* A selected card wears the move grammar: surfaces that drag the card show a
+   grip, while drag-blocked chrome (.nodrag) keeps its own cursor and text that
+   opens an editor shows the I-beam. */
+.board-flow.tool-select .card.selected,
+.board-flow.tool-select .card.selected > :is(.card-head, .card-body, .card-foot) {
+  cursor: grab;
+}
+.board-flow.tool-select .react-flow__node.dragging .card.selected,
+.board-flow.tool-select .react-flow__node.dragging .card.selected > .card-head {
+  cursor: grabbing;
+}
+.board-flow.tool-select .card.selected .card-connector {
+  cursor: crosshair;
+}
+.board-flow.tool-select .card.selected .card-title-display,
+.board-flow.tool-select .card.selected .note-render {
+  cursor: text;
+}
+.board-flow.tool-select .card.selected .note-render {
+  user-select: text;
+}
+/* Keep the selection-dependent match at the Note root. Its Markdown
+   descendants inherit the same I-beam, while the later link rule can still
+   claim pointer, without rematching a giant Note subtree on selection. */
+.board-flow.tool-select .note-render * {
+  cursor: inherit;
+}
+/* The select tool paints `default` over every descendant of a node, which
+   silences anything inside a Card that answers a press. An address in prose is
+   clickable whether or not its Card is selected, and so is every row and
+   address in a run's trail, so all of them say so under the pointer. */
+.board-flow.tool-select .react-flow__node .card
+  :is(.note-render, .result-text, .bubble-text, .tool-trail)
+  :is(a[href], .tool-trail__step-line--pressable, .tool-trail__more) {
+  cursor: pointer;
+}
+.board-flow.tool-pan .react-flow__pane,
+.board-flow.tool-pan .react-flow__node,
+.board-flow.tool-pan .react-flow__node *,
+.board-flow.tool-pan .react-flow__edge,
+.board-flow.tool-pan .react-flow__edge *,
+.board-flow.tool-pan .react-flow__handle,
+.board-flow.tool-pan .react-flow__resize-control {
+  cursor: grab;
+}
+.board-flow.tool-pan:active .react-flow__pane,
+.board-flow.tool-pan:active .react-flow__node,
+.board-flow.tool-pan:active .react-flow__edge,
+.board-flow.tool-pan:active .react-flow__handle,
+.board-flow.tool-pan:active .react-flow__resize-control {
+  cursor: grabbing;
+}
+/* Once pane movement is armed, one transparent gesture surface owns the
+   closed-hand cursor. This preserves the pan feedback over rich descendants
+   without restyling every descendant when the gesture starts and ends. */
+.board-flow.tool-pan .react-flow__pane.dragging::after {
+  position: absolute;
+  z-index: var(--e-z-lifted);
+  inset: 0;
+  cursor: grabbing;
+  content: '';
+}
+.board-flow.tool-highlight .react-flow__node,
+.board-flow.tool-highlight .react-flow__node *,
+.board-flow.tool-highlight .react-flow__edge,
+.board-flow.tool-highlight .react-flow__edge *,
+.board-flow.tool-highlight .react-flow__handle,
+.board-flow.tool-highlight .react-flow__resize-control {
+  cursor: default;
+}
+.board-flow.tool-highlight .note-render,
+.board-flow.tool-highlight .note-render *,
+.board-flow.tool-highlight .result-text,
+.board-flow.tool-highlight .result-text *,
+.board-flow.tool-highlight .followup-thread .bubble-text,
+.board-flow.tool-highlight .followup-thread .bubble-text *,
+.board-flow.tool-highlight .transcript,
+.board-flow.tool-highlight .transcript * {
+  cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%232b2a27' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m9 11-6 6v3h9l3-3' fill='%23f2d94e'/><path d='m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4' fill='%23fffdf8'/></svg>") 3 18, text;
+  user-select: text;
+  /* While the highlighter is out, any readable text becomes selectable to paint. */
+}
+.board-flow.tool-highlight .highlight-erase {
+  cursor: pointer;
+}
+/* While a highlight drag is in progress, only the card it started in stays
+   selectable — the browser clamps the live selection at that card's edge
+   instead of spilling into neighbour cards or page chrome. !important so the
+   lock beats the broad user-select: text rule above. */
+body.highlight-drag * {
+  user-select: none !important;
+}
+body.highlight-drag .highlight-drag-origin,
+body.highlight-drag .highlight-drag-origin * {
+  user-select: text !important;
+}
+.board-flow.tool-highlight ::selection {
+  /* The drag wash previews the active tag color — it feels like the pen's ink. */
+  background: var(
+    --active-highlight-bg,
+    color-mix(in srgb, var(--e-go) 12%, var(--e-wash-base))
+  );
+}
+.viewport-back-control.e-button {
+  position: absolute;
+  z-index: var(--e-z-canvas-chrome);
+  top: var(--e-sp-3);
+  left: var(--e-sp-3);
+}
+.deep-link-toast.e-toast {
+  position: absolute;
+  z-index: var(--e-z-toast);
+  top: var(--e-sp-3);
+  right: var(--e-sp-3);
+}
+.board-selection-status.e-toast {
+  right: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.react-flow__node.card-link-target::after {
+  position: absolute;
+  z-index: var(--e-z-canvas-chrome);
+  inset: calc(var(--e-sp-1) * -1);
+  border: 1.5px solid var(--e-go);
+  border-radius: var(--e-r-card);
+  opacity: 0;
+  pointer-events: none;
+  content: "";
+  animation: card-link-ring 1.65s var(--e-ease-out);
+}
+
+@keyframes card-link-ring {
+  0% {
+    opacity: 0.72;
+  }
+  38% {
+    opacity: 0.42;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+:root[data-reduced-motion="true"] .react-flow__node.card-link-target::after {
+  animation-duration: var(--e-t-reduced-fade) !important;
+}

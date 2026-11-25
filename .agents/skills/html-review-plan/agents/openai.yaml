@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML Review Plan"
+  short_description: "Build standalone interactive delivery reviews"
+  default_prompt: "Use $html-review-plan to create a standalone interactive review for this epic or major delivery."

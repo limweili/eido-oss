@@ -1,0 +1,6 @@
+interface:
+  display_name: "DevOps Coach"
+  short_description: "Find and remove delivery bottlenecks"
+  default_prompt: "Use $devops-coach to review my current delivery bottleneck and decide the next action."
+policy:
+  allow_implicit_invocation: false

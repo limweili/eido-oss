@@ -1,0 +1,59 @@
+# ci-class: experimental
+name: Rich Card baseline evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rich-card-baseline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    # This issue-specific browser/performance canary is mandatory evidence for
+    # #402, but it does not change the repository's normal Required gate.
+    name: Rich Card baseline evidence (experimental)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out the exact branch head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Probe every rich Card choreography once (non-evidence)
+        run: npm run perf:rich-card:probe
+
+      - name: Verify rich Card correctness probes
+        run: npm run perf:rich-card:correctness
+
+      - name: Capture repeated rich Card baseline
+        env:
+          EIDO_RICH_CARD_ARTIFACT: artifacts/richCardBaseline.raw.json
+        run: npm run perf:rich-card:capture
+
+      - name: Preserve raw browser evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rich-card-baseline-${{ github.sha }}
+          path: |
+            artifacts/richCardBaseline.raw.json
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14

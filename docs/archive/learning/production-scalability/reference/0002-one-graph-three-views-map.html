@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>One Graph, Three Views Map</title>
+    <link rel="stylesheet" href="../assets/course.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="eyebrow">Reference 0002</div>
+        <h1>One Graph, Three Views Map</h1>
+        <p class="lede">Use this to decide where a feature belongs before an agent starts coding.</p>
+      </header>
+
+      <section class="rule">
+        <p><strong>Thin waist:</strong> Eido's Board records are the source of truth. Canvas, context, execution, and playback are projections from those records.</p>
+      </section>
+
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Owns</th>
+            <th>Should Not Own</th>
+            <th>Current Eido Modules</th>
+            <th>Agent Prompt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Graph Truth</strong></td>
+            <td>Cards, Connections, Outputs, Output Versions, Runs, Intent Log Events, settings.</td>
+            <td>React Flow nodes, DOM state, generated prompt text as the only record of meaning.</td>
+            <td><code>src/graph/types.ts</code>, <code>src/graph/store.ts</code>, <code>src/graph/save.ts</code></td>
+            <td>Which Board records does this feature add or change?</td>
+          </tr>
+          <tr>
+            <td><strong>Canvas View</strong></td>
+            <td>What is visible, selected, culled, summarized, hit-tested, or drawn at this zoom.</td>
+            <td>Semantic meaning, provenance, context ranking, output lineage.</td>
+            <td><code>src/canvas/boardScene.ts</code>, <code>src/canvas/renderPlanning.ts</code>, <code>src/canvas/Board.tsx</code></td>
+            <td>What projection lets the renderer avoid full-board work?</td>
+          </tr>
+          <tr>
+            <td><strong>Semantic View</strong></td>
+            <td>What context matters, what constrains, what modifies, what gets explained to the user.</td>
+            <td>Canvas coordinates, DOM rendering, network streaming state.</td>
+            <td><code>src/brain/compiler.ts</code>, <code>src/brain/sourceContext.ts</code>, <code>src/brain/applyMods.ts</code></td>
+            <td>What graph facts are compiled, and can the user inspect the trace?</td>
+          </tr>
+          <tr>
+            <td><strong>Execution View</strong></td>
+            <td>Runs, statuses, model, compiled instruction, used cards, used connections, produced versions.</td>
+            <td>Live canvas state as hidden dependency, untraceable AI output.</td>
+            <td><code>src/brain/runEngine.ts</code>, <code>src/graph/types.ts</code></td>
+            <td>What snapshot/provenance record makes this output explainable later?</td>
+          </tr>
+          <tr>
+            <td><strong>Playback View</strong></td>
+            <td>Durable reconstruction from coarse semantic events and checkpoints.</td>
+            <td>Every keystroke, unbounded undo, feature-specific history systems.</td>
+            <td><code>src/graph/timeline.ts</code>, <code>IntentLogEvent</code></td>
+            <td>Is this change meaningful enough for Playback, or only Undo/session state?</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Fast Decision Test</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>If it must be saved</h3>
+          <p>It probably belongs in Board records first, then projected outward.</p>
+        </div>
+        <div class="card">
+          <h3>If it changes pixels</h3>
+          <p>It probably belongs in the canvas view, scene derivation, or renderer adapter.</p>
+        </div>
+        <div class="card">
+          <h3>If it changes AI input</h3>
+          <p>It belongs in the graph/compiler path and needs an inspectable trace.</p>
+        </div>
+        <div class="card">
+          <h3>If it changes AI output</h3>
+          <p>It needs a Run and Output Version provenance story.</p>
+        </div>
+        <div class="card">
+          <h3>If it changes history</h3>
+          <p>Decide whether it is Undo, Playback, both, or neither.</p>
+        </div>
+      </div>
+
+      <h2>One Useful Phrase</h2>
+      <pre><code>Please implement this as a projection from Board records, not as a second source of truth. Name the owning record, the projection module, and the test that proves they stay in sync.</code></pre>
+
+      <h2>Related</h2>
+      <p><a href="../lessons/0002-one-graph-three-projections.html">Lesson 0002: One Graph, Three Projections</a></p>
+      <p><a href="0001-scalability-pattern-matrix.html">Reference 0001: Scalability Pattern Matrix</a></p>
+    </main>
+  </body>
+</html>

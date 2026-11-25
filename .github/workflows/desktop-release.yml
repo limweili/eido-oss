@@ -1,0 +1,331 @@
+name: Desktop release publication
+
+# Packaged certification builds and verifies the installers, including signing
+# and notarization on macOS. This workflow publishes the certified bytes, the
+# signed update feed, and the stable download addresses (#978, ADR 0032).
+
+on:
+  workflow_dispatch:
+    inputs:
+      semver:
+        description: Unique SemVer of the certified release to publish
+        required: true
+        type: string
+      certification_set_id:
+        description: >-
+          Certification set identifier containing verified binaries, exactly as
+          minted by the certification run (eido-cert-v2-<run id>-<attempt>).
+        required: true
+        type: string
+      min_supported_version:
+        description: Optional minimum supported version floor
+        required: false
+        type: string
+      blocked_versions:
+        description: Optional comma-separated list of recalled/blocked versions
+        required: false
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  # Different commits publish to the same aliases and update feed.
+  group: desktop-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish release to Cloudflare R2
+    runs-on: ubuntu-24.04
+    # Moves roughly a gigabyte in four directions: two certification artifacts
+    # down from Actions, binaries and aliases up to R2, then the feed and both
+    # aliases back down for verification. A timeout between the manifest upload
+    # and that verification is the one ambiguous outcome this job can have, so
+    # the limit has headroom rather than being sized to the happy path.
+    timeout-minutes: 30
+    environment: release-publish
+    steps:
+      - name: Check out release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      # The certification set id embeds the run that produced it, so the run to
+      # download from is derived rather than trusted as a second free-text
+      # input. Two inputs that must agree are two inputs that can disagree.
+      - name: Resolve the certification run from the certification set
+        id: certification
+        env:
+          CERTIFICATION_SET_ID: ${{ inputs.certification_set_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$CERTIFICATION_SET_ID" =~ ^eido-cert-v2-([0-9]{1,20})-([0-9]{1,10})$ ]]; then
+            echo "Certification set id is not a v2 certification set: $CERTIFICATION_SET_ID" >&2
+            exit 1
+          fi
+          echo "run_id=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+          echo "Publishing from certification run ${BASH_REMATCH[1]}."
+
+      - name: Download the certified binaries and their evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CERTIFICATION_SET_ID: ${{ inputs.certification_set_id }}
+          CERTIFICATION_RUN_ID: ${{ steps.certification.outputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CERTIFIED_DIR="$RUNNER_TEMP/certified"
+          mkdir -p "$CERTIFIED_DIR/darwin-arm64" "$CERTIFIED_DIR/win32-x64"
+          # Each certification artifact carries `package/` and `evidence/`.
+          # Downloaded into per-platform directories so the verifier reads each
+          # platform's own evidence, never the other's.
+          gh run download "$CERTIFICATION_RUN_ID" \
+            --name "eido-packaged-certification-${CERTIFICATION_SET_ID}-darwin-arm64" \
+            --dir "$CERTIFIED_DIR/darwin-arm64"
+          gh run download "$CERTIFICATION_RUN_ID" \
+            --name "eido-packaged-certification-${CERTIFICATION_SET_ID}-win32-x64" \
+            --dir "$CERTIFIED_DIR/win32-x64"
+
+      # The gate. On Linux there is no codesign/spctl/stapler, so this reads the
+      # signing posture the macOS certification leg recorded and proves the
+      # bytes in hand are the ones it certified. Refuses schemaVersion 1
+      # evidence, which predates the signing posture gate entirely.
+      - name: Verify the artifacts are certified, signed, notarized, and stapled
+        id: verified
+        env:
+          CERTIFICATION_SET_ID: ${{ inputs.certification_set_id }}
+          SEMVER: ${{ inputs.semver }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/release/verify-certified-artifacts.mjs \
+            --certified-dir "$RUNNER_TEMP/certified" \
+            --certification-set-id "$CERTIFICATION_SET_ID" \
+            --semver "$SEMVER" \
+            --source-sha "$GITHUB_SHA" \
+            > "$RUNNER_TEMP/verified-artifacts.json"
+          cat "$RUNNER_TEMP/verified-artifacts.json"
+
+      - name: Generate the update manifest from the verified digests
+        env:
+          SEMVER: ${{ inputs.semver }}
+          MIN_SUPPORTED: ${{ inputs.min_supported_version }}
+          BLOCKED: ${{ inputs.blocked_versions }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIST="$RUNNER_TEMP/release-dist"
+          mkdir -p "$DIST"
+
+          # Names and digests come from the verified evidence, never from a
+          # second guess at what the builder named its output.
+          VERIFIED="$RUNNER_TEMP/verified-artifacts.json"
+          DARWIN_DMG=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].artifactName)' "$VERIFIED")
+          DARWIN_SHA256=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].sha256)' "$VERIFIED")
+          DARWIN_ZIP=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].updateArtifact.artifactName)' "$VERIFIED")
+          DARWIN_ZIP_SHA256=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].updateArtifact.sha256)' "$VERIFIED")
+          DARWIN_ZIP_SHA512=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].updateArtifact.sha512)' "$VERIFIED")
+          DARWIN_ZIP_BYTES=$(node -e 'const v=require(process.argv[1]);process.stdout.write(String(v.platforms["darwin-arm64"].updateArtifact.bytes))' "$VERIFIED")
+          WIN32_EXE=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["win32-x64"].artifactName)' "$VERIFIED")
+          WIN32_SHA256=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["win32-x64"].sha256)' "$VERIFIED")
+
+          cp "$RUNNER_TEMP/certified/darwin-arm64/package/$DARWIN_DMG" "$DIST/$DARWIN_DMG"
+          cp "$RUNNER_TEMP/certified/darwin-arm64/package/$DARWIN_ZIP" "$DIST/$DARWIN_ZIP"
+          cp "$RUNNER_TEMP/certified/win32-x64/package/$WIN32_EXE" "$DIST/$WIN32_EXE"
+
+          EXTRA_FLAGS=()
+          if [ -n "$MIN_SUPPORTED" ]; then
+            EXTRA_FLAGS+=(--min-supported-version "$MIN_SUPPORTED")
+          fi
+          if [ -n "$BLOCKED" ]; then
+            EXTRA_FLAGS+=(--blocked-versions "$BLOCKED")
+          fi
+
+          # Deliberately unsigned here. Signing is a separate step so it goes
+          # through the signer that cross-checks the compiled public key and
+          # verifies its own output; see below.
+          node scripts/release/generate-update-manifest.mjs \
+            --version "$SEMVER" \
+            --source-sha "$GITHUB_SHA" \
+            --download-page-url "https://eido.so" \
+            --darwin-arm64-artifact "$DARWIN_DMG" \
+            --darwin-arm64-sha256 "$DARWIN_SHA256" \
+            --darwin-arm64-update-artifact "$DARWIN_ZIP" \
+            --darwin-arm64-update-sha256 "$DARWIN_ZIP_SHA256" \
+            --darwin-arm64-update-sha512 "$DARWIN_ZIP_SHA512" \
+            --darwin-arm64-update-bytes "$DARWIN_ZIP_BYTES" \
+            --win32-x64-artifact "$WIN32_EXE" \
+            --win32-x64-sha256 "$WIN32_SHA256" \
+            --out-dir "$DIST" \
+            "${EXTRA_FLAGS[@]}"
+
+      # Signed through sign-update-manifest.mjs rather than inline, because that
+      # signer derives the public key from the private key, refuses to continue
+      # unless it equals EIDO_UPDATE_MANIFEST_PUBLIC_KEY_HEX (the same key
+      # compiled into every shipped app), and re-reads both files from disk to
+      # verify the signature before reporting success. A manifest signed by the
+      # wrong key would be refused by every client in the field; this fails the
+      # release instead of publishing it.
+      - name: Sign the update manifest and self-verify against the compiled key
+        env:
+          EIDO_UPDATE_MANIFEST_SIGNING_KEY: ${{ secrets.EIDO_UPDATE_MANIFEST_SIGNING_KEY }}
+          EIDO_UPDATE_MANIFEST_PUBLIC_KEY_HEX: ${{ vars.EIDO_UPDATE_MANIFEST_PUBLIC_KEY_HEX }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${EIDO_UPDATE_MANIFEST_SIGNING_KEY:-}" ]; then
+            echo "The update manifest signing key is not available to this job." >&2
+            exit 1
+          fi
+          if [ -z "${EIDO_UPDATE_MANIFEST_PUBLIC_KEY_HEX:-}" ]; then
+            echo "The compiled update manifest public key is not configured." >&2
+            exit 1
+          fi
+          node scripts/release-signing/sign-update-manifest.mjs \
+            "$RUNNER_TEMP/release-dist/eido-update.json"
+          test -s "$RUNNER_TEMP/release-dist/eido-update.json.sig"
+
+      - name: Upload release binaries and feed assets to Cloudflare R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          R2_ENDPOINT="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+
+          # Names come from the same verified evidence the manifest was built
+          # from, so the aliases below can never point at a file this release
+          # did not certify.
+          VERIFIED="$RUNNER_TEMP/verified-artifacts.json"
+          DARWIN_DMG=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].artifactName)' "$VERIFIED")
+          DARWIN_ZIP=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].updateArtifact.artifactName)' "$VERIFIED")
+          WIN32_EXE=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["win32-x64"].artifactName)' "$VERIFIED")
+
+          # Binaries first, manifest last. A client that reads the manifest the
+          # instant it appears must find the artifacts it names already there.
+          # Versioned names are immutable, so they may be cached forever.
+          aws s3 cp "$RUNNER_TEMP/release-dist/$DARWIN_DMG" "s3://${R2_BUCKET_NAME}/$DARWIN_DMG" \
+            --cache-control "public, max-age=31536000, immutable" \
+            --endpoint-url "$R2_ENDPOINT"
+          aws s3 cp "$RUNNER_TEMP/release-dist/$DARWIN_ZIP" "s3://${R2_BUCKET_NAME}/$DARWIN_ZIP" \
+            --cache-control "public, max-age=31536000, immutable" \
+            --endpoint-url "$R2_ENDPOINT"
+          aws s3 cp "$RUNNER_TEMP/release-dist/$WIN32_EXE" "s3://${R2_BUCKET_NAME}/$WIN32_EXE" \
+            --cache-control "public, max-age=31536000, immutable" \
+            --endpoint-url "$R2_ENDPOINT"
+
+          # Each release moves the stable download aliases to the current
+          # build. The update manifest names only versioned artifacts, because that
+          # is what a shipped client verifies by digest, and an alias whose
+          # bytes change under a fixed name could never be verified that way.
+          #
+          # Content-Disposition so a person still receives a version-stamped
+          # file rather than a folder full of "Eido-latest" downloads.
+          #
+          # no-cache because the name is stable while the bytes are not. .dmg
+          # and .exe are both on Cloudflare's default cached-extension list, so
+          # without this the edge could keep serving the previous release from
+          # these addresses after a new one is published. Revalidation is cheap;
+          # the body only crosses the wire when it actually changed.
+          #
+          # Uploaded with the binaries, before the manifest, on the same
+          # ordering discipline as everything else in this step.
+          aws s3 cp "$RUNNER_TEMP/release-dist/$DARWIN_DMG" \
+            "s3://${R2_BUCKET_NAME}/Eido-latest-arm64.dmg" \
+            --cache-control "no-cache" \
+            --content-disposition "attachment; filename=\"$DARWIN_DMG\"" \
+            --endpoint-url "$R2_ENDPOINT"
+          aws s3 cp "$RUNNER_TEMP/release-dist/$WIN32_EXE" \
+            "s3://${R2_BUCKET_NAME}/Eido-latest-x64.exe" \
+            --cache-control "no-cache" \
+            --content-disposition "attachment; filename=\"$WIN32_EXE\"" \
+            --endpoint-url "$R2_ENDPOINT"
+
+          # The feed keeps fixed names too, so it carries the same no-cache
+          # rule. A cached older manifest would make clients see a version they
+          # already refused as stale, and would fail the live check below for a
+          # reason that has nothing to do with what was published.
+          aws s3 cp "$RUNNER_TEMP/release-dist/eido-update.json.sig" "s3://${R2_BUCKET_NAME}/eido-update.json.sig" --cache-control "no-cache" --endpoint-url "$R2_ENDPOINT"
+          aws s3 cp "$RUNNER_TEMP/release-dist/eido-update.json.sha256" "s3://${R2_BUCKET_NAME}/eido-update.json.sha256" --cache-control "no-cache" --endpoint-url "$R2_ENDPOINT"
+          aws s3 cp "$RUNNER_TEMP/release-dist/latest-mac.yml" "s3://${R2_BUCKET_NAME}/latest-mac.yml" --cache-control "no-cache" --endpoint-url "$R2_ENDPOINT"
+          aws s3 cp "$RUNNER_TEMP/release-dist/eido-update.json" "s3://${R2_BUCKET_NAME}/eido-update.json" --cache-control "no-cache" --endpoint-url "$R2_ENDPOINT"
+
+      # Reads the live feed exactly as a shipped client does, and verifies the
+      # published signature against the compiled public key. Proves the bytes
+      # that left this runner are the bytes updates.eido.so now serves.
+      - name: Verify the live feed verifies against the compiled public key
+        env:
+          SEMVER: ${{ inputs.semver }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          LIVE="$RUNNER_TEMP/live-feed"
+          mkdir -p "$LIVE"
+          curl -f -s -S "https://updates.eido.so/eido-update.json" -o "$LIVE/eido-update.json"
+          curl -f -s -S "https://updates.eido.so/eido-update.json.sha256" -o "$LIVE/eido-update.json.sha256"
+          curl -f -s -S "https://updates.eido.so/eido-update.json.sig" -o "$LIVE/eido-update.json.sig"
+          node scripts/release/verify-published-feed.mjs --dir "$LIVE" --version "$SEMVER"
+          echo "Published release verified successfully on updates.eido.so."
+
+      - name: Verify the live macOS updater metadata and ZIP are certified
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERIFIED="$RUNNER_TEMP/verified-artifacts.json"
+          LIVE="$RUNNER_TEMP/live-feed"
+          mkdir -p "$LIVE"
+          curl -f -s -S "https://updates.eido.so/latest-mac.yml" -o "$LIVE/latest-mac.yml"
+          if ! cmp -s "$RUNNER_TEMP/release-dist/latest-mac.yml" "$LIVE/latest-mac.yml"; then
+            echo "live latest-mac.yml differs from the certified release metadata" >&2
+            exit 1
+          fi
+          DARWIN_ZIP=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms["darwin-arm64"].updateArtifact.artifactName)' "$VERIFIED")
+          curl -f -s -S "https://updates.eido.so/$DARWIN_ZIP" -o "$LIVE/$DARWIN_ZIP"
+          node --input-type=module - "$VERIFIED" "$LIVE/$DARWIN_ZIP" <<'NODE'
+          import { createHash } from 'node:crypto'
+          import { readFileSync, statSync } from 'node:fs'
+          const verified = JSON.parse(readFileSync(process.argv[2], 'utf8'))
+          const expected = verified.platforms['darwin-arm64'].updateArtifact
+          const bytes = readFileSync(process.argv[3])
+          if (statSync(process.argv[3]).size !== expected.bytes
+            || createHash('sha256').update(bytes).digest('hex') !== expected.sha256
+            || createHash('sha512').update(bytes).digest('base64') !== expected.sha512) {
+            throw new Error('live macOS update ZIP differs from the certified bytes')
+          }
+          NODE
+
+      # Fetch the stable public addresses and compare the served bytes with
+      # the digests certification recorded for this release.
+      - name: Verify the stable download addresses serve this release
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERIFIED="$RUNNER_TEMP/verified-artifacts.json"
+          ALIASES="$RUNNER_TEMP/live-aliases"
+          mkdir -p "$ALIASES"
+          for pair in "darwin-arm64:Eido-latest-arm64.dmg" "win32-x64:Eido-latest-x64.exe"; do
+            feed_key="${pair%%:*}"
+            alias_name="${pair##*:}"
+            expected=$(node -e 'const v=require(process.argv[1]);process.stdout.write(v.platforms[process.argv[2]].sha256)' "$VERIFIED" "$feed_key")
+            curl -f -s -S "https://updates.eido.so/${alias_name}" -o "$ALIASES/$alias_name"
+            observed=$(sha256sum "$ALIASES/$alias_name" | cut -d' ' -f1)
+            if [ "$observed" != "$expected" ]; then
+              echo "https://updates.eido.so/${alias_name} serves ${observed}, not the certified ${expected}." >&2
+              exit 1
+            fi
+            echo "${alias_name} serves the certified ${feed_key} artifact."
+          done

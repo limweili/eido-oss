@@ -1,0 +1,364 @@
+/* ---------- Canvas toolbox (persistent tools + selected-card controls) ---------- */
+.bottom-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  z-index: var(--e-z-dock);
+  display: flex;
+  max-width: calc(100% - 120px);
+  transform: translateX(-50%);
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e-sp-2);
+  pointer-events: none;
+}
+
+.dock-stack {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.canvas-toolbox {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  background: var(--e-surface-panel);
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-well);
+  box-shadow: none;
+  padding: 5px 7px;
+  pointer-events: auto;
+}
+
+.tool-cluster {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+}
+
+.tool-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 3px;
+  background: var(--e-line);
+}
+
+.dock-context-tray {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 1px);
+  z-index: 0;
+  display: inline-flex;
+  max-width: min(920px, calc(100vw - 24px));
+  transform: translate(-50%, 100%);
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-sp-1);
+  padding: 5px 7px 6px;
+  border-radius: var(--e-r-well) var(--e-r-well) 0 0;
+  background: var(--e-surface-panel);
+  border: 1px solid var(--e-line-strong);
+  border-bottom: 0;
+  transition: transform var(--e-t-move) var(--e-ease-settle);
+  pointer-events: none;
+}
+
+.dock-context-tray.open {
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+.card-context-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+}
+
+.dock-control {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+}
+
+.dock-label {
+  color: var(--e-ink-soft);
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-micro);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dock-hint {
+  color: var(--e-ink-soft);
+  font-family: var(--e-sans);
+  font-size: var(--e-fs-ui);
+}
+
+/* ---------- Mod menu - one row per kind, like the reference add-mod menu ---------- */
+.mod-library-menu {
+  /* Wears the toolbox skin and paints above the dock stack (and the context
+     tray) so every row stays reachable. */
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 200px;
+  max-height: min(560px, calc(100vh - 160px));
+  overflow: auto;
+  padding: 5px 7px;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-well);
+  background: var(--e-surface-panel);
+  box-shadow: none;
+  pointer-events: auto;
+  scrollbar-color: var(--e-ink-faint) transparent;
+}
+
+.mod-library-row {
+  display: flex;
+  height: 28px;
+  align-items: center;
+  padding: 0 var(--e-sp-2);
+  border: 0;
+  border-radius: var(--e-r-inner);
+  background: none;
+  color: var(--e-ink);
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mod-library-row:hover {
+  background: color-mix(in srgb, var(--e-ink) 7%, transparent);
+}
+
+.mod-library-row:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: -1.5px;
+}
+
+/* The user's own saved Mods follow the kinds behind a thin seam. */
+.mod-library-row.first-saved {
+  position: relative;
+  margin-top: var(--e-sp-2);
+}
+
+.mod-library-row.first-saved::before {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  left: 0;
+  border-top: 1px solid var(--e-line);
+  content: '';
+}
+
+/* ---------- Context menus owned by dock controls ---------- */
+.dock-popover-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.dock-popover {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  z-index: var(--e-z-popover);
+  min-width: 156px;
+  max-width: min(260px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  padding: 6px;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-floating);
+  box-shadow: var(--e-shadow-lift);
+}
+
+.dock-menu {
+  display: grid;
+  max-height: 240px;
+  overflow: auto;
+  gap: var(--e-sp-1);
+  scrollbar-color: var(--e-ink-faint) transparent;
+}
+
+.dock-menu button {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--e-r-inner);
+  background: transparent;
+  color: var(--e-ink);
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-ui);
+  line-height: 1.4;
+  text-align: left;
+}
+
+.dock-menu button svg {
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.dock-menu button > span:last-child {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dock-check-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.dock-menu button:not(.active) svg {
+  opacity: 0;
+}
+
+.dock-menu button:hover,
+.dock-menu button:focus-visible {
+  border-color: var(--e-line);
+  background: var(--e-wash);
+  outline: none;
+}
+
+.dock-menu button.active {
+  border-color: var(--e-ink);
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+  font-weight: 500;
+}
+
+/* The Note text stepper: the design system's stepper pill, sized to the dock's
+   key rhythm so it reads as one more key in the strip rather than a form
+   control that wandered in. The shared pill (`.e-stepper`, 056-mod-face-chrome.css)
+   is fixed at a panel's measure, which is three times what three tight
+   segments need, so the dock scopes its own complete height and width here
+   instead of borrowing the panel's - the panel's height is otherwise the only
+   thing standing between the dock's stepper and the pointer:coarse rung in
+   005-primitives.css, which stretches the buttons to 40px without it. */
+.dock-stepper {
+  width: auto;
+  height: 28px;
+  border-color: var(--e-line);
+}
+
+.dock-stepper button {
+  height: 100%;
+}
+
+.dock-stepper__value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.dock-stepper__value:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--e-go);
+}
+
+/* The hairline the plus sits behind. */
+.dock-stepper__divider {
+  width: 1px;
+  align-self: stretch;
+  margin-block: var(--e-sp-1);
+  background: var(--e-line);
+}
+
+/* Segmented control (helps/pushes, strong/weak) */
+.seg {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-chip);
+}
+
+.seg button {
+  flex: 1;
+  padding: 7px 10px;
+  border: 0;
+  background: var(--e-surface-card);
+  color: var(--e-ink-soft);
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-ui);
+  white-space: nowrap;
+}
+
+.seg.sm button {
+  padding: 5px 10px;
+  font-size: var(--e-fs-label);
+}
+
+.dock-group .seg button {
+  flex: 0 0 auto;
+}
+
+.seg button + button {
+  border-left: 1px solid var(--e-line-strong);
+}
+
+.seg button.active {
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+  font-weight: 500;
+}
+
+.seg button.active.warn {
+  background: var(--e-avoid);
+  color: var(--e-on-solid);
+}
+
+@media (max-width: 720px) {
+  .bottom-dock {
+    bottom: 10px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .dock-stack {
+    max-width: 100%;
+  }
+
+  .canvas-toolbox {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-color: var(--e-ink-faint) transparent;
+  }
+
+  .dock-context-tray {
+    max-width: calc(100vw - 16px);
+  }
+}
+
+@media (max-width: 560px) {
+  .mod-library-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mod-library-actions {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

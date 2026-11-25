@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Epic #749 — Canvas Ownership Repairs: Founder Review</title>
+  <style>
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1a1c1f;
+  --muted: #6b7280;
+  --surface: #f3f4f6;
+  --surface-strong: #e5e7eb;
+  --border: #d1d5db;
+  --accent: #1677ff;
+  --accent-soft: #e8f2ff;
+  --decision: #0f8a4b;
+  --decision-soft: #e8f7ef;
+  --warning: #d66b00;
+  --warning-soft: #fff1e5;
+  --danger: #c62828;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181818;
+    --fg: #f8fafc;
+    --muted: #a6adb8;
+    --surface: #25272b;
+    --surface-strong: #33363c;
+    --border: #454950;
+    --accent: #83c3ff;
+    --accent-soft: #18324b;
+    --decision: #5bd58e;
+    --decision-soft: #173a27;
+    --warning: #ffad63;
+    --warning-soft: #442b18;
+    --danger: #ff7b7b;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); }
+#founder-review { position: relative; width: 100%; padding: clamp(1rem, 2.5vw, 2.5rem); overflow-wrap: anywhere; }
+#founder-review h1, #founder-review h2, #founder-review h3, #founder-review h4 { line-height: 1.2; }
+#founder-review h1 { font-size: clamp(1.9rem, 3vw, 3rem); margin: .35rem 0 1rem; }
+#founder-review h2 { margin-top: 3rem; padding-top: 1.25rem; border-top: 2px solid var(--border); }
+#founder-review h3 { margin-top: 1.8rem; }
+#founder-review p, #founder-review li { max-width: 85ch; }
+#founder-review a { color: var(--accent); }
+#founder-review code { white-space: normal; word-break: break-all; }
+.report-header { padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.kicker, .section-label, .muted { color: var(--muted); }
+.section-label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.lede { font-size: 1.1rem; max-width: 75ch; }
+.toc { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.toc ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem 1.5rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0; }
+.two-col, .comment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+.card { background: var(--surface); border-radius: .9rem; padding: 1rem; }
+.stat { display: grid; gap: .25rem; }
+.stat strong { font-size: 1.4rem; }
+.plain-group { padding: .5rem 0 1rem; border-bottom: 1px solid var(--border); }
+.callout { margin: 1rem 0; padding: .8rem 1rem; border-left: 4px solid var(--accent); background: var(--accent-soft); }
+.callout.decision { border-color: var(--decision); background: var(--decision-soft); }
+.callout.warning { border-color: var(--warning); background: var(--warning-soft); }
+.area-intro { color: var(--muted); max-width: 80ch; }
+.impact-chain { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: .75rem; align-items: center; margin: 1.5rem 0; }
+.impact-node { min-height: 10rem; display: grid; align-content: center; gap: .5rem; padding: 1rem; border: 2px solid var(--decision); border-radius: .9rem; background: var(--decision-soft); text-align: center; }
+.impact-node.pending { border-color: var(--warning); background: var(--warning-soft); }
+.impact-node small { color: var(--muted); }
+.impact-arrow { color: var(--muted); font-size: 1.5rem; }
+.table-wrap { width: 100%; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 1rem 0; }
+th, td { padding: .75rem .6rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); }
+details { padding: .75rem 0; border-bottom: 1px solid var(--border); }
+summary { cursor: pointer; font-weight: 700; }
+.diagram-placeholder { min-height: 9rem; display: grid; place-items: center; padding: 1rem; border: 1px dashed var(--border); color: var(--muted); }
+button, select, textarea { font: inherit; color: inherit; }
+button { border: 1px solid var(--border); border-radius: .55rem; padding: .48rem .75rem; background: var(--bg); cursor: pointer; }
+button.primary { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+label { display: grid; gap: .3rem; margin-top: .7rem; font-weight: 600; }
+select, textarea { width: 100%; border: 1px solid var(--border); border-radius: .55rem; padding: .55rem .7rem; background: var(--bg); }
+textarea { min-height: 7rem; resize: vertical; }
+.actions, .annotation-tools, .comment-actions, .comment-label { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .6rem; }
+.annotation-tools { color: var(--muted); }
+.inline-comments, .comment-index { display: grid; gap: .75rem; margin-top: .75rem; }
+.inline-comments:empty { display: none; }
+.founder-comment[data-status="resolved"] { opacity: .7; }
+.founder-comment blockquote, #founder-comment-quote, .inline-composer blockquote { margin: .65rem 0; padding-left: .8rem; border-left: 3px solid var(--border); color: var(--muted); }
+.founder-comment-body { white-space: pre-wrap; }
+.badge { display: inline-block; padding: .12rem .5rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .85rem; }
+.evidence { display: inline-block; margin-right: .35rem; padding: .12rem .48rem; border: 1px solid currentColor; border-radius: 999px; font-size: .75rem; font-weight: 800; letter-spacing: .03em; white-space: nowrap; }
+.evidence.measured { color: var(--decision); background: var(--decision-soft); }
+.evidence.decided { color: var(--accent); background: var(--accent-soft); }
+.evidence.enabled { color: var(--warning); background: var(--warning-soft); }
+.evidence.expected, .evidence.not-proven { color: var(--muted); background: var(--surface); }
+.review-checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0; }
+.review-checks article { border: 1px solid var(--border); border-radius: .9rem; padding: 1rem; }
+.review-checks h3 { margin-top: 0; }
+.diagram-scroll { width: 100%; overflow-x: auto; padding: .75rem 0; }
+.ownership-diagram { display: block; min-width: 760px; width: 100%; height: auto; color: var(--fg); }
+.ownership-diagram .box { fill: var(--surface); stroke: currentColor; stroke-width: 2; }
+.ownership-diagram .native { fill: var(--decision-soft); stroke: var(--decision); }
+.ownership-diagram .painted { fill: var(--warning-soft); stroke: var(--warning); }
+.ownership-diagram .arrow { fill: none; stroke: var(--muted); stroke-width: 2; marker-end: url(#ownership-arrow); }
+.ownership-diagram text { fill: currentColor; font-family: ui-sans-serif, system-ui, sans-serif; }
+.source-list li { margin-bottom: .6rem; }
+.boundary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.boundary-grid > div { border-top: 3px solid var(--border); padding-top: .75rem; }
+.selection-comment-trigger { position: absolute; z-index: 20; }
+.inline-composer { margin: .65rem 0 1rem; }
+.review-instructions, .comment-workbench { margin: 1.5rem 0; }
+footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); }
+[hidden] { display: none !important; }
+@media (max-width: 760px) {
+  .summary-grid, .two-col, .comment-grid, .toc ol, .review-checks, .boundary-grid { grid-template-columns: 1fr; }
+  .impact-chain { grid-template-columns: 1fr; }
+  .impact-arrow { transform: rotate(90deg); justify-self: center; }
+  table, thead, tbody, tr, th, td { display: block; }
+  thead { display: none; }
+  tr { padding: .6rem 0; border-bottom: 2px solid var(--border); }
+  td { display: grid; grid-template-columns: minmax(7rem, .8fr) minmax(0, 1.7fr); gap: .6rem; border: 0; padding: .3rem 0; }
+  td::before { content: attr(data-label); color: var(--muted); font-weight: 700; }
+}
+@media print {
+  .annotation-tools, .selection-comment-trigger, .inline-composer, .comment-actions, .comment-workbench .comment-grid { display: none !important; }
+  .founder-comment { break-inside: avoid; }
+}
+  </style>
+</head>
+<body>
+<main id="founder-review"
+      data-report-id="eido-749-canvas-ownership-review"
+      data-comment-schema="founder-review-comments/v1">
+  <header id="executive-summary" class="report-header" data-review-anchor data-anchor-label="Executive summary">
+    <p class="kicker">Founder review · Epic #749 · canvas ownership field repair · source state: pre-PR at code commit <code>7376b44fe6dd4620d716adaf19ff3e71458e509f</code> · base <code>6ed9a0f4c64d9c563040fa280c98baae0a8328da</code> · 2026-07-23</p>
+    <h1>Epic #749 — Canvas Ownership Repairs: Founder Review</h1>
+    <p class="section-label">Outcome first</p>
+    <p class="lede">The merged renderer is materially smoother and the field repair now closes the three concrete regressions found during founder testing: an individually giant visible Card can keep a native readable surface, Reading marquee can select both mounted and painter-owned Cards, and pan/zoom silhouettes no longer leak a sharper second outline. The repair is implemented and locally green, but this is deliberately a <strong>pre-PR review</strong>: only the 600,000-unit calibration and starvation repair are on merged main; the 10-Card oversize pool, mixed-ownership marquee, and pixel-boundary repair are not yet merged or packaged.</p>
+    <div class="boundary-grid">
+      <div>
+        <h3>Merged main at <code>6ed9a0f</code></h3>
+        <p><span class="evidence measured">MEASURED</span> Ordinary Reading residency uses a 600,000-unit viewport pool and skips a Card that does not fit instead of starving cheaper Cards later in the stable order. Exact-main Required CI is green.</p>
+      </div>
+      <div>
+        <h3>Repair branch at <code>7376b44</code></h3>
+        <p><span class="evidence enabled">ENABLED</span> Up to 10 individually oversize exact-visible Cards get native at-rest ownership outside that pool; mixed mounted/painted marquee and the fill-only motion silhouette are repaired. Hosted PR proof and packaged acceptance do not exist yet.</p>
+      </div>
+    </div>
+    <div class="summary-grid" aria-label="Executive evidence">
+      <div class="card stat"><span class="muted">Founder Board weight</span><strong>4,982,185</strong><span><span class="evidence measured">MEASURED</span> The diagnostic that exposed the failure; it is weight units, not bytes or rendered nodes.</span></div>
+      <div class="card stat"><span class="muted">Starvation signature</span><strong>120,363 / 300,000</strong><span><span class="evidence measured">MEASURED</span> One giant blocker plus 13 later tiny Cards remained demoted although most of the pool was unused.</span></div>
+      <div class="card stat"><span class="muted">Ordinary viewport pool</span><strong>600,000</strong><span><span class="evidence decided">DECIDED</span> Founder-tested in the hot-reloaded build and retained as the current calibration.</span></div>
+      <div class="card stat"><span class="muted">Oversize viewport pool</span><strong>10 Cards</strong><span><span class="evidence decided">DECIDED</span> Exact-visible only, separate from 600K, still inside the 540-Card count ceiling.</span></div>
+      <div class="card stat"><span class="muted">Frozen-head proof</span><strong>2,346 + 6</strong><span><span class="evidence measured">MEASURED</span> 2,346 unit/component tests and all 6 marquee interaction tests passed at the code head.</span></div>
+    </div>
+    <div class="callout decision"><strong>Recommended next action:</strong> review the four checks below, then open the PR. The implementation is narrow, reversible, and source/test complete; hosted Required/browser checks and the packaged founder verdict remain the gates after this report.</div>
+    <div class="callout warning"><strong>Do not read this report as final acceptance.</strong> No measured FPS, fast-pan timing, or final packaged feel result is claimed. Those remain founder-manual evidence.</div>
+  </header>
+
+  <nav class="toc" aria-label="Report contents">
+    <ol>
+      <li><a href="#executive-summary">Executive summary</a></li>
+      <li><a href="#impact">Impact and boundary</a></li>
+      <li><a href="#founder-checks">Four review checks</a></li>
+      <li><a href="#work-delivered">Work and decisions</a></li>
+      <li><a href="#technical-teaching">Technical teaching</a></li>
+      <li><a href="#retro">Retro</a></li>
+      <li><a href="#sources">Sources</a></li>
+      <li><a href="#comment-workbench">Comment and return</a></li>
+    </ol>
+  </nav>
+
+  <section id="review-workflow" class="card review-instructions" data-review-anchor data-anchor-label="How to review and comment">
+    <h2>How to review and return comments</h2>
+    <p>This report uses exactly five evidence labels: <span class="evidence measured">MEASURED</span> direct observation or deterministic calculation; <span class="evidence decided">DECIDED</span> an approved conclusion; <span class="evidence enabled">ENABLED</span> implemented capability not yet delivered to users; <span class="evidence expected">EXPECTED</span> a future effect with a gate; and <span class="evidence not-proven">NOT YET PROVEN</span> a named limitation.</p>
+    <ol>
+      <li>Read the boundary above and the four manual checks below; technical detail is available without blocking a five-minute scan.</li>
+      <li>Highlight exact wording and press <strong>Comment here</strong>, or use <strong>Comment on this section</strong>.</li>
+      <li>Add, edit, resolve, or delete comments. Each comment is marked for an agent response.</li>
+      <li>Press <strong>Save commented HTML</strong> and return that standalone file.</li>
+    </ol>
+  </section>
+
+  <section id="impact" data-review-anchor data-anchor-label="Impact and delivery boundary">
+    <h2>Impact and delivery boundary</h2>
+    <p class="area-intro">The field repair changes representation ownership, not saved Board data or Detail Band thresholds. It keeps expensive rich DOM bounded while restoring the native Card where the painter-only fallback was not an acceptable visible result.</p>
+    <div class="impact-chain" role="img" aria-label="Field evidence led to a bounded ownership repair, enabling readable giant Cards and complete mixed-residency interaction, with packaged feel still awaiting founder validation">
+      <div class="impact-node"><strong>Field evidence</strong><span>4.98M Board; 120,363 of 300K admitted; 13 cheaper Cards starved</span><small>MEASURED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Bounded decision</strong><span>600K skip-and-continue plus a viewport-local 10-Card oversize pool</span><small>DECIDED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Repair capability</strong><span>Native giant Cards, mixed marquee, one Card boundary owner</span><small>ENABLED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node pending"><strong>User effect</strong><span>Readable and spatially stable text-heavy navigation after merge and packaging</span><small>EXPECTED · NOT YET PROVEN</small></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>What is true</th><th>Evidence</th><th>Boundary</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Layer">Merged product</td><td data-label="What is true">Later lightweight visible Cards are no longer blocked by an earlier Card that misses the ordinary pool.</td><td data-label="Evidence"><span class="evidence measured">MEASURED</span> PR #803 merged at <code>6ed9a0f</code>; exact-main Required run <a href="https://github.com/limweili/eido/actions/runs/29947015436">29947015436</a> succeeded.</td><td data-label="Boundary">Founder feel for 600K was positive in the local build; this is not a packaged end-to-end acceptance claim.</td></tr>
+          <tr><td data-label="Layer">Pre-PR repair</td><td data-label="What is true">At most 10 individually oversize exact-visible Cards mount natively outside the ordinary pool.</td><td data-label="Evidence"><span class="evidence enabled">ENABLED</span> Planner, scene, diagnostics, ownership consumers, tests, and governing docs agree at <code>7376b44</code>.</td><td data-label="Boundary">No hosted checks or package contains this commit yet.</td></tr>
+          <tr><td data-label="Layer">Interaction</td><td data-label="What is true">Reading marquee unions mounted <code>P ∪ O ∪ L</code> results with painter-owned <code>S</code> geometry.</td><td data-label="Evidence"><span class="evidence measured">MEASURED</span> Full marquee interaction file passed 6 of 6 in a disposable browser-data root.</td><td data-label="Boundary">Human feel at fast pan/zoom remains manual.</td></tr>
+          <tr><td data-label="Layer">Visual ownership</td><td data-label="What is true">A moving mounted Card underlay is fill-only and uses the transformed native shell radius; DOM owns all border and selection ink.</td><td data-label="Evidence"><span class="evidence enabled">ENABLED</span> Deterministic painter recording and source assertions are green.</td><td data-label="Boundary"><span class="evidence not-proven">NOT YET PROVEN</span> Pixel-perfect perception on the founder's display must be checked after the PR build.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="callout decision"><strong>Review question:</strong> Is the boundary between merged 600K behavior, the PR #807 ownership repair, and still-unproven packaged feel clear and acceptable?</p>
+  </section>
+
+  <section id="founder-checks" data-review-anchor data-anchor-label="Four founder review checks">
+    <h2>Four things worth reviewing manually</h2>
+    <p class="area-intro">These are the only remaining taste/performance checks requested before final packaging. The test suite intentionally does not pretend to measure their feel.</p>
+    <div class="review-checks">
+      <article id="check-oversize" data-review-anchor data-anchor-label="Check 1 oversized visible Cards">
+        <h3>1. Oversized visible Card</h3>
+        <p>At Reading zoom, place or revisit a Note above 600,000 weight units. Its Markdown, links, selection semantics, and accessible Card group should be present at rest without hover. Pan it offscreen and back: <code>O</code> is viewport-local, so it may unmount offscreen and remount when exact-visible. The overlay should report it under <strong>Oversized-visible</strong>, not ordinary admitted weight.</p>
+        <p><span class="evidence expected">EXPECTED</span> The first 10 such exact-visible Cards remain native; an 11th remains painter-owned <code>S</code> until interaction or capacity returns.</p>
+      </article>
+      <article id="check-outline" data-review-anchor data-anchor-label="Check 2 Card outline during motion">
+        <h3>2. Card outline while panning and zooming</h3>
+        <p>Inspect both selected and deselected Cards while slowly and quickly panning/zooming. There should be one rounded Card boundary—no sharper grey outline behind it, no selected double stroke, and no flash when motion settles.</p>
+        <p><span class="evidence expected">EXPECTED</span> The DOM Card owns border ink; the moving canvas underlay contributes fill continuity only.</p>
+      </article>
+      <article id="check-marquee" data-review-anchor data-anchor-label="Check 3 mixed-residency marquee">
+        <h3>3. Marquee across mounted and painted Cards</h3>
+        <p>At Reading zoom, drag one marquee across a native Card and a painter-owned Card. Both should select. Repeat after one Card promotes on hover. Then zoom below Reading: the same empty-space left drag should pan rather than show a marquee.</p>
+        <p><span class="evidence measured">MEASURED</span> The browser interaction gate covers mounted and painted Cards, a painter-owned crossing wire, and the below-Reading pan policy. <span class="evidence not-proven">NOT YET PROVEN</span> Manual review decides whether the tool still feels natural.</p>
+      </article>
+      <article id="check-budget-semantics" data-review-anchor data-anchor-label="Check 4 budget semantics">
+        <h3>4. Budget semantics, Results, and images</h3>
+        <p>Switch a Result Card among several versions and confirm the ordinary weight follows only the chosen version, not all history. Paste an image and confirm the Card increases by 20,000 units. That number is a provisional residency proxy per asset—not image bytes, decoded memory, or characters.</p>
+        <p><span class="evidence not-proven">NOT YET PROVEN</span> The 20,000 proxy and omission of chosen Result follow-up/transcript text may need later calibration; neither should block this ownership repair without contrary field evidence.</p>
+      </article>
+    </div>
+    <p class="callout decision"><strong>Review question:</strong> Do these four checks cover the founder-visible acceptance surface, or is one concrete scenario missing?</p>
+  </section>
+
+  <section id="work-delivered" data-review-anchor data-anchor-label="Work delivered and decisions">
+    <h2>Work delivered and decisions</h2>
+    <p class="area-intro">The repair is deliberately one coherent ownership change. It does not revive the rejected cached renderer, change persistence, or broaden the two deferred epic slices.</p>
+
+    <article id="completion-boundary" data-review-anchor data-anchor-label="Completion boundary">
+      <h3>Merged, enabled, and intentionally excluded</h3>
+      <div class="two-col">
+        <div class="plain-group">
+          <h4>Merged on main</h4>
+          <ul>
+            <li><span class="evidence measured">MEASURED</span> Epic slices for the synthetic long-Note scenario, bounded text residency, look-ahead image prewarm, packaged-safe counters, and composed compatibility are already merged.</li>
+            <li><span class="evidence measured">MEASURED</span> PR #803 raised ordinary residency from 300K to 600K and changed a weight miss from “stop the tier” to “skip this Card and continue.”</li>
+          </ul>
+        </div>
+        <div class="plain-group">
+          <h4>Enabled at the pre-PR head</h4>
+          <ul>
+            <li><span class="evidence enabled">ENABLED</span> The separate exact-visible <code>O10</code> native pool, separate diagnostic weight, and full <code>P/O/L/S</code> downstream ownership.</li>
+            <li><span class="evidence enabled">ENABLED</span> Mixed-residency Reading marquee and the fill-only, native-radius motion silhouette.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout warning"><strong>Still deferred:</strong> <a href="https://github.com/limweili/eido/issues/752">#752</a> (<code>content-visibility</code> body bounding) and <a href="https://github.com/limweili/eido/issues/756">#756</a> (motion-scoped painted demotion) remain open, unlabeled backlog issues. This field repair did not reactivate or implement either one.</div>
+    </article>
+
+    <article id="selected-decision" data-review-anchor data-anchor-label="Selected residency decision">
+      <h3>The selected residency policy</h3>
+      <p><span class="evidence decided">DECIDED</span> Ordinary cold Cards share a 600,000-unit pool in stable visible-first, prior-visible-first order. A Card that would exceed the remaining pool stays in <code>S</code>, but the planner continues to later candidates. That removes head-of-line starvation without reordering Cards or solving an expensive packing problem.</p>
+      <p><span class="evidence decided">DECIDED</span> A Card whose individual weight is above 600,000 cannot fit that pool by definition. If it is exact-visible, it may instead enter <code>O</code>: a native, passive/read-only-at-rest Card surface that preserves real Markdown, links, selection, and accessibility. <code>O</code> has 10 slots, consumes none of the 600K ordinary pool, shares the overall 540-Card ceiling, and never admits look-ahead, preload, or offscreen-retained Cards. Interaction promotes any Card into limit-exempt <code>L</code>.</p>
+      <p>The briefly considered 100-Card cap was rejected. Because every <code>O</code> Card is above 600K, 100 slots would permit more than 60 million weight units before accounting for ordinary or Live Cards. Ten is the evidence-led rung; changing it requires an actual 10-giant-Card viewport result.</p>
+    </article>
+
+    <article id="metric-semantics" data-review-anchor data-anchor-label="What the weight metric counts">
+      <h3>What the “character budget” really counts</h3>
+      <p>The label is shorthand. The immutable per-Card residency weight is:</p>
+      <p><code>Card block text length + chosen Result version text length + (asset count × 20,000)</code></p>
+      <ul>
+        <li><strong>Result history is handled correctly for the reported concern.</strong> The metric resolves <code>chosenVersionId</code> (falling back to the latest version) and counts only that version's main <code>text.length</code>. Nine unchosen versions do not accumulate against the viewport pool.</li>
+        <li><strong>Conversation/follow-up depth is not fully modeled.</strong> Chosen transcript and follow-up-thread text are not added to this proxy today. That can undercount an unusually large visible Result surface and remains a named tuning follow-up.</li>
+        <li><strong>Every asset contributes a fixed 20,000 units.</strong> This includes each pasted image and file. It is not the data URL length, saved byte size, decoded byte size, or a claim that an image equals 20,000 characters. The separate rendition cache still enforces its 8 MiB decoded and 2 MiB derived-byte budgets.</li>
+      </ul>
+      <p><span class="evidence decided">DECIDED</span> Keep the cheap proxy for this repair. It is viewport-independent, incrementally cached, and good enough to prevent obvious rich-DOM blowups. Retune its components only with a Card type that contradicts the proxy in founder testing.</p>
+    </article>
+
+    <article id="delivery-ledger" data-review-anchor data-anchor-label="Delivery and evidence ledger">
+      <h3>Delivery and evidence ledger</h3>
+      <details>
+        <summary>Open exact source, test, CI, and tracker detail</summary>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Scope</th><th>State</th><th>Proof</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td data-label="Scope">Epic implementation through F7</td><td data-label="State">Merged through <code>8c5dc29</code></td><td data-label="Proof">Broad compatibility: 8 files / 49 tests; exact-main Required run <a href="https://github.com/limweili/eido/actions/runs/29942658890">29942658890</a></td><td data-label="Meaning">The original train is source-complete but #749/#757 remain open for founder acceptance.</td></tr>
+              <tr><td data-label="Scope">PR #803 starvation repair</td><td data-label="State">Merged as <code>6ed9a0f</code></td><td data-label="Proof">PR Required and browser canary green; exact-main Required <a href="https://github.com/limweili/eido/actions/runs/29947015436">29947015436</a> green</td><td data-label="Meaning">600K and skip-and-continue are delivered on main.</td></tr>
+              <tr><td data-label="Scope">Ownership repair code</td><td data-label="State">Pre-PR <code>7376b44</code> on base <code>6ed9a0f</code></td><td data-label="Proof"><code>npm test</code>: 248 files / 2,346 tests; <code>npm run typecheck</code>; design-system drift: 39/39 records plus HTML token sync; full marquee file: 6/6; <code>git diff --check</code></td><td data-label="Meaning">Local structural and interaction proof is green.</td></tr>
+              <tr><td data-label="Scope">Ownership repair hosted proof</td><td data-label="State">No PR at report time</td><td data-label="Proof"><span class="evidence not-proven">NOT YET PROVEN</span> No Required or browser check exists for <code>7376b44</code>.</td><td data-label="Meaning">Open the PR after this review, then wait for exact-head gates.</td></tr>
+              <tr><td data-label="Scope">Packaged founder feel</td><td data-label="State">Pending repaired build</td><td data-label="Proof"><span class="evidence not-proven">NOT YET PROVEN</span> No agent FPS/timing substitute.</td><td data-label="Meaning">The four checks in this report are the human acceptance surface.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </article>
+
+    <article id="next-sequence" data-review-anchor data-anchor-label="Next sequence and rollback">
+      <h3>Next sequence and rollback</h3>
+      <ol>
+        <li>Commit this standalone report and the narrow governing-doc corrections.</li>
+        <li>Open one PR from <code>codex/fix-749-canvas-ownership-regressions</code>; run hosted Required and browser checks on its exact head.</li>
+        <li>Merge only after those checks are green, package the merged head, then run the four founder checks above.</li>
+        <li>Record the packaged verdict on #749/#757. Keep #752/#756 deferred unless that verdict supplies new contradictory evidence.</li>
+      </ol>
+      <p>Rollback is one ordinary commit/PR revert. The repair changes derived renderer state and documentation only—no Profile schema, saved Board format, migration, export, or AI authority changes.</p>
+    </article>
+    <p class="callout decision"><strong>Review question:</strong> Should any limitation listed here block PR #807 from merging once its amended exact-head checks are green?</p>
+  </section>
+
+  <section id="technical-teaching" data-review-anchor data-anchor-label="Technical teaching">
+    <h2>Technical teaching: five letters, one Card owner</h2>
+    <div class="callout decision"><strong>One-minute model:</strong> <code>V</code> says what the viewport can see. <code>P</code>, <code>O</code>, and <code>L</code> are three reasons a real native Card is mounted. <code>S</code> is the lightweight canvas safety representation for visible Cards that have no native owner. The native union is exactly <code>P ∪ O ∪ L</code>; interaction and paint must consult that union, never assume <code>P</code> alone covers the screen.</div>
+
+    <article id="ownership-vocabulary" data-review-anchor data-anchor-label="V P O L S vocabulary">
+      <h3>Vocabulary and product meaning</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Set</th><th>Meaning</th><th>Bound</th><th>Owner</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Set"><code>V</code></td><td data-label="Meaning">Cards whose resolved geometry intersects the exact viewport.</td><td data-label="Bound">Spatial query</td><td data-label="Owner">Input to the decision, not itself a render owner.</td></tr>
+            <tr><td data-label="Set"><code>P</code></td><td data-label="Meaning">Ordinary buffered Passive residency: visible first, then bounded look-ahead/preload/retention.</td><td data-label="Bound">600K ordinary weight and shared 540 count</td><td data-label="Owner">Native DOM Card.</td></tr>
+            <tr><td data-label="Set"><code>O</code></td><td data-label="Meaning">Individually oversize exact-visible Passive Cards that cannot fit <code>P</code>.</td><td data-label="Bound">10 exact-visible Cards; shared 540 count; no offscreen admission</td><td data-label="Owner">Native DOM Card, read-only at rest until Live interaction.</td></tr>
+            <tr><td data-label="Set"><code>L</code></td><td data-label="Meaning">Cards pinned by current hover, selection, focus, editing, scroll, gesture, or media ownership.</td><td data-label="Bound">Limit-exempt while an actual owner exists</td><td data-label="Owner">Native DOM Card with full interaction.</td></tr>
+            <tr><td data-label="Set"><code>S</code></td><td data-label="Meaning">Visible Cards left to the Board-wide painter because no native owner admitted them.</td><td data-label="Bound">Existing scene/paint caps</td><td data-label="Owner">Canvas paint and canvas body hit candidate.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article id="technical-diagram" data-review-anchor data-anchor-label="Ownership decision diagram">
+      <h3>How one visible Card gets an owner</h3>
+      <figure>
+        <div class="diagram-scroll" tabindex="0" aria-label="Scrollable renderer ownership diagram">
+          <svg class="ownership-diagram" viewBox="0 0 960 470" role="img" aria-labelledby="ownership-diagram-title ownership-diagram-desc">
+            <title id="ownership-diagram-title">Viewport-local Card ownership decision</title>
+            <desc id="ownership-diagram-desc">A visible Card enters the native P pool when its ordinary cumulative weight fits, the native O pool when it is individually over 600,000 and one of ten exact-visible slots is available, or the native L pool whenever live interaction owns it. Otherwise the visible Card remains in the painted S safety representation. P, O, and L together are the only native Card owners.</desc>
+            <defs>
+              <marker id="ownership-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path></marker>
+            </defs>
+            <rect class="box" x="25" y="185" width="150" height="90" rx="14"></rect>
+            <text x="100" y="220" text-anchor="middle" font-size="28" font-weight="700">V</text>
+            <text x="100" y="247" text-anchor="middle" font-size="16">exact-visible Card</text>
+
+            <path class="arrow" d="M 175 205 C 245 205, 230 70, 310 70"></path>
+            <path class="arrow" d="M 175 230 C 245 230, 240 185, 310 185"></path>
+            <path class="arrow" d="M 175 250 C 245 250, 240 300, 310 300"></path>
+            <path class="arrow" d="M 175 270 C 245 270, 240 415, 310 415"></path>
+
+            <rect class="box native" x="310" y="25" width="245" height="90" rx="14"></rect>
+            <text x="432" y="58" text-anchor="middle" font-size="25" font-weight="700">P · ordinary native</text>
+            <text x="432" y="84" text-anchor="middle" font-size="15">≤600K cumulative pool; visible first</text>
+
+            <rect class="box native" x="310" y="140" width="245" height="90" rx="14"></rect>
+            <text x="432" y="173" text-anchor="middle" font-size="25" font-weight="700">O · oversize native</text>
+            <text x="432" y="199" text-anchor="middle" font-size="15">&gt;600K alone; exact-visible; at most 10</text>
+
+            <rect class="box native" x="310" y="255" width="245" height="90" rx="14"></rect>
+            <text x="432" y="288" text-anchor="middle" font-size="25" font-weight="700">L · live native</text>
+            <text x="432" y="314" text-anchor="middle" font-size="15">interaction owner wins; limit-exempt</text>
+
+            <rect class="box painted" x="310" y="370" width="245" height="90" rx="14"></rect>
+            <text x="432" y="403" text-anchor="middle" font-size="25" font-weight="700">S · painted safety</text>
+            <text x="432" y="429" text-anchor="middle" font-size="15">visible but no native admission</text>
+
+            <path class="arrow" d="M 555 70 C 640 70, 620 160, 700 160"></path>
+            <path class="arrow" d="M 555 185 L 700 185"></path>
+            <path class="arrow" d="M 555 300 C 640 300, 620 210, 700 210"></path>
+
+            <rect class="box native" x="700" y="115" width="235" height="145" rx="14"></rect>
+            <text x="817" y="155" text-anchor="middle" font-size="25" font-weight="700">P ∪ O ∪ L</text>
+            <text x="817" y="185" text-anchor="middle" font-size="17">one native DOM Card</text>
+            <text x="817" y="212" text-anchor="middle" font-size="15">Markdown · links · a11y · hit owner</text>
+            <text x="817" y="237" text-anchor="middle" font-size="15">DOM owns all boundary ink</text>
+
+            <path class="arrow" d="M 555 415 L 700 415"></path>
+            <rect class="box painted" x="700" y="365" width="235" height="100" rx="14"></rect>
+            <text x="817" y="402" text-anchor="middle" font-size="23" font-weight="700">S only</text>
+            <text x="817" y="430" text-anchor="middle" font-size="15">canvas paint + body hit candidate</text>
+          </svg>
+        </div>
+        <figcaption>A Card can have overlapping reasons to be native, but only one DOM instance mounts. During movement a complementary fill silhouette may sit underneath a native Card; it is not a second hit target or border owner.</figcaption>
+      </figure>
+    </article>
+
+    <article id="technical-mechanism" data-review-anchor data-anchor-label="Mechanism and trade-offs">
+      <h3>Mechanism → trade-off → product meaning → gate</h3>
+      <ul>
+        <li><strong>Residency:</strong> immutable Card metrics feed one deterministic planner. Skipping a miss avoids starvation; <code>O10</code> restores native content for individually giant visible Cards. The trade-off is a bounded worst case of 10 giant native surfaces. The gate is a real 10-giant viewport, not a speculative cap increase.</li>
+        <li><strong>Marquee:</strong> React Flow supplies selected mounted ids while Eido computes the same rectangle against <code>S</code> Card geometry, then unions both sets. The trade-off is one app-side geometry pass per coalesced selection frame. The gate is the mixed Reading interaction test plus founder feel.</li>
+        <li><strong>Motion underlay:</strong> canvas draws the transformed Card fill with the same 8px shell radius; it draws no stroke, ports, or selection ring for native owners. The trade-off is intentionally less painter decoration under the DOM. The product result is a single boundary; the gate is pixel inspection while moving and settling.</li>
+      </ul>
+    </article>
+
+    <article id="technical-limitations" data-review-anchor data-anchor-label="Limitations and tuning surfaces">
+      <h3>What else can be tuned—and what should not move without evidence</h3>
+      <ul>
+        <li><strong>600K ordinary weight:</strong> founder-calibrated and merged. It is not the only bound.</li>
+        <li><strong>10 oversize exact-visible Cards:</strong> the new independent bound. It is the next manual stress surface.</li>
+        <li><strong>540 native cold Cards:</strong> an existing occupancy/count ceiling shared by <code>P ∪ O</code>; exceeding the visible count still leaves the scene canvas-owned rather than mounting unbounded DOM.</li>
+        <li><strong>Live owners:</strong> <code>L</code> is deliberately limit-exempt while real interaction holds it. A pathological many-selected or many-media scenario is a separate ownership question, not a reason to make active work disappear.</li>
+        <li><strong>20K per asset:</strong> provisional residency weighting, independent from 8 MiB decoded and 2 MiB derived rendition-cache budgets.</li>
+        <li><strong>Result content:</strong> only the chosen version's main text counts; unchosen history does not bottleneck residency, but chosen transcript/follow-up depth can be underweighted.</li>
+        <li><strong>Painter fallback:</strong> an 11th individually oversize visible Card remains <code>S</code>; it is spatially present and interactive but not a full native Markdown/accessibility surface until <code>L</code> or capacity admits it.</li>
+      </ul>
+    </article>
+    <p class="callout decision"><strong>Review question:</strong> Is the 10-Card exact-visible <code>O</code> bound the right conservative trade-off for this release?</p>
+  </section>
+
+  <section id="retro" data-review-anchor data-anchor-label="Retro and collaboration">
+    <h2>Retro: what worked, what cost time, what changes next</h2>
+    <div class="callout decision"><strong>One-minute verdict:</strong> The counters paid for themselves by turning “blank until hover” into an exact admission bug, and founder screenshots exposed two related ownership regressions quickly. The avoidable part was shipping a stable-prefix policy and “fully detailed only” marquee assumption without first enumerating every mixed <code>P/O/L/S</code> consumer. The corrective rule is simple: whenever ownership partitions change, audit paint, hit, selection, accessibility, diagnostics, and motion as one boundary.</div>
+    <div class="summary-grid">
+      <div class="card stat"><span class="muted">Actual bottleneck</span><strong>Head-of-line admission</strong><span><span class="evidence measured">MEASURED</span> One 4.86M Card stopped later work at 120,363 of 300K.</span></div>
+      <div class="card stat"><span class="muted">Most effective unblock</span><strong>Founder counters + minimum repro</strong><span>The exact diagnostic was reproduced with two Cards, then matched at 4,982,185 total weight.</span></div>
+      <div class="card stat"><span class="muted">Future rule</span><strong>Audit every owner consumer</strong><span>A new set such as <code>O</code> must update mount, paint, hit, marquee, a11y, counters, docs, and tests together.</span></div>
+    </div>
+
+    <article id="retro-friction" data-review-anchor data-anchor-label="Friction and bottlenecks">
+      <h3>Friction and the real unblocks</h3>
+      <p>The original 300K policy was internally coherent but product-wrong: its tests intentionally pinned “stop at the first miss.” Raising the number alone could not solve a 4.86M head Card. A deterministic disposable repro falsified stale-cache theories: shrinking the blocker immediately admitted all later Cards. That led to the merged skip-and-continue policy instead of a larger arbitrary number.</p>
+      <p>The field repair then revealed a broader systems issue. Once Reading could legitimately mix native and painted Cards, marquee availability still assumed every visible Card must be native, and the moving painter still assumed it owned the Card border. Both bugs were old single-plane assumptions exposed by the new partition, not evidence that bounded residency itself should be removed.</p>
+    </article>
+
+    <article id="retro-interventions" data-review-anchor data-anchor-label="Founder interventions">
+      <h3>Founder interventions</h3>
+      <p>The founder's “600K feels fine” decision prevented calibration churn. The request for frozen native giant Cards changed the solution from an unbounded budget increase to a separate viewport-local pool. The 100-versus-10 exchange was especially useful: it made the worst-case cost visible and ended at the safer 10-Card rung. Screenshots of the sharper outline and the marquee disappearance then supplied concrete acceptance targets.</p>
+      <p>The cost was late-cycle scope movement across three related symptoms. That was justified by real field evidence, but future epics should schedule one explicit counter-guided founder pass after the first packaged candidate and before closeout language is written. One bundled pass would preserve the same product input with less tracker and documentation churn.</p>
+    </article>
+
+    <article id="retro-accountability" data-review-anchor data-anchor-label="Agent accountability">
+      <h3>Agent accountability</h3>
+      <p>The team should have challenged the “stable prefix” comment as a product choice, not merely an implementation invariant, and should have included giant-then-tiny Cards in the first residency boundary test. It also should have traced every consumer of “fully detailed” before accepting mixed Reading ownership. The founder did not create these bugs by testing late; the implementation and review lanes failed to anticipate the ownership fan-out.</p>
+      <p>The recovery was disciplined: no real Profile data was inspected, the symptom was reproduced in a disposable environment, visual/performance automation was not inflated, and the branch stayed one reversible repair. The remaining responsibility is to keep the pre-PR/merged boundary honest until hosted and packaged proof exists.</p>
+    </article>
+
+    <article id="retro-actions" data-review-anchor data-anchor-label="Future operating model">
+      <h3>Keep / Stop / Start / Change</h3>
+      <div class="two-col">
+        <div class="plain-group">
+          <h4>Keep / Start</h4>
+          <ul>
+            <li>Keep default-off packaged numeric counters; they shortened diagnosis dramatically without exposing content.</li>
+            <li>Start every ownership change with a consumer matrix: mount, paint, hit, selection, keyboard/a11y, diagnostics, motion, and docs.</li>
+            <li>Keep fast deterministic seam tests and one broad interaction journey; leave perceived fluidity and pixel feel to founder review.</li>
+          </ul>
+        </div>
+        <div class="plain-group">
+          <h4>Stop / Change</h4>
+          <ul>
+            <li>Stop treating a chosen ordering policy as automatically correct because it is deterministic.</li>
+            <li>Change closeout timing: collect the counter-guided founder pass before calling a field-sensitive epic complete.</li>
+            <li>Do not reactivate #752/#756 by implication; require a fresh finding tied to their actual mechanisms.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <details>
+      <summary>Open compact field timeline</summary>
+      <ol>
+        <li>Epic implementation merged through <code>8c5dc29</code>; Required green; founder feel remained open.</li>
+        <li>Founder Board reported 4,982,185 total weight, 120,363 admitted of 300K, 14 demoted, and content appearing on hover.</li>
+        <li>Disposable repro proved one giant Card plus 13 later tiny Cards; shrinking the blocker restored all content.</li>
+        <li>PR #803 merged skip-and-continue and 600K; founder reported 600K felt fine.</li>
+        <li>Founder requested native frozen giant Cards, kept viewport-local cap at 10, and reported marquee and double-outline regressions.</li>
+        <li>Pre-PR repair <code>7376b44</code> added <code>O10</code>, mixed marquee ownership, and fill-only native-radius silhouettes; local structural and interaction proof passed.</li>
+      </ol>
+    </details>
+    <p class="callout decision"><strong>Review question:</strong> Which ownership-boundary check should become mandatory at the start of the next renderer change?</p>
+  </section>
+
+  <section id="sources" data-review-anchor data-anchor-label="Sources and provenance">
+    <h2>Sources, evidence, and provenance</h2>
+    <p>This report contains no founder screenshots, Board content, Profile records, external scripts, fonts, or other remote assets. Field numbers are aggregate numeric diagnostics supplied in this task; test fixtures used synthetic/disposable data.</p>
+    <ul class="source-list">
+      <li><strong>Canonical specification and tracker:</strong> <a href="https://github.com/limweili/eido/issues/749">Epic #749</a>; closeout <a href="https://github.com/limweili/eido/issues/757">#757</a>; deferred <a href="https://github.com/limweili/eido/issues/752">#752</a> and <a href="https://github.com/limweili/eido/issues/756">#756</a>. Read 2026-07-23.</li>
+      <li><strong>Merged starvation repair:</strong> <a href="https://github.com/limweili/eido/pull/803">PR #803</a>, merge <code>6ed9a0f4c64d9c563040fa280c98baae0a8328da</code>; exact-main Required <a href="https://github.com/limweili/eido/actions/runs/29947015436">29947015436</a>.</li>
+      <li><strong>Pre-PR implementation:</strong> branch <code>codex/fix-749-canvas-ownership-regressions</code>, code commit <code>7376b44fe6dd4620d716adaf19ff3e71458e509f</code>, based on <code>6ed9a0f4c64d9c563040fa280c98baae0a8328da</code>. No PR or hosted checks existed at report generation.</li>
+      <li><strong>Executable seams:</strong> <code>src/canvas/cardResidency.ts</code>, <code>boardScene.ts</code>, <code>Board.tsx</code>, <code>BoardOverviewLayer.tsx</code>, and <code>src/performance/rendererCounterRuntime.ts</code> at the code commit above.</li>
+      <li><strong>Architecture authority:</strong> ADRs <a href="../../adr/0019-viewport-derived-detail-bands.md">0019</a>, <a href="../../adr/0020-board-space-shapes-screen-space-labels.md">0020</a>, <a href="../../adr/0023-buffered-passive-cards-and-hover-activation.md">0023</a>, <a href="../../adr/0024-image-renditions-are-derived-and-visibility-aware.md">0024</a>, and the <a href="../../foundations/canvas-layer.md">canvas foundation</a>.</li>
+      <li><strong>Local proof at <code>7376b44</code>:</strong> <code>npm test</code> → 248 files / 2,346 tests; <code>npm run typecheck &amp;&amp; npm run ci:design-system</code> → typecheck, 39 evidence records, generated HTML token sync; <code>EIDO_INTERACTION_TEST_PORT=5275 EIDO_INTERACTION_TEST_DATA_FILE=/tmp/eido-marquee-5275.json npx playwright test --config playwright.interaction.config.ts src/canvas/marqueeSelection.browser.test.ts</code> → 6/6 in 18.4s using disposable data; <code>git diff --check</code> green.</li>
+      <li><strong>Living delivery record:</strong> <a href="../epics/2026-07-23-epic-749-text-heavy-board-performance/RETRO.md">Epic #749 retro</a>. This review is point-in-time and does not replace the tracker.</li>
+    </ul>
+    <div class="callout warning"><span class="evidence not-proven">NOT YET PROVEN</span> No measured FPS, controlled pan/zoom timing, exact-head hosted Required/browser result, merged repair package, or final packaged founder verdict exists for <code>7376b44</code>.</div>
+    <p class="callout decision"><strong>Review question:</strong> Is any authoritative source missing before this review can support the merge decision?</p>
+  </section>
+
+  <section id="comment-workbench" class="card comment-workbench" data-review-anchor data-anchor-label="Comment workbench">
+    <p class="kicker">Standalone founder review workflow</p>
+    <h2>Comment directly in this review</h2>
+    <p>Comments are embedded into the saved HTML and explicitly marked for agent response.</p>
+    <div class="comment-grid">
+      <div>
+        <label for="founder-comment-anchor">Anchor section</label>
+        <select id="founder-comment-anchor"></select>
+        <label for="founder-comment-type">Comment type</label>
+        <select id="founder-comment-type"><option>Question</option><option>Change request</option><option>Concern</option><option>Approval</option></select>
+        <label for="founder-comment-body">Your comment</label>
+        <textarea id="founder-comment-body" rows="7" placeholder="Write the question or change you want addressed."></textarea>
+        <div class="actions"><button id="founder-comment-save" class="primary" type="button">Add founder comment</button><button id="founder-comment-cancel" type="button" hidden>Cancel edit</button></div>
+      </div>
+      <div>
+        <label>Selected quote</label>
+        <blockquote id="founder-comment-quote">No text selected. Highlight wording to use Comment here.</blockquote>
+        <div class="actions"><button id="founder-comment-use-selection" type="button">Use selected text</button><button id="founder-comment-clear-quote" type="button">Clear quote</button></div>
+        <div class="actions"><button id="founder-comments-save-html" class="primary" type="button">Save commented HTML</button><button id="founder-comments-export-json" type="button">Export comments JSON</button></div>
+        <p id="founder-comments-state" class="muted" aria-live="polite">No founder comments yet.</p>
+      </div>
+    </div>
+    <h3>Founder comment index <span id="founder-comment-count" class="badge">0</span></h3>
+    <div id="founder-comment-index" class="comment-index" aria-live="polite"></div>
+  </section>
+
+  <script id="founder-comments-data" type="application/json">{"schemaVersion":"founder-review-comments/v1","reportId":"eido-749-canvas-ownership-review","comments":[],"deletedIds":[]}</script>
+  <footer><p>Epic #749 · canvas ownership field repair · Pre-PR review · code commit 7376b44fe6dd4620d716adaf19ff3e71458e509f · base 6ed9a0f4c64d9c563040fa280c98baae0a8328da · generated 2026-07-23</p></footer>
+</main>
+  <script>
+(() => {
+  'use strict';
+
+  const root = document.getElementById('founder-review');
+  if (!root) return;
+
+  const schemaVersion = 'founder-review-comments/v1';
+  const reportId = root.dataset.reportId;
+  const storageKey = `founder-review-comments:${reportId}`;
+  const dataNode = document.getElementById('founder-comments-data');
+  const anchorInput = document.getElementById('founder-comment-anchor');
+  const typeInput = document.getElementById('founder-comment-type');
+  const bodyInput = document.getElementById('founder-comment-body');
+  const quoteNode = document.getElementById('founder-comment-quote');
+  const saveButton = document.getElementById('founder-comment-save');
+  const cancelButton = document.getElementById('founder-comment-cancel');
+  const countNode = document.getElementById('founder-comment-count');
+  const indexNode = document.getElementById('founder-comment-index');
+  const stateNode = document.getElementById('founder-comments-state');
+
+  let pendingQuote = '';
+  let pendingAnchorId = 'executive-summary';
+  let pendingInlineTargetId = '';
+  let editingId = null;
+  let localStorageAvailable = true;
+
+  const selectionTrigger = document.createElement('button');
+  selectionTrigger.type = 'button';
+  selectionTrigger.className = 'primary selection-comment-trigger';
+  selectionTrigger.textContent = 'Comment here';
+  selectionTrigger.hidden = true;
+  selectionTrigger.dataset.exportTransient = 'true';
+  root.appendChild(selectionTrigger);
+
+  function safeJson(value) {
+    return JSON.stringify(value, null, 2).replace(/</g, '\\u003c');
+  }
+
+  function parsePayload(text) {
+    try {
+      const parsed = JSON.parse(text || '{}');
+      return {
+        schemaVersion: parsed.schemaVersion || schemaVersion,
+        reportId: parsed.reportId || reportId,
+        comments: Array.isArray(parsed.comments) ? parsed.comments : [],
+        deletedIds: Array.isArray(parsed.deletedIds) ? parsed.deletedIds : []
+      };
+    } catch (_) {
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function readLocalPayload() {
+    try {
+      return parsePayload(localStorage.getItem(storageKey) || '{}');
+    } catch (_) {
+      localStorageAvailable = false;
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function mergePayloads(embedded, local) {
+    const deleted = new Set([...(embedded.deletedIds || []), ...(local.deletedIds || [])]);
+    const byId = new Map();
+    [...(embedded.comments || []), ...(local.comments || [])].forEach(comment => {
+      if (!comment?.id || deleted.has(comment.id)) return;
+      const prior = byId.get(comment.id);
+      const priorTime = Date.parse(prior?.updatedAt || prior?.createdAt || 0) || 0;
+      const nextTime = Date.parse(comment.updatedAt || comment.createdAt || 0) || 0;
+      if (!prior || nextTime >= priorTime) byId.set(comment.id, comment);
+    });
+    return {
+      schemaVersion,
+      reportId,
+      comments: [...byId.values()].sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || ''))),
+      deletedIds: [...deleted]
+    };
+  }
+
+  let payload = mergePayloads(parsePayload(dataNode.textContent), readLocalPayload());
+
+  function anchors() {
+    return [...root.querySelectorAll('[data-review-anchor][id]')];
+  }
+
+  function anchorLabel(anchor) {
+    return anchor?.dataset.anchorLabel || anchor?.querySelector('h1,h2,h3,h4')?.textContent.trim() || anchor?.id || 'Review';
+  }
+
+  function ensureReviewUi() {
+    anchors().forEach(anchor => {
+      let tools = [...anchor.children].find(child => child.classList?.contains('annotation-tools'));
+      if (!tools) {
+        tools = document.createElement('div');
+        tools.className = 'annotation-tools';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'section-comment';
+        button.dataset.anchor = anchor.id;
+        button.textContent = 'Comment on this section';
+        const hint = document.createElement('span');
+        hint.textContent = 'Founder feedback is embedded in the returned HTML.';
+        tools.append(button, hint);
+        const heading = [...anchor.children].find(child => /^H[1-4]$/.test(child.tagName));
+        if (heading) heading.insertAdjacentElement('afterend', tools);
+        else anchor.prepend(tools);
+      }
+      let well = [...anchor.children].find(child => child.classList?.contains('section-comments'));
+      if (!well) {
+        well = document.createElement('div');
+        well.className = 'inline-comments section-comments';
+        well.dataset.commentsFor = anchor.id;
+        well.setAttribute('aria-live', 'polite');
+        anchor.appendChild(well);
+      }
+    });
+  }
+
+  function populateAnchors() {
+    const prior = anchorInput.value || pendingAnchorId;
+    anchorInput.replaceChildren();
+    anchors().forEach(anchor => {
+      const option = document.createElement('option');
+      option.value = anchor.id;
+      option.textContent = anchorLabel(anchor);
+      anchorInput.appendChild(option);
+    });
+    anchorInput.value = document.getElementById(prior) ? prior : anchorInput.options[0]?.value || '';
+    pendingAnchorId = anchorInput.value;
+  }
+
+  function persist() {
+    dataNode.textContent = safeJson(payload);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+      localStorageAvailable = true;
+    } catch (_) {
+      localStorageAvailable = false;
+    }
+  }
+
+  function badge(text) {
+    const node = document.createElement('span');
+    node.className = 'badge';
+    node.textContent = text;
+    return node;
+  }
+
+  function commentCard(comment, indexCopy = false) {
+    const card = document.createElement('article');
+    card.className = 'card founder-comment';
+    card.setAttribute('data-founder-comment', 'true');
+    card.dataset.commentId = comment.id;
+    card.dataset.authorRole = 'FOUNDER_REVIEW_COMMENT';
+    card.dataset.requiresAgentResponse = 'true';
+    card.dataset.status = comment.status || 'open';
+    card.dataset.anchorId = comment.anchorId || '';
+    if (indexCopy) card.dataset.indexCopy = 'true';
+
+    const label = document.createElement('div');
+    label.className = 'comment-label';
+    label.append(badge('FOUNDER REVIEW COMMENT'), badge(comment.type || 'Question'), badge((comment.status || 'open').toUpperCase()));
+    const required = document.createElement('span');
+    required.textContent = 'Requires agent response';
+    label.appendChild(required);
+    card.appendChild(label);
+
+    const link = document.createElement('a');
+    link.href = `#${comment.inlineTargetId || comment.anchorId}`;
+    link.textContent = comment.anchorLabel || comment.anchorId || 'Review';
+    card.appendChild(link);
+
+    if (comment.quote) {
+      const quote = document.createElement('blockquote');
+      quote.textContent = comment.quote;
+      card.appendChild(quote);
+    }
+    const body = document.createElement('p');
+    body.className = 'founder-comment-body';
+    body.textContent = comment.body;
+    card.appendChild(body);
+    const meta = document.createElement('p');
+    meta.className = 'muted';
+    meta.textContent = `${comment.createdAt || ''}${comment.updatedAt && comment.updatedAt !== comment.createdAt ? ` · updated ${comment.updatedAt}` : ''} · ID ${comment.id}`;
+    card.appendChild(meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    [['edit', 'Edit'], ['resolve', comment.status === 'resolved' ? 'Reopen' : 'Resolve'], ['delete', 'Delete']].forEach(([action, text]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.commentAction = action;
+      button.dataset.commentId = comment.id;
+      button.textContent = text;
+      if (action === 'delete') button.style.color = 'var(--danger)';
+      actions.appendChild(button);
+    });
+    card.appendChild(actions);
+    return card;
+  }
+
+  function insertNear(target, node) {
+    if (/^(LI|TD|TH)$/.test(target.tagName)) target.appendChild(node);
+    else target.insertAdjacentElement('afterend', node);
+  }
+
+  function inlineWell(target, targetId) {
+    let well = root.querySelector(`[data-inline-comments-for="${targetId}"]`);
+    if (!well) {
+      well = document.createElement('div');
+      well.className = 'inline-comments inline-target-comments';
+      well.dataset.inlineCommentsFor = targetId;
+      well.setAttribute('aria-live', 'polite');
+      insertNear(target, well);
+    }
+    return well;
+  }
+
+  function renderComments() {
+    root.querySelectorAll('.inline-target-comments').forEach(node => node.remove());
+    root.querySelectorAll('.section-comments').forEach(node => node.replaceChildren());
+    indexNode.replaceChildren();
+    payload.comments.forEach(comment => {
+      const anchor = document.getElementById(comment.anchorId);
+      const target = comment.inlineTargetId ? document.getElementById(comment.inlineTargetId) : null;
+      const well = target ? inlineWell(target, comment.inlineTargetId) : [...(anchor?.children || [])].find(child => child.classList?.contains('section-comments'));
+      if (well) well.appendChild(commentCard(comment));
+      indexNode.appendChild(commentCard(comment, true));
+    });
+    countNode.textContent = String(payload.comments.length);
+    if (!payload.comments.length) {
+      const empty = document.createElement('p');
+      empty.className = 'muted';
+      empty.textContent = 'No founder comments yet.';
+      indexNode.appendChild(empty);
+    }
+    stateNode.textContent = `${payload.comments.length} founder comment${payload.comments.length === 1 ? '' : 's'}${localStorageAvailable ? ' · saved locally · export HTML to return.' : ' · export HTML before closing.'}`;
+    dataNode.textContent = safeJson(payload);
+  }
+
+  function setQuote(text, anchorId, inlineTargetId = '') {
+    pendingQuote = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 1000);
+    if (anchorId && document.getElementById(anchorId)) {
+      pendingAnchorId = anchorId;
+      anchorInput.value = anchorId;
+    }
+    pendingInlineTargetId = inlineTargetId;
+    quoteNode.textContent = pendingQuote || 'No text selected. Highlight wording to use Comment here.';
+  }
+
+  function selectionBlock(element, anchor) {
+    return element?.closest?.('p,li,blockquote,td,th,pre,figure,.callout,.plain-group') || anchor;
+  }
+
+  function ensureTarget(element) {
+    if (!element.id) element.id = `founder-comment-target-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    element.dataset.founderCommentTarget = 'true';
+    return element.id;
+  }
+
+  function positionSelectionTrigger(rect) {
+    const rootRect = root.getBoundingClientRect();
+    selectionTrigger.hidden = false;
+    requestAnimationFrame(() => {
+      const left = Math.max(0, Math.min(rect.right - rootRect.left, root.clientWidth - selectionTrigger.offsetWidth));
+      selectionTrigger.style.left = `${left}px`;
+      selectionTrigger.style.top = `${Math.max(0, rect.bottom - rootRect.top + 6)}px`;
+    });
+  }
+
+  function captureSelection(moveToWorkbench = false) {
+    const selection = getSelection();
+    if (!selection || !selection.rangeCount || selection.isCollapsed) {
+      selectionTrigger.hidden = true;
+      return false;
+    }
+    const text = selection.toString().replace(/\s+/g, ' ').trim();
+    const range = selection.getRangeAt(0);
+    const node = range.startContainer;
+    const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    const anchor = element?.closest?.('[data-review-anchor][id]');
+    if (!text || !anchor || !root.contains(anchor)) return false;
+    const targetId = ensureTarget(selectionBlock(element, anchor));
+    const rects = [...range.getClientRects()];
+    setQuote(text, anchor.id, targetId);
+    if (moveToWorkbench) {
+      document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      bodyInput.focus();
+      selectionTrigger.hidden = true;
+    } else {
+      positionSelectionTrigger(rects.at(-1) || range.getBoundingClientRect());
+    }
+    return true;
+  }
+
+  function addComment(body, type, anchorId, quote, inlineTargetId) {
+    body = String(body || '').trim();
+    if (!body) return false;
+    const now = new Date().toISOString();
+    payload.comments.push({
+      id: `founder-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      authorRole: 'FOUNDER_REVIEW_COMMENT',
+      requiresAgentResponse: true,
+      reportId,
+      anchorId,
+      anchorLabel: anchorLabel(document.getElementById(anchorId)),
+      inlineTargetId: inlineTargetId || '',
+      quote: quote || '',
+      body,
+      type: type || 'Question',
+      status: 'open',
+      createdAt: now,
+      updatedAt: now
+    });
+    persist();
+    renderComments();
+    return true;
+  }
+
+  function closeInlineComposer() {
+    root.querySelector('.inline-composer')?.remove();
+  }
+
+  function openInlineComposer() {
+    closeInlineComposer();
+    const target = document.getElementById(pendingInlineTargetId) || document.getElementById(pendingAnchorId);
+    if (!target || !pendingQuote) return;
+    const composer = document.createElement('div');
+    composer.className = 'card inline-composer';
+    composer.dataset.exportTransient = 'true';
+    composer.innerHTML = '<strong>Comment on highlighted text</strong>';
+    const quote = document.createElement('blockquote');
+    quote.textContent = pendingQuote;
+    composer.appendChild(quote);
+    const fieldId = `founder-inline-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const typeLabel = document.createElement('label');
+    typeLabel.htmlFor = `${fieldId}-type`;
+    typeLabel.textContent = 'Comment type';
+    const type = document.createElement('select');
+    type.id = `${fieldId}-type`;
+    ['Question', 'Change request', 'Concern', 'Approval'].forEach(value => type.add(new Option(value, value)));
+    const bodyLabel = document.createElement('label');
+    bodyLabel.htmlFor = `${fieldId}-body`;
+    bodyLabel.textContent = 'Your comment';
+    const body = document.createElement('textarea');
+    body.id = `${fieldId}-body`;
+    body.placeholder = 'Write the question or change you want addressed.';
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'primary';
+    add.textContent = 'Add founder comment';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.textContent = 'Cancel';
+    actions.append(add, cancel);
+    composer.append(typeLabel, type, bodyLabel, body, actions);
+    insertNear(target, composer);
+    selectionTrigger.hidden = true;
+    body.focus();
+    add.addEventListener('click', () => {
+      if (!addComment(body.value, type.value, pendingAnchorId, pendingQuote, pendingInlineTargetId)) return body.focus();
+      closeInlineComposer();
+      getSelection()?.removeAllRanges();
+    });
+    cancel.addEventListener('click', closeInlineComposer);
+    body.addEventListener('keydown', event => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        event.preventDefault();
+        add.click();
+      }
+    });
+  }
+
+  function resetWorkbench() {
+    editingId = null;
+    bodyInput.value = '';
+    typeInput.value = 'Question';
+    setQuote('', anchorInput.value || 'executive-summary');
+    saveButton.textContent = 'Add founder comment';
+    cancelButton.hidden = true;
+  }
+
+  function saveWorkbenchComment() {
+    const body = bodyInput.value.trim();
+    if (!body) return bodyInput.focus();
+    if (editingId) {
+      const comment = payload.comments.find(item => item.id === editingId);
+      if (!comment) return;
+      comment.anchorId = anchorInput.value;
+      comment.anchorLabel = anchorLabel(document.getElementById(anchorInput.value));
+      comment.inlineTargetId = pendingInlineTargetId || '';
+      comment.quote = pendingQuote;
+      comment.body = body;
+      comment.type = typeInput.value;
+      comment.updatedAt = new Date().toISOString();
+      persist();
+      renderComments();
+    } else if (!addComment(body, typeInput.value, anchorInput.value, pendingQuote, pendingInlineTargetId)) {
+      return;
+    }
+    resetWorkbench();
+  }
+
+  function editComment(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    editingId = id;
+    anchorInput.value = comment.anchorId;
+    typeInput.value = comment.type;
+    bodyInput.value = comment.body;
+    setQuote(comment.quote, comment.anchorId, comment.inlineTargetId || '');
+    saveButton.textContent = 'Save founder comment';
+    cancelButton.hidden = false;
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function toggleResolved(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    comment.status = comment.status === 'resolved' ? 'open' : 'resolved';
+    comment.updatedAt = new Date().toISOString();
+    persist();
+    renderComments();
+  }
+
+  function deleteComment(id) {
+    if (!payload.comments.some(item => item.id === id) || !confirm('Delete this founder review comment?')) return;
+    payload.comments = payload.comments.filter(item => item.id !== id);
+    if (!payload.deletedIds.includes(id)) payload.deletedIds.push(id);
+    if (editingId === id) resetWorkbench();
+    persist();
+    renderComments();
+  }
+
+  function beginSectionComment(anchorId) {
+    closeInlineComposer();
+    selectionTrigger.hidden = true;
+    anchorInput.value = anchorId;
+    setQuote('', anchorId);
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function download(content, type, filename) {
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportJson() {
+    download(safeJson({ ...payload, exportedAt: new Date().toISOString() }), 'application/json;charset=utf-8', `${reportId}-founder-comments.json`);
+  }
+
+  function exportHtml() {
+    persist();
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('#founder-comments-data').textContent = safeJson(payload);
+    clone.querySelector('#founder-review').dataset.exportedWithFounderComments = new Date().toISOString();
+    clone.querySelectorAll('[data-export-transient="true"]').forEach(node => node.remove());
+    const clonedBody = clone.querySelector('#founder-comment-body');
+    if (clonedBody) clonedBody.textContent = '';
+    let marker = clone.querySelector('meta[name="founder-review-comments-schema"]');
+    if (!marker) {
+      marker = document.createElement('meta');
+      marker.name = 'founder-review-comments-schema';
+      clone.querySelector('head').appendChild(marker);
+    }
+    marker.content = schemaVersion;
+    const date = new Date().toISOString().slice(0, 10);
+    download(`<!doctype html>\n${clone.outerHTML}`, 'text/html;charset=utf-8', `${reportId}-commented-${date}.html`);
+    stateNode.textContent = `Commented HTML saved with ${payload.comments.length} embedded comment${payload.comments.length === 1 ? '' : 's'}.`;
+  }
+
+  ensureReviewUi();
+  populateAnchors();
+  renderComments();
+
+  root.addEventListener('click', event => {
+    const selectionButton = event.target.closest('.selection-comment-trigger');
+    if (selectionButton) return openInlineComposer();
+    const sectionButton = event.target.closest('.section-comment');
+    if (sectionButton) return beginSectionComment(sectionButton.dataset.anchor);
+    const actionButton = event.target.closest('[data-comment-action]');
+    if (!actionButton) return;
+    const { commentId, commentAction } = actionButton.dataset;
+    if (commentAction === 'edit') editComment(commentId);
+    if (commentAction === 'resolve') toggleResolved(commentId);
+    if (commentAction === 'delete') deleteComment(commentId);
+  });
+
+  root.addEventListener('mouseup', event => {
+    if (event.target.closest('#comment-workbench,.inline-composer,.selection-comment-trigger')) return;
+    setTimeout(() => captureSelection(false), 0);
+  });
+  anchorInput.addEventListener('change', () => {
+    pendingAnchorId = anchorInput.value;
+    pendingInlineTargetId = '';
+  });
+  saveButton.addEventListener('click', saveWorkbenchComment);
+  cancelButton.addEventListener('click', resetWorkbench);
+  document.getElementById('founder-comment-use-selection').addEventListener('click', () => captureSelection(true));
+  document.getElementById('founder-comment-clear-quote').addEventListener('click', () => setQuote('', anchorInput.value));
+  document.getElementById('founder-comments-save-html').addEventListener('click', exportHtml);
+  document.getElementById('founder-comments-export-json').addEventListener('click', exportJson);
+  bodyInput.addEventListener('keydown', event => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.preventDefault();
+      saveWorkbenchComment();
+    }
+  });
+})();
+  </script>
+</body>
+</html>

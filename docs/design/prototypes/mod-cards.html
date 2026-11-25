@@ -1,0 +1,2551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mods: one class (PROTOTYPE)</title>
+<link rel="stylesheet" href="lib/mod-ui-font.css">
+<style>
+/* ============================================================
+   MODS — ONE CLASS (refinement prototype)
+
+   The refinement pass on mod-workbench-v2: ONE mod class.
+   Every mod is BOTH a control surface and a visualizer — you
+   change the value by touching the picture of the value. No
+   wiring, no packs, no compiler board: each mod stands alone
+   and speaks its own sentences from its own tiny prompt engine
+   (frame + {value}; the label speaks when no frame is written;
+   silence is visible, never hidden). The sentences live behind
+   the CONTEXT eye key in the card foot (the main-app card
+   standard), together with the mod's TREATMENT line — a per-kind
+   mini system prompt saying how to READ the values ("each value
+   is out of 100…"), collapsed and editable, carried ahead of the
+   sentences and, in the app, into the prompt compiler on card
+   connections. Removal is standardized: every option's × sits at
+   its right / top-right edge, hover-revealed.
+
+   Eleven kinds: mixer · filter · slider · dial · count ·
+   switch · pad · select · order · radar · matrix.
+   Every kind grows with a + where growth makes sense (dials,
+   sliders, bands, axes, options, items, lanes, rows/columns);
+   the pad alone is fixed — two axes ARE the pad.
+
+   Tokens are the app design system (SYSTEM.md, --e-*); the
+   instrument recipes are lifted from lib/mod-ui.css so the
+   faces stay visually identical to the workbench. The output
+   node dot (13px hollow ink ring astride the right edge,
+   accent fill on hover, no tooltip) is kept as the app-wide
+   connector standard, worn here as identity, not wiring.
+   ============================================================ */
+
+:root {
+  /* surface ladder (SYSTEM.md §1.1) */
+  --e-surface-recessed: #dcd7cc;
+  --e-surface-ground:   #e8e4dc;
+  --e-surface-panel:    #f1eee8;
+  --e-surface-card:     #f8f6f1;
+  --e-surface-floating: #fcfaf6;
+  --e-surface-field:    #e9e5dd;
+  --e-field-bg:         #fcfaf6;
+
+  /* ink ladder (§1.2) */
+  --e-ink:        #232019;
+  --e-ink-soft:   #5f594c;
+  --e-ink-faint:  #847d70;
+  --e-line:         rgba(35,32,25,.16);
+  --e-line-strong:  rgba(35,32,25,.28);
+  --e-dot:          rgba(35,32,25,.26);
+
+  /* functional (§1.3) */
+  --e-go:     #2f6f5e;
+  --e-avoid:  #bb4326;
+  --e-mod:    #6a4fb0;
+
+  /* type — instrument voice (§2.2); paper voice for ledes only */
+  --e-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --e-sans: "Open Sans", system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* radius (§3.2) */
+  --e-r-inner: 4px;
+  --e-r-chip:  6px;
+  --e-r-card:  8px;
+  --e-r-well:  10px;
+
+  /* motion (§5) */
+  --e-t-fast: 120ms;
+  --e-t-move: 220ms;
+  --e-ease-out:    cubic-bezier(.25,.6,.25,1);
+  --e-ease-settle: cubic-bezier(.2,.75,.25,1.08);
+  --e-shadow-lift: 0 2px 4px rgba(35,32,25,.08), 0 12px 30px rgba(35,32,25,.16);
+
+  --accent: #6a4fb0;   /* default = the mod hue; instances override */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--e-surface-ground); }
+body {
+  font-family: var(--e-mono);
+  color: var(--e-ink);
+  /* the board dot grid (§1.1) */
+  background-image: radial-gradient(circle 1px at 1px 1px, rgba(35,32,25,.11) 98%, transparent);
+  background-size: 22px 22px;
+  padding: 36px 28px 90px;
+}
+
+/* accent derivations — declared at instance scope, never :root */
+.mod, .e-pop {
+  --accent-tint: color-mix(in srgb, var(--accent) 30%, var(--e-surface-recessed));
+  --accent-wash: color-mix(in srgb, var(--accent) 12%, var(--e-surface-card));
+}
+
+/* ---------------- type roles (§2.2, floor 11px) ---------------- */
+.t-micro { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; line-height: 1.2; }
+
+/* ---------------- page chrome ---------------- */
+.masthead { max-width: 1180px; margin: 0 auto 26px; }
+.masthead .eyebrow { color: var(--e-ink-faint); margin-bottom: 8px; }
+.masthead h1 { font-weight: 700; font-size: 16px; letter-spacing: .04em; }
+.masthead .lede {
+  font-family: var(--e-sans);
+  font-size: 13px; line-height: 1.5;
+  color: var(--e-ink-soft);
+  max-width: 68ch; margin-top: 6px;
+}
+.masthead-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+
+/* the board of mods — flex columns, NOT CSS multicol: multicol rebalances
+   the whole board on any in-card text change (~130ms/frame mid-drag) */
+.board { max-width: 1180px; margin: 0 auto; display: flex; align-items: flex-start; gap: 20px; }
+.board-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+
+/* ---------------- buttons (§6.1) ---------------- */
+.e-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 26px; padding: 0 12px;
+  background: transparent; color: var(--e-ink);
+  border: 1px solid var(--e-ink); border-radius: var(--e-r-chip);
+  font-family: var(--e-mono); font-size: 12px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase; line-height: 1;
+  cursor: pointer; user-select: none;
+  transition: background var(--e-t-fast) var(--e-ease-out), transform var(--e-t-fast) var(--e-ease-out);
+}
+.e-btn:hover { background: rgba(35,32,25,.07); }
+.e-btn:active { transform: scale(.97); }
+.e-btn--primary { background: var(--e-go); border-color: var(--e-go); color: #f8f6f1; }
+.e-btn--primary:hover { background: color-mix(in srgb, var(--e-go) 88%, var(--e-ink)); }
+
+/* ---------------- the mod card shell (§8.1 + workbench) ---------------- */
+.mod {
+  position: relative;
+  display: flex; flex-direction: column;
+  background: var(--e-surface-card);
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-card);
+  padding: 0 0 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  /* a drag inside one card must never re-lay-out the whole board */
+  contain: layout style;
+}
+/* containment makes each card a stacking context, so anything that
+   overhangs a neighbour (hover chips, resize dots) lifts its card */
+.mod:hover { z-index: 30; }
+.mod.is-resizing { z-index: 60; }
+.mod-head {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 36px; padding: 7px 14px;
+  border-bottom: 1px solid var(--e-line);
+}
+/* identity dot — persistent, opens the color well */
+.mod-dot {
+  flex: none; width: 10px; height: 10px;
+  border: none; border-radius: 50%;
+  background: var(--accent); padding: 0; cursor: pointer;
+  transition: transform var(--e-t-fast) var(--e-ease-out), filter var(--e-t-fast) var(--e-ease-out);
+}
+.mod-dot:hover { transform: scale(1.25); filter: brightness(1.12); }
+.mod-title {
+  flex: 1 1 auto; min-width: 0;
+  font-size: 14px; font-weight: 500; line-height: 1.35;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  border-radius: var(--e-r-inner); outline: none;
+  /* optical: the glyphs measure 1px high of the head's centerline */
+  position: relative; top: 1px;
+}
+/* actions — hover-revealed chrome, top-right */
+.mod-chrome {
+  flex: none; display: flex; gap: 2px;
+  opacity: 0; transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.mod:hover .mod-chrome, .mod:focus-within .mod-chrome { opacity: 1; }
+.mod-key {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border: none; padding: 0; border-radius: var(--e-r-chip);
+  background: transparent; color: var(--e-ink-soft);
+  font-family: var(--e-mono); font-size: 14px; line-height: 1;
+  cursor: pointer;
+  transition: background var(--e-t-fast) var(--e-ease-out), color var(--e-t-fast) var(--e-ease-out);
+}
+.mod-key:hover { background: rgba(35,32,25,.08); color: var(--e-ink); }
+.mod-key svg { display: block; }
+
+/* the output node — the app-wide connector standard */
+.mod-node {
+  position: absolute; right: -8px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 8; cursor: crosshair;
+}
+.mod-node::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 24px; height: 24px; transform: translate(-50%,-50%);
+}
+.mod-node-dot {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--e-surface-ground);
+  border: 1.5px solid var(--e-ink);
+  transition: background .1s ease, border-color .1s ease, transform .1s ease;
+}
+.mod-node:hover .mod-node-dot { background: var(--accent); border-color: var(--accent); transform: scale(1.15); }
+
+/* corner resize — the regular Eido card gesture: go-dot handles on the
+   four corners, hover-revealed */
+.mod-resize {
+  position: absolute; width: 9px; height: 9px;
+  border: none; padding: 0; border-radius: 50%;
+  background: var(--e-go); opacity: 0; z-index: 9;
+  transition: opacity var(--e-t-fast) var(--e-ease-out);
+}
+.mod:hover .mod-resize, .mod:focus-within .mod-resize, .mod-resize.is-resizing { opacity: 1; }
+.mod-resize::before { content: ''; position: absolute; inset: -8px; }
+.mod-resize.top { top: -4.5px; }
+.mod-resize.bottom { bottom: -4.5px; }
+.mod-resize.left { left: -4.5px; }
+.mod-resize.right { right: -4.5px; }
+.mod-resize.top.left, .mod-resize.bottom.right { cursor: nwse-resize; }
+.mod-resize.top.right, .mod-resize.bottom.left { cursor: nesw-resize; }
+/* an explicitly sized card: the body flexes and the tall wells stretch.
+   No min-height:0 anywhere — content keeps its intrinsic minimum, so the
+   resize clamp reads the true floor and rows can never overlap. */
+.mod.is-sized .mod-body { flex: 1 1 auto; min-height: 0; }
+/* well rows may compress (their wells hold a 110px floor and spill past it,
+   which the clamp reads); plain rows keep their intrinsic minimum */
+.mod.is-sized .mod-row:has(> .i-bd),
+.mod.is-sized .mod-row:has(> .i-radar),
+.mod.is-sized .mod-row:has(> .i-pad),
+.mod.is-sized .mod-row:has(> .i-order),
+.mod.is-sized .mod-row:has(> .i-mx-wrap) { flex: 1 1 auto; min-height: 0; }
+.mod.is-sized .i-bd, .mod.is-sized .i-radar, .mod.is-sized .i-pad {
+  height: auto; flex: 1 1 auto; min-height: 110px;
+}
+/* order grows with the card: tokens deepen to the select control's height */
+.mod.is-sized .i-order { flex: 1 1 auto; }
+.mod.is-sized .i-order-list, .mod.is-sized .i-order-nums { justify-content: center; }
+.mod.is-sized .i-order-token, .mod.is-sized .i-order-num {
+  height: auto; flex: 1 1 24px; min-height: 24px; max-height: 32px;
+}
+.mod.is-sized .i-mx-wrap { flex: 1 1 auto; }
+
+/* body + rows */
+.mod-body { padding: 12px 14px 0; display: flex; flex-direction: column; gap: 12px; }
+.mod-row { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.mod-row-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mod-sub {
+  font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--e-ink-soft); line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  border-radius: var(--e-r-inner); outline: none;
+}
+.mod-val {
+  flex: none; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums;
+  letter-spacing: .04em; color: var(--e-ink); line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 176px;
+  text-transform: lowercase;
+}
+.mod-row-head .mod-sub { flex: 1 1 auto; }
+/* removal standard: a small solid circle that LIVES ON TOP of the element
+   (right edge or top-right corner per host), hover-revealed — it never
+   reserves space or squeezes into the element's own layout */
+.row-x {
+  position: absolute; top: 50%; right: -15px; transform: translateY(-50%);
+  flex: none; width: 16px; height: 16px; padding: 0;
+  border: 1px solid var(--e-line-strong); border-radius: 50%;
+  background: var(--e-surface-card);
+  color: var(--e-ink-soft); font-family: var(--e-mono); font-size: 12px; line-height: 1;
+  box-shadow: 0 1px 3px rgba(35,32,25,.16);
+  cursor: pointer; opacity: 0; z-index: 6;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: opacity var(--e-t-fast) var(--e-ease-out),
+              color var(--e-t-fast) var(--e-ease-out),
+              border-color var(--e-t-fast) var(--e-ease-out);
+}
+/* reveal follows the pointer's own host: whole-row for row instruments,
+   per-option for cells/tokens/labels — never every option at once */
+.mod-row:hover .mod-row-head .row-x,
+.mod-row:hover .i-swrow > .row-x,
+.mod-row:hover .i-countrow > .row-x,
+.i-dial:hover .row-x, .i-order-token:hover .row-x,
+.mx-lbl:hover .row-x, .rd-tipwrap:hover .row-x { opacity: 1; }
+.row-x:hover { color: var(--e-ink); border-color: var(--e-ink); }
+.mod-row-head, .i-swrow, .i-countrow { position: relative; }
+/* switch + count rows: the circle floats at the row's top-right corner
+   (dial-style), clear of the toggle / stepper pill */
+.i-swrow > .row-x, .i-countrow > .row-x { top: -7px; right: -4px; transform: none; }
+/* named-value row heads (slider, filter): the head RESERVES a zone at its
+   right end — the circle gets its own space, never crowding the value */
+.mod-row-head.has-x { padding-right: 26px; }
+.mod-row-head .row-x { right: 2px; }
+
+/* ghost growth affordance — a ghost of the thing it creates */
+.mod-add {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 26px;
+  border: 1px dashed var(--e-line-strong); border-radius: var(--e-r-chip);
+  background: transparent; color: var(--e-ink-faint);
+  font-family: var(--e-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer;
+  transition: color var(--e-t-fast) var(--e-ease-out),
+              border-color var(--e-t-fast) var(--e-ease-out),
+              background var(--e-t-fast) var(--e-ease-out);
+}
+.mod-add:hover { color: var(--e-ink); border-color: var(--e-ink); background: rgba(35,32,25,.04); }
+
+/* ---------------- the foot — the CONTEXT key (main-app card grammar) ---------------- */
+.mod-foot {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 12px; padding: 9px 14px 0;
+  border-top: 1px solid var(--e-line);
+}
+.mod-ikey {
+  position: relative; width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--e-ink); border-radius: var(--e-r-chip);
+  background: transparent; color: var(--e-ink); padding: 0; cursor: pointer;
+  transition: background var(--e-t-fast) var(--e-ease-out);
+}
+.mod-ikey:hover { background: rgba(35,32,25,.07); }
+.mod-ikey svg { display: block; }
+/* tooltip — the ink pill, on intent (600ms), like the app's icon keys */
+.mod-ikey::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 7px); left: -1px;
+  background: var(--e-ink); color: var(--e-surface-ground);
+  font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 999px; white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity .12s ease;
+  z-index: 50;
+}
+.mod-ikey:hover::after { opacity: 1; transition-delay: 600ms; }
+
+/* the context popover — sentences + the collapsed treatment line */
+.e-pop--ctx { width: 300px; }
+.mod-tape-head {
+  font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--e-ink-faint); margin-bottom: 6px;
+}
+.ctx-lines { margin-bottom: 11px; }
+.mod-tape-line { font-size: 13px; line-height: 1.55; color: var(--e-ink-soft); }
+.mod-tape-line::before { content: '→ '; color: var(--e-ink-faint); }
+.mod-tape-line b { color: var(--accent); font-weight: 500; }
+.mod-tape-line.is-mute { color: var(--e-ink-faint); font-style: italic; }
+.e-input.e-textarea {
+  /* first line sits exactly like the single-line input: (30 − 16) / 2 = 7px */
+  display: block; height: auto; line-height: 16px;
+  padding: 7px 10px; resize: vertical;
+}
+
+/* ---------------- instruments (recipes from lib/mod-ui.css) ---------------- */
+
+/* slider */
+.i-sliderline { display: flex; align-items: center; gap: 10px; }
+.i-track {
+  --hd: 24px;
+  position: relative; flex: 1 1 auto; height: 32px; min-width: 40px;
+  background: var(--e-surface-recessed); border-radius: 999px;
+  cursor: ew-resize; touch-action: none;
+}
+.i-fill {
+  position: absolute; inset: 4px;
+  background: var(--accent-tint);
+  /* clip, don't resize: the reveal is paint-only, no layout per frame.
+     The right cap lands at the handle centre, under the handle. */
+  /* left cap round, right edge square — it tucks flush behind the handle */
+  clip-path: inset(0 calc((100% - var(--hd)) * (1 - var(--t, 0)) + var(--hd)/2) 0 0 round 999px 0 0 999px);
+  pointer-events: none;
+}
+/* the rail spans the handle's travel; --t rides the compositor */
+.i-rail {
+  position: absolute; top: 0; bottom: 0;
+  left: calc(4px + var(--hd)/2);
+  width: calc(100% - var(--hd) - 8px);
+  transform: translateX(calc(var(--t, 0) * 100%));
+  will-change: transform;
+  pointer-events: none;
+}
+.i-detent {
+  position: absolute; top: 50%; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--e-dot); transform: translate(-50%,-50%); pointer-events: none;
+}
+.i-handle {
+  position: absolute; left: 0; top: 50%;
+  width: var(--hd); height: var(--hd); border-radius: 50%;
+  background: var(--e-ink); transform: translate(-50%,-50%);
+  pointer-events: none; transition: background .1s ease;
+}
+.i-track.is-dragging .i-handle { background: var(--accent); }
+
+/* dial */
+.i-dials { display: flex; flex-wrap: wrap; gap: 12px 6px; justify-content: space-evenly; }
+.i-dial { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 82px; position: relative; }
+.i-dial svg { display: block; cursor: ns-resize; touch-action: none; }
+.i-dial .arc-track { fill: none; stroke: rgba(35,32,25,.13); stroke-width: 6; stroke-linecap: round; }
+.i-dial .arc-value { fill: none; stroke: var(--accent); stroke-width: 6; stroke-linecap: round; }
+.i-dial .core { fill: var(--e-ink); }
+.i-dial .needle { stroke: var(--e-surface-card); stroke-width: 4.5; stroke-linecap: round; }
+.i-dial .tick { stroke: var(--e-dot); stroke-width: 1.6; stroke-linecap: round; }
+.i-dial.is-dragging .core { fill: color-mix(in srgb, var(--e-ink) 88%, var(--accent)); }
+.i-dial .mod-sub { max-width: 100%; text-align: center; }
+.i-dial .mod-val { max-width: 100%; }
+.i-dial .row-x { top: -2px; right: 2px; transform: none; }
+
+/* switch */
+.i-swrow { display: flex; align-items: center; gap: 10px; }
+.i-swrow .mod-sub { flex: 1 1 auto; }
+.i-switch {
+  position: relative; width: 52px; height: 28px; flex: none;
+  border: none; padding: 0; border-radius: 999px;
+  background: var(--e-surface-recessed); cursor: pointer;
+  transition: background var(--e-t-fast) var(--e-ease-out);
+}
+.i-switch::after {
+  content: ""; position: absolute; top: 4px; left: 4px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--e-ink);
+  /* transform, not left: the knob answers on the compositor, instantly */
+  transition: transform var(--e-t-fast) var(--e-ease-out), background var(--e-t-fast) var(--e-ease-out);
+  will-change: transform;
+}
+.i-switch.is-on { background: var(--accent); }
+.i-switch.is-on::after { transform: translateX(24px); background: var(--e-surface-card); }
+
+/* count */
+.i-countrow { display: flex; align-items: center; gap: 10px; }
+.i-countrow .mod-sub { flex: 1 1 auto; }
+.i-count-foot { display: flex; align-items: center; }
+.i-count {
+  display: flex; align-items: stretch; height: 30px; width: 122px; flex: none;
+  border-radius: 999px; background: var(--e-surface-recessed); overflow: hidden;
+}
+.i-count button {
+  flex: none; width: 30px; border: none; background: transparent;
+  font-family: var(--e-mono); font-size: 12px; color: var(--e-ink);
+  cursor: pointer; padding: 0; line-height: 1;
+  transition: background .1s ease;
+}
+.i-count button:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.i-count button:active { background: color-mix(in srgb, var(--accent) 32%, transparent); }
+.i-count .n {
+  flex: 1 1 auto; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+}
+.i-count .n i { font-style: normal; color: var(--e-ink-faint); white-space: pre; }
+
+/* pad */
+.i-pad {
+  /* single colour: the well stays flat, snap dots appear only with stops */
+  position: relative; height: 190px;
+  background-color: var(--e-surface-recessed);
+  border-radius: var(--e-r-card);
+  cursor: crosshair; touch-action: none; overflow: hidden;
+}
+/* the plane spans the 14px-inset travel area; --px/--py move full-size
+   wrappers by percent of their own box — compositor only, no layout */
+.i-pad-plane { position: absolute; inset: 14px; pointer-events: none; }
+.i-pad-wx, .i-pad-wy { position: absolute; inset: 0; pointer-events: none; }
+/* wx carries the handle and paints ABOVE the sibling h-line wrapper:
+   the dot stays solid, nothing crosses it */
+.i-pad-wx { transform: translateX(calc(var(--px, .5) * 100%)); will-change: transform; z-index: 1; }
+.i-pad-wy { transform: translateY(calc(var(--py, .5) * 100%)); will-change: transform; }
+.i-pad-ch { position: absolute; background: var(--e-line); pointer-events: none; }
+.i-pad-ch--v { left: 0; width: 1px; top: -14px; bottom: -14px; }
+.i-pad-ch--h { top: 0; height: 1px; left: -14px; right: -14px; }
+.i-pad-handle {
+  position: absolute; left: 0; top: 0;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent);
+  transform: translate(-50%,-50%); pointer-events: none;
+  transition: filter .1s ease;
+}
+.i-pad.is-dragging .i-pad-handle { filter: brightness(1.12); }
+.i-pad-end {
+  position: absolute; font-size: 11px; font-weight: 500; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--e-ink-faint); line-height: 1; pointer-events: none;
+}
+.i-pad-end--xlo { left: 10px; bottom: 7px; }
+.i-pad-end--xhi { right: 10px; bottom: 7px; }
+.i-pad-end--yhi { left: 10px; top: 7px; }
+.i-pad-end--ylo { left: 10px; bottom: 24px; }
+.i-pad-snap {
+  position: absolute; width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(35,32,25,.34); transform: translate(-50%,-50%); pointer-events: none;
+}
+
+/* select — segmented ≤4, stack 5+ */
+/* the control stays open (no overflow clip) so each option's remove circle
+   can ride its top-right corner; the end cells carry the pill radius */
+.i-seg {
+  display: flex; align-items: stretch; height: 32px;
+  border-radius: 999px; background: var(--e-surface-recessed);
+  min-width: 0; touch-action: none;
+}
+.i-seg-cell {
+  flex: 1 1 0; min-width: 0; border: none; background: transparent; padding: 0 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--e-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--e-ink-soft);
+  cursor: pointer;
+  transition: background var(--e-t-fast) var(--e-ease-out), color var(--e-t-fast) var(--e-ease-out);
+}
+.i-seg-cell:first-child { border-radius: 999px 0 0 999px; }
+.i-seg-cell:last-child { border-radius: 0 999px 999px 0; }
+.i-seg-cell + .i-seg-cell { border-left: 1px solid var(--e-line); }
+.i-seg-cell:hover { background: rgba(35,32,25,.06); color: var(--e-ink); }
+.i-seg-cell.is-picked { background: var(--accent); }
+.i-stack { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.i-stack-row {
+  height: 24px; border: none; border-radius: 999px;
+  background: var(--e-surface-recessed); padding: 0 12px; text-align: left;
+  display: flex; align-items: center;
+  font-family: var(--e-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--e-ink-soft);
+  cursor: pointer;
+  transition: background var(--e-t-fast) var(--e-ease-out), color var(--e-t-fast) var(--e-ease-out);
+}
+.i-stack-row:hover { background: color-mix(in srgb, var(--e-surface-recessed) 80%, var(--e-ink)); }
+.i-stack-row.is-picked { background: var(--accent); }
+/* option removal — the circle rides the option's TOP-RIGHT corner,
+   floating above the control, never squeezing the name */
+.i-seg-cell, .i-stack-row { position: relative; }
+.i-seg-cell .opt-name, .i-stack-row .opt-name {
+  pointer-events: none; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.i-seg-cell .row-x { top: -7px; right: -2px; transform: none; }
+.i-stack-row .row-x { top: -6px; right: 0; transform: none; }
+.i-seg-cell:hover .row-x, .i-stack-row:hover .row-x { opacity: 1; }
+
+/* order */
+.i-order {
+  display: flex; align-items: stretch; gap: 8px;
+  background: var(--e-surface-recessed); border-radius: var(--e-r-card);
+  padding: 8px 10px; overflow: hidden;
+}
+.i-order-nums { flex: none; display: flex; flex-direction: column; gap: 6px; }
+.i-order-num {
+  height: 24px; display: flex; align-items: center;
+  font-size: 11px; color: var(--e-ink-faint); font-variant-numeric: tabular-nums; line-height: 1;
+}
+.i-order-list { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; min-width: 0; touch-action: none; }
+.i-order-token {
+  position: relative;
+  height: 24px; display: flex; align-items: center; gap: 6px; padding: 0 12px;
+  border-radius: 999px; background: var(--accent-tint);
+  font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--e-ink); white-space: nowrap;
+  cursor: grab; user-select: none;
+  transition: transform var(--e-t-move) var(--e-ease-settle);
+}
+.i-order-token.is-top { background: var(--accent); }
+.i-order-token.is-lift {
+  transition: none; cursor: grabbing;
+  box-shadow: var(--e-shadow-lift); z-index: 5; position: relative;
+}
+.i-order-token .tk-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.i-order-token .row-x { right: 4px; }
+
+/* filter */
+.i-filter {
+  position: relative; height: 84px;
+  background-color: var(--e-surface-recessed);
+  background-image: radial-gradient(circle 1px at 1px 1px, rgba(35,32,25,.14) 98%, transparent);
+  background-size: 14px 14px; background-position: 7px 7px;
+  border-radius: var(--e-r-card);
+  cursor: ew-resize; touch-action: none; overflow: hidden;
+}
+.i-filter svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.i-filter .curve { fill: none; stroke: var(--e-ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.i-filter .wash { fill: var(--accent-wash); stroke: none; }
+.i-filter .det { fill: var(--e-dot); }
+.i-filter-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
+.e-chip-key {
+  border: 1px solid var(--e-ink);
+  background: transparent;
+  padding: 5px 9px; border-radius: var(--e-r-chip);
+  font-family: var(--e-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--e-ink);
+  line-height: 1; white-space: nowrap; flex: none; cursor: pointer;
+  transition: background var(--e-t-fast) var(--e-ease-out), transform var(--e-t-fast) var(--e-ease-out);
+}
+.e-chip-key:hover { background: rgba(35,32,25,.07); }
+.e-chip-key:active { transform: scale(.97); }
+
+/* mixer — thickness = share of the whole; shade ranks the channels.
+   Drag the SEAM between two channels: only those two trade share. */
+.i-bd {
+  display: flex; flex-direction: column;
+  height: 176px; border-radius: var(--e-r-well);
+  background: var(--e-surface-ground); overflow: hidden;
+  border: 1px solid var(--e-line);
+}
+.bd-band {
+  position: relative; flex: none; min-height: 3px;
+  border-bottom: 1px solid var(--e-line);
+  transition: height var(--e-t-move) var(--e-ease-out), background var(--e-t-move) var(--e-ease-out);
+}
+.bd-band:last-child { border-bottom: none; }
+.i-bd.is-dragging .bd-band, .mod.is-resizing .bd-band { transition: none; }
+.bd-grip {
+  position: absolute; left: 0; right: 0; bottom: -6px; height: 12px;
+  cursor: row-resize; touch-action: none; z-index: 3;
+}
+.bd-lbl {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  max-width: 55%;
+}
+/* the band's right side: the share value; when the channel is removable
+   the share steps left, leaving the circle its own zone at the band edge */
+.bd-right {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center;
+}
+.bd-band.has-x .bd-right { right: 32px; }
+.bd-share {
+  font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums;
+  color: var(--e-ink); opacity: .8;
+}
+.bd-band > .row-x { right: 8px; }
+.bd-band:hover .row-x { opacity: 1; }
+.bd-band.is-thin .bd-lbl, .bd-band.is-thin .bd-share { display: none; }
+
+/* radar */
+.i-radar {
+  position: relative; height: 240px;
+  background: var(--e-surface-ground); border: 1px solid var(--e-line);
+  border-radius: var(--e-r-well); overflow: hidden;
+}
+.i-radar svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.i-radar .back polygon, .i-radar .back line { fill: none; stroke: var(--e-line); stroke-width: 1; }
+.i-radar .rd-fill { fill: rgba(35,32,25,.07); }
+.i-radar .rd-line { fill: none; stroke: var(--e-ink); stroke-width: 2; stroke-linejoin: round; }
+.i-radar .rd-vert { fill: var(--accent); stroke: transparent; stroke-width: 16; cursor: grab; }
+.i-radar .rd-vert.is-dragging { cursor: grabbing; }
+/* axis labels — HTML, so they rename inline; the × rides the label (removal standard).
+   The × floats beside the text without spending label width, so edge labels never clip. */
+.rd-tipwrap { position: absolute; display: inline-flex; align-items: center; }
+/* the circle sits at the NAME's top-right, superscript-style */
+.rd-tipwrap .row-x { left: calc(100% + 1px); right: auto; top: -9px; transform: none; }
+.rd-lbl {
+  font-size: 11px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--e-ink-soft); line-height: 1.2; white-space: nowrap;
+  border-radius: var(--e-r-inner); outline: none;
+  /* long names truncate; the chart never moves for a label */
+  max-width: 78px; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* matrix — chrome-bodied grid; dot diameter is the value's picture.
+   The wrap is a flex column so the grid centers vertically when the card
+   grows; horizontal centering of the CELL BLOCK is seated by place(). */
+.i-mx-wrap {
+  position: relative; padding: 20px 26px 26px 20px;
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+}
+.i-mx-grid { display: grid; width: max-content; }
+.mx-corner { }
+.mx-lbl {
+  position: relative;
+  display: flex; align-items: center;
+  font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--e-ink-soft); line-height: 1.2; min-width: 0;
+}
+.mx-lbl .mod-sub { flex: 0 1 auto; }
+.mx-lbl--row { justify-content: flex-end; padding-right: 9px; text-align: right; }
+.mx-lbl--col { justify-content: center; padding-bottom: 7px; align-items: flex-end; }
+/* the remove key overlays the label's TOP-RIGHT corner — the app-wide
+   removal standard; it never spends label width */
+.mx-lbl .row-x { transform: none; }
+.mx-lbl--col .row-x { top: -18px; right: -6px; }
+.mx-lbl--row .row-x { top: calc(50% - 21px); right: -2px; }
+.mx-cells {
+  position: relative;
+  border: 1px solid var(--e-line); border-radius: var(--e-r-chip);
+}
+.mx-cell {
+  position: relative; border: none; background: transparent; padding: 0;
+  border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line);
+  cursor: pointer;
+}
+.mx-cell.eR { border-right: none; }
+.mx-cell.eB { border-bottom: none; }
+.mx-cell:hover { background: rgba(35,32,25,.04); }
+.mx-dot {
+  position: absolute; left: 50%; top: 50%;
+  border-radius: 50%;
+  background: var(--accent); pointer-events: none;
+  /* animate scale, not width/height: the grow stays off the layout thread */
+  transform: translate(-50%,-50%) scale(var(--s, 0));
+  transition: transform var(--e-t-fast) var(--e-ease-out), background var(--e-t-fast) var(--e-ease-out);
+  will-change: transform;
+}
+/* ghost growth — a dashed ghost of the row/column it creates */
+.mx-ghost {
+  position: absolute; display: flex; align-items: center; justify-content: center;
+  border: 1.5px dashed var(--e-line-strong); border-radius: var(--e-r-chip);
+  background: transparent; color: var(--e-ink-faint);
+  font-family: var(--e-mono); font-size: 12px; cursor: pointer;
+  opacity: 0; transition: opacity var(--e-t-fast) var(--e-ease-out), color var(--e-t-fast) var(--e-ease-out), border-color var(--e-t-fast) var(--e-ease-out);
+  padding: 0;
+}
+.mod:hover .mx-ghost { opacity: 1; }
+.mx-ghost:hover { color: var(--e-ink); border-color: var(--e-ink); }
+
+/* ---------------- settings popover ---------------- */
+.e-pop {
+  position: absolute;
+  width: 252px;
+  background: var(--e-surface-floating);
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-card);
+  box-shadow: var(--e-shadow-lift);
+  padding: 14px;
+  z-index: 1000;
+}
+.e-pop-field { margin-bottom: 13px; }
+.e-pop-field:last-child { margin-bottom: 0; }
+.e-pop-label {
+  display: block; font-size: 11px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--e-ink-soft); margin-bottom: 6px; line-height: 1;
+}
+/* e-edit — the inline edit (new design-system piece): visually minimal,
+   just an underline. Rests invisible inside the text it edits; hover hints
+   the affordance, focus draws the go line. Negative margins return the
+   comfortable padding, so entering edit never shifts geometry. */
+.e-edit {
+  /* 2px above, 1px + 1px underline below: the TEXT sits dead-center, not the box */
+  padding: 2px 3px 1px; margin: -2px -3px -2px;
+  border-bottom: 1px solid transparent; border-radius: 0;
+  outline: none; caret-color: var(--e-go);
+  transition: color var(--e-t-fast) var(--e-ease-out), border-color var(--e-t-fast) var(--e-ease-out);
+}
+.e-edit:hover { border-bottom-color: var(--e-line-strong); }
+.e-edit:focus { color: var(--e-ink); border-bottom-color: var(--e-go); box-shadow: none; }
+
+.e-input {
+  width: 100%; height: 30px; padding: 0 10px;
+  border: 1px solid var(--e-line-strong); border-radius: var(--e-r-chip);
+  background: var(--e-field-bg);
+  font-family: var(--e-sans); font-size: 12px; color: var(--e-ink);
+  outline: none; caret-color: var(--e-go);
+  transition: border-color var(--e-t-fast) var(--e-ease-out), background var(--e-t-fast) var(--e-ease-out);
+}
+.e-input:hover:not(:focus) { background: var(--e-surface-field); }
+.e-input:focus { border-color: var(--e-go); background: var(--e-field-bg); }
+.e-input::placeholder { color: var(--e-ink-soft); }
+.e-pop-help {
+  margin-top: 5px; font-family: var(--e-sans);
+  font-size: 11px; line-height: 1.5; color: var(--e-ink-faint);
+}
+.e-stepper {
+  display: flex; align-items: stretch; height: 28px; width: 122px;
+  border-radius: 999px; background: var(--e-surface-field);
+  border: 1px solid var(--e-line); overflow: hidden;
+}
+.e-stepper button {
+  flex: none; width: 28px; border: none; background: transparent;
+  font-family: var(--e-mono); font-size: 13px; color: var(--e-ink);
+  cursor: pointer; padding: 0;
+}
+.e-stepper button:hover { background: rgba(35,32,25,.07); }
+.e-stepper .val {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+}
+.e-modes { display: flex; gap: 6px; flex-wrap: wrap; }
+.e-modes .e-chip-key.is-on { background: var(--e-ink); color: var(--e-surface-ground); }
+/* sentence accordion — one open at a time */
+.e-acc { border-top: 1px solid var(--e-line); }
+.e-acc:last-of-type { border-bottom: 1px solid var(--e-line); }
+.e-acc-head {
+  width: 100%; min-height: 28px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 4px 2px; border: none; background: none;
+  font-family: var(--e-mono); font-size: 11px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--e-ink);
+  cursor: pointer; text-align: left;
+}
+.e-acc-head:hover { background: rgba(35,32,25,.05); }
+.e-acc-head .acc-state {
+  font-size: 11px; color: var(--e-ink-faint); letter-spacing: .02em; margin-left: auto;
+  text-transform: none; max-width: 58%;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.e-acc-head::after { content: '+'; color: var(--e-ink-faint); }
+.e-acc.is-open .e-acc-head::after { content: '−'; color: var(--e-ink); }
+.e-acc-body { display: none; padding: 4px 2px 10px; }
+.e-acc.is-open .e-acc-body { display: block; }
+
+/* the color well — 12 identities, column-major 6×2 (§1.5) */
+.e-pop--well { width: auto; padding: 10px 11px; }
+.e-well-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 18px);
+  grid-template-rows: repeat(2, 18px);
+  grid-auto-flow: column;
+  gap: 8px;
+}
+.e-swatch {
+  width: 18px; height: 18px; border: none; border-radius: 50%;
+  cursor: pointer; padding: 0; position: relative;
+  transition: transform .1s ease;
+  box-shadow: inset 0 0 0 1px rgba(35,32,25,.14);
+}
+.e-swatch:hover { transform: scale(1.15); }
+.e-swatch.is-active::after {
+  content: ""; position: absolute; inset: -4px;
+  border: 1.5px solid var(--e-ink); border-radius: 50%;
+}
+
+/* add-mod menu */
+.addmod-wrap { position: relative; }
+.addmod-menu {
+  position: absolute; right: 0; top: calc(100% + 6px);
+  width: 200px;
+  background: var(--e-surface-floating);
+  border: 1px solid var(--e-line-strong); border-radius: var(--e-r-card);
+  box-shadow: var(--e-shadow-lift); padding: 6px; z-index: 1200;
+  display: none;
+}
+.addmod-menu.is-open { display: block; }
+.addmod-row {
+  width: 100%; height: 28px; display: flex; align-items: center;
+  padding: 0 8px; border: none; border-radius: var(--e-r-inner);
+  background: none; font-family: var(--e-mono); font-size: 13px;
+  color: var(--e-ink); cursor: pointer; text-align: left;
+}
+.addmod-row:hover { background: rgba(35,32,25,.07); }
+
+@media (prefers-reduced-motion: reduce) {
+  .i-order-token, .i-switch::after, .i-handle, .i-pad-handle, .bd-band, .mx-dot { transition: none; }
+  .i-order-token.is-lift { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-row">
+    <div>
+      <div class="eyebrow t-micro">Eido · Mod system · refinement prototype</div>
+      <h1>MODS: ONE CLASS</h1>
+      <p class="lede">Every mod is a control and its own picture. Touch the value to change it. Nothing
+        wires to anything; each mod stands alone. + grows a mod where growing makes sense, and every
+        option removes from its right edge. Click any name to rename it. The gear holds each mod's few
+        settings and its option prompts; the eye opens the mod context, including the quiet line that
+        tells the AI how to read the values.</p>
+    </div>
+    <div class="addmod-wrap">
+      <button class="e-btn e-btn--primary" id="addMod">ADD MOD</button>
+      <div class="addmod-menu" id="addModMenu"></div>
+    </div>
+  </div>
+</header>
+
+<main class="board" id="board"></main>
+
+<script>
+'use strict';
+
+/* ================= helpers ================= */
+const $ = (s, r) => (r || document).querySelector(s);
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const cap = s => { s = String(s).toLowerCase(); return s.charAt(0).toUpperCase() + s.slice(1); };
+const low = s => String(s).toLowerCase();
+const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function h(tag, cls, parent, text) {
+  const el = document.createElement(tag);
+  if (cls) el.className = cls;
+  if (text != null) el.textContent = text;
+  if (parent) parent.appendChild(el);
+  return el;
+}
+function sv(tag, attrs, parent) {
+  const el = document.createElementNS(SVG_NS, tag);
+  if (attrs) for (const k in attrs) el.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(el);
+  return el;
+}
+/* pointer-capture drag: fn(e, phase) with phase start|move|end */
+function drag(el, fn) {
+  el.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    el.setPointerCapture(e.pointerId);
+    fn(e, 'start');
+    /* coalesce moves to one per frame — pointers report faster than paint */
+    let queued = null, raf = 0;
+    const flush = () => {
+      raf = 0;
+      if (queued) { const ev = queued; queued = null; fn(ev, 'move'); }
+    };
+    const mv = ev => { queued = ev; if (!raf) raf = requestAnimationFrame(flush); };
+    const up = ev => {
+      if (raf) { cancelAnimationFrame(raf); flush(); }
+      el.removeEventListener('pointermove', mv);
+      el.removeEventListener('pointerup', up);
+      el.removeEventListener('pointercancel', up);
+      fn(ev, 'end');
+    };
+    el.addEventListener('pointermove', mv);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+  });
+}
+/* inline rename — state changes color, never geometry.
+   opts.dbl: the label sits on a draggable surface, so editing arms on
+   double-click and single pointerdowns fall through to the drag. */
+function renamable(el, get, set, opts) {
+  const o = opts || {};
+  el.spellcheck = false;
+  el.classList.add('e-edit');
+  if (o.dbl) {
+    el.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      el.contentEditable = 'plaintext-only';
+      el.focus();
+    });
+    el.addEventListener('pointerdown', e => { if (el.isContentEditable) e.stopPropagation(); });
+  } else {
+    el.contentEditable = 'plaintext-only';
+    el.addEventListener('pointerdown', e => e.stopPropagation());
+  }
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+    if (e.key === 'Escape') { el.textContent = get(); el.blur(); }
+  });
+  el.addEventListener('blur', () => {
+    const v = el.textContent.trim();
+    if (v) set(v); else el.textContent = get();
+    if (o.dbl) el.contentEditable = 'false';
+  });
+  el.textContent = get();
+}
+
+/* quantize a 0–100 value to N steps */
+const snap = (v, steps) => steps >= 2 ? clamp(Math.round(v / (100 / steps)) * (100 / steps), 0, 100) : clamp(v, 0, 100);
+/* the spoken value: a named stop when stops are named, else a percent */
+function spoken(v, steps, stops) {
+  if (steps >= 2 && stops && stops.length === steps + 1) {
+    const i = Math.round(v / (100 / steps));
+    if (stops[i]) return low(stops[i]);
+  }
+  return Math.round(v) + '%';
+}
+/* fill a frame — {value} slot, label speaks when no frame is written */
+function say(frame, label, value) {
+  const f = (frame || '').trim() || (cap(label) + ': {value}.');
+  const html = esc(f).split('{value}').join('<b>' + esc(value) + '</b>');
+  return f.indexOf('{value}') >= 0 ? html : html + ' <b>' + esc(value) + '</b>';
+}
+
+/* ================= identity palette (SYSTEM.md §1.5) ================= */
+const IDENTITIES = [
+  '#2e2b25', '#8b939c',   /* charcoal · slate  */
+  '#d66be8', '#9c3fba',   /* orchid   · purple */
+  '#3568c6', '#48a2ef',   /* blue     · sky    */
+  '#eca23b', '#b5540f',   /* amber    · orange */
+  '#1b7550', '#65b563',   /* green    · mint   */
+  '#f1666d', '#c9282e'    /* coral    · red    */
+];
+const accentUse = new Map();
+function takeAccent(preferred) {
+  const hex = preferred || IDENTITIES.slice().sort((a, b) =>
+    (accentUse.get(a) || 0) - (accentUse.get(b) || 0))[0];
+  accentUse.set(hex, (accentUse.get(hex) || 0) + 1);
+  return hex;
+}
+
+/* ================= popovers — one at a time ================= */
+let openPopEl = null;
+function closePop() { if (openPopEl) { openPopEl.remove(); openPopEl = null; } ctxView = null; }
+document.addEventListener('pointerdown', e => {
+  if (openPopEl && !openPopEl.contains(e.target)) closePop();
+});
+function openPop(anchor, cls) {
+  closePop();
+  const pop = h('div', 'e-pop' + (cls ? ' ' + cls : ''), document.body);
+  pop.addEventListener('pointerdown', e => e.stopPropagation());
+  requestAnimationFrame(() => place());
+  function place() {
+    const a = anchor.getBoundingClientRect();
+    const w = pop.offsetWidth, hgt = pop.offsetHeight;
+    let x = a.right + 8 + window.scrollX;
+    if (a.right + 8 + w > window.innerWidth - 8) x = a.left - w - 8 + window.scrollX;
+    if (x < window.scrollX + 8) x = window.scrollX + 8;
+    let y = a.top + window.scrollY - 4;
+    y = Math.min(y, window.scrollY + window.innerHeight - hgt - 8);
+    if (y < window.scrollY + 8) y = window.scrollY + 8;
+    pop.style.left = x + 'px';
+    pop.style.top = Math.max(8, y) + 'px';
+  }
+  openPopEl = pop;
+  return pop;
+}
+
+/* popup field builders */
+function fField(pop, label) {
+  const f = h('div', 'e-pop-field', pop);
+  if (label) h('label', 'e-pop-label', f, label);
+  return f;
+}
+function fInput(field, value, onCommit, placeholder) {
+  const inp = h('input', 'e-input', field);
+  inp.type = 'text';
+  inp.value = value || '';
+  if (placeholder) inp.placeholder = placeholder;
+  inp.addEventListener('input', () => onCommit(inp.value));
+  return inp;
+}
+/* multi-line variant — sentences and anything else that wraps */
+function fText(field, value, onCommit, placeholder) {
+  const ta = h('textarea', 'e-input e-textarea', field);
+  ta.rows = 2;
+  ta.value = value || '';
+  if (placeholder) ta.placeholder = placeholder;
+  ta.addEventListener('input', () => onCommit(ta.value));
+  return ta;
+}
+function fHelp(field, text) { h('div', 'e-pop-help', field, text); }
+function fStepper(field, get, set, opts) {
+  const o = Object.assign({ min: 2, max: 10, off: true }, opts);
+  const st = h('div', 'e-stepper', field);
+  const minus = h('button', null, st, '−');
+  const val = h('span', 'val', st);
+  const plus = h('button', null, st, '+');
+  const paint = () => { val.textContent = get() < o.min ? 'OFF' : String(get()); };
+  minus.addEventListener('click', () => { set(get() <= o.min ? (o.off ? 0 : o.min) : get() - 1); paint(); });
+  plus.addEventListener('click', () => { set(get() < o.min ? o.min : Math.min(o.max, get() + 1)); paint(); });
+  paint();
+}
+function fAcc(pop, title, state, build) {
+  const acc = h('div', 'e-acc', pop);
+  const head = h('button', 'e-acc-head', acc);
+  h('span', null, head, title);
+  if (state) h('span', 'acc-state', head, state);
+  const body = h('div', 'e-acc-body', acc);
+  head.addEventListener('click', () => {
+    const open = acc.classList.contains('is-open');
+    pop.querySelectorAll('.e-acc').forEach(a => a.classList.remove('is-open'));
+    if (!open) acc.classList.add('is-open');
+  });
+  build(body);
+  return acc;
+}
+/* matrix-style stop names: one input per stop, following the stepper.
+   st.stops holds steps+1 slots (0%…100%); empty slots speak as percents. */
+function stopNameList(mod, field, st) {
+  const list = h('div', null, field);
+  list.style.cssText = 'display:flex;flex-direction:column;gap:6px';
+  const help = h('div', 'e-pop-help', field, '');
+  const sync = () => {
+    const n = st.steps >= 2 ? st.steps + 1 : 0;
+    while (st.stops.length < n) st.stops.push('');
+    st.stops.length = n;
+    list.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const inp = h('input', 'e-input', list);
+      inp.type = 'text';
+      inp.value = st.stops[i] || '';
+      inp.placeholder = Math.round(i / st.steps * 100) + '%';
+      inp.addEventListener('input', () => { st.stops[i] = inp.value.trim(); refresh(mod); });
+    }
+    help.textContent = n
+      ? 'This order between stop names.'
+      : 'Turn on stops first.';
+  };
+  sync();
+  return sync;
+}
+
+/* ================= the treatment line =================
+   Each kind's mini system prompt: what this mod IS and how to READ its
+   values. Hidden behind the CONTEXT popover, collapsed, editable. It
+   travels ahead of the sentences (and would carry into the app's
+   prompt compiler on card connections).
+
+   FIRST PRINCIPLE: the treatment never repeats the user's words. Names,
+   end labels, stop names and prompts all reach the AI through the value
+   sentences, which are built live from state — so the treatment can't
+   go stale, no matter what the user renames. It may cite structural
+   facts (a mode, a stop count) but never editable text. */
+const TREATS = {
+  slider:  () => 'Each value runs 0 to 100 — 0 not at all, 100 as much as possible.',
+  dial:    () => 'Each value runs 0 to 100 — 0 not at all, 100 as much as possible.',
+  count:   m => {
+    const st = m.state;
+    if (st.mode === 'percent') return 'Each value is a percentage. 0% means none, 100% means as many as fits.';
+    if (st.mode === 'ratio') return 'Each value is a proportion out of ' + st.steps + '. Read it as a share, not an exact count.';
+    return 'Each count is an exact number. Include exactly that many.';
+  },
+  switch:  () => 'Only statements switched on apply. Off means left out on purpose, do not infer it.',
+  pad:     () => 'One position on two axes. Each axis runs 0 to 100 between its two named ends — read both axes together.',
+  select:  () => 'One option is picked at a time. Follow its prompt and ignore the rest.',
+  order:   () => 'The list is a ranking. Earlier entries outweigh later ones when they conflict.',
+  filter:  () => 'Each limit is a hard boundary, not a target. Stay inside it.',
+  mixer:   () => 'The channels are one mix. Shares sum to 100% and set proportion, not order.',
+  radar:   () => 'Each axis is a value out of 100, from 0 (not at all) to 100 (as strong as it goes). Read the axes together as one profile.',
+  matrix:  () => 'Each value applies only where it is named. Anything unmentioned is left out on purpose — do not fill it in.'
+};
+function treatment(mod) { return (mod.treatOverride || '').trim() || TREATS[mod.kind](mod); }
+
+/* ================= the CONTEXT popover ================= */
+const EYE_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+
+let ctxView = null;   /* {mod, lines} while a context popover is open */
+function renderCtxLines(mod, host) {
+  host.innerHTML = mod.K.tape(mod).map(l =>
+    '<div class="mod-tape-line' + (l.mute ? ' is-mute' : '') + '">' + l.html + '</div>').join('');
+}
+function openContext(mod, anchor) {
+  const pop = openPop(anchor, 'e-pop--ctx');
+  pop.style.setProperty('--accent', mod.accent);
+  h('div', 'mod-tape-head', pop, 'Mod context');
+  const lines = h('div', 'ctx-lines', pop);
+  renderCtxLines(mod, lines);
+  /* the treatment line — collapsed by default, editable */
+  const acc = h('div', 'e-acc', pop);
+  const head = h('button', 'e-acc-head', acc);
+  h('span', null, head, 'How to read it');
+  const state = h('span', 'acc-state', head, mod.treatOverride ? 'EDITED' : 'DEFAULT');
+  const body = h('div', 'e-acc-body', acc);
+  head.addEventListener('click', () => acc.classList.toggle('is-open'));
+  const f = fField(body);
+  const ta = h('textarea', 'e-input e-textarea', f);
+  ta.value = treatment(mod);
+  ta.addEventListener('input', () => {
+    /* only text that DIFFERS from the computed default is an override —
+       retyping the default (or clearing) stays DEFAULT, so the line
+       keeps following the mod instead of silently freezing */
+    const v = ta.value.trim();
+    mod.treatOverride = v && v !== TREATS[mod.kind](mod) ? ta.value : null;
+    state.textContent = mod.treatOverride ? 'EDITED' : 'DEFAULT';
+  });
+  ta.addEventListener('blur', () => { if (!ta.value.trim()) ta.value = treatment(mod); });
+  fHelp(f, 'Sent ahead of the prompts so the AI knows how to read the values. Clear it to get the default back.');
+  ctxView = { mod, lines, ta, state };
+}
+
+/* ================= the mod shell ================= */
+const board = $('#board');
+/* the board's own masonry: cards live in display order in boardCards;
+   layoutBoard deals them into flex columns, balancing by measured height.
+   Runs on load, add, and window resize — never mid-drag. */
+const boardCards = [];
+function layoutBoard() {
+  const gap = 20;
+  const w = board.clientWidth || 1180;
+  const cols = Math.max(1, Math.min(3, Math.floor((w + gap) / (330 + gap))));
+  let colEls = [...board.children].filter(c => c.classList.contains('board-col'));
+  if (colEls.length !== cols) {
+    board.textContent = '';
+    colEls = Array.from({ length: cols }, () => h('div', 'board-col', board));
+  }
+  /* pass 1: split by count so every card measures at true column width */
+  const per = Math.ceil(boardCards.length / cols) || 1;
+  boardCards.forEach((el, i) => colEls[Math.min(cols - 1, Math.floor(i / per))].appendChild(el));
+  if (cols === 1) return;
+  /* pass 2: re-deal sequentially against the height target */
+  const hts = boardCards.map(el => el.offsetHeight + gap);
+  const target = hts.reduce((a, b) => a + b, 0) / cols;
+  let ci = 0, acc = 0;
+  boardCards.forEach((el, i) => {
+    if (ci < cols - 1 && acc > 0 && acc + hts[i] / 2 > target) { ci++; acc = 0; }
+    acc += hts[i];
+    colEls[ci].appendChild(el);
+  });
+}
+window.addEventListener('resize', layoutBoard);
+const MODS = [];
+
+function createMod(kind, seed) {
+  const K = KINDS[kind];
+  const mod = {
+    kind, K,
+    title: (seed && seed.title) || K.name,
+    accent: takeAccent(seed && seed.accent),
+    state: K.seed(seed || {})
+  };
+
+  const el = h('div', 'mod');
+  el.style.setProperty('--accent', mod.accent);
+  mod.el = el;
+
+  /* head: identity → name → actions (left to right, §2.5) */
+  const head = h('div', 'mod-head', el);
+  const dot = h('button', 'mod-dot', head);
+  dot.title = 'Color';
+  const title = h('div', 'mod-title', head);
+  renamable(title, () => mod.title, v => { mod.title = v; refresh(mod); });
+  const chrome = h('div', 'mod-chrome', head);
+  if (K.add) {
+    const plus = h('button', 'mod-key', chrome, '+');
+    plus.title = K.addWord || 'Add';
+    plus.addEventListener('click', () => { K.add(mod); rebuild(mod); });
+    mod.plusKey = plus;
+  }
+  const gear = h('button', 'mod-key', chrome);
+  gear.title = 'Settings';
+  gear.innerHTML = '<svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><line x1="1" y1="4" x2="11" y2="4"/><line x1="1" y1="8" x2="11" y2="8"/><circle cx="4.2" cy="4" r="1.7" fill="var(--e-surface-card)"/><circle cx="7.8" cy="8" r="1.7" fill="var(--e-surface-card)"/></svg>';
+  gear.addEventListener('click', () => openSettings(mod, gear));
+  const xKey = h('button', 'mod-key', chrome, '×');
+  xKey.title = 'Remove';
+  xKey.addEventListener('click', () => {
+    closePop();
+    el.remove();
+    MODS.splice(MODS.indexOf(mod), 1);
+    /* forget the card everywhere — a stale boardCards entry would
+       resurrect it on the next deal (resize / add) */
+    const bi = boardCards.indexOf(el);
+    if (bi >= 0) boardCards.splice(bi, 1);
+    accentUse.set(mod.accent, Math.max(0, (accentUse.get(mod.accent) || 1) - 1));
+    layoutBoard();
+  });
+
+  dot.addEventListener('click', () => {
+    const pop = openPop(dot, 'e-pop--well');
+    const grid = h('div', 'e-well-grid', pop);
+    IDENTITIES.forEach(hex => {
+      const sw = h('button', 'e-swatch' + (hex === mod.accent ? ' is-active' : ''), grid);
+      sw.style.background = hex;
+      sw.addEventListener('click', () => {
+        accentUse.set(mod.accent, Math.max(0, (accentUse.get(mod.accent) || 1) - 1));
+        mod.accent = takeAccent(hex);
+        el.style.setProperty('--accent', hex);
+        grid.querySelectorAll('.e-swatch').forEach(s => s.classList.remove('is-active'));
+        sw.classList.add('is-active');
+        refresh(mod);
+      });
+    });
+  });
+
+  /* body + the CONTEXT key + the output node (the connector-dot standard) */
+  mod.body = h('div', 'mod-body', el);
+  mod.treatOverride = null;   /* the user's edited treatment line, if any */
+  const foot = h('div', 'mod-foot', el);
+  const eye = h('button', 'mod-ikey', foot);
+  eye.dataset.tip = 'CONTEXT';
+  eye.setAttribute('aria-label', 'Context');
+  eye.innerHTML = EYE_SVG;
+  eye.addEventListener('click', () => openContext(mod, eye));
+  const node = h('span', 'mod-node', el);
+  h('span', 'mod-node-dot', node);
+
+  /* corner resize — the regular Eido card gesture (min 200×120) */
+  [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']].forEach(([cv, ch]) => {
+    const hd = h('button', 'mod-resize ' + cv + ' ' + ch, el);
+    hd.setAttribute('aria-label', 'Resize card from ' + cv + ' ' + ch);
+    let w0 = 0, h0 = 0, x0 = 0, y0 = 0;
+    drag(hd, (e, ph) => {
+      if (ph === 'start') {
+        const r = el.getBoundingClientRect();
+        w0 = r.width; h0 = r.height; x0 = e.clientX; y0 = e.clientY;
+        hd.classList.add('is-resizing');
+        el.classList.add('is-resizing');
+        return;
+      }
+      if (ph === 'end') {
+        hd.classList.remove('is-resizing');
+        el.classList.remove('is-resizing');
+        layoutBoard();
+        return;
+      }
+      const w = clamp(w0 + (e.clientX - x0) * (ch === 'left' ? -1 : 1), 200, 640);
+      let hgt = clamp(h0 + (e.clientY - y0) * (cv === 'top' ? -1 : 1), 120, 900);
+      el.classList.add('is-sized');
+      el.style.width = w + 'px';
+      el.style.height = hgt + 'px';
+      refresh(mod);
+      /* dynamic minimum: nothing may spill past the foot or the card edge.
+         scrollHeight misses spill INSIDE the card, so measure the deepest
+         row/instrument bottom against the foot directly; iterate, since
+         growing the card also moves the foot. */
+      const spillNow = () => {
+        const footTop = el.querySelector('.mod-foot').getBoundingClientRect().top;
+        let maxB = footTop;
+        [...mod.body.children].forEach(r => {
+          maxB = Math.max(maxB, r.getBoundingClientRect().bottom);
+          [...r.children].forEach(c2 => { maxB = Math.max(maxB, c2.getBoundingClientRect().bottom); });
+        });
+        return Math.max(maxB - footTop, el.scrollHeight - el.clientHeight);
+      };
+      for (let guard = 0; guard < 4; guard++) {
+        const spill = spillNow();
+        if (spill <= 0) break;
+        hgt += spill;
+        el.style.height = hgt + 'px';
+        refresh(mod);
+      }
+    });
+  });
+
+  K.build(mod);
+  refresh(mod);
+  MODS.push(mod);
+  return mod;
+}
+
+/* structural change → rebuild the face; value change → refresh() */
+function rebuild(mod) {
+  mod.body.innerHTML = '';
+  mod.K.build(mod);
+  refresh(mod);
+}
+function refresh(mod, lite) {
+  /* lite: a mid-drag value change — repaint only what moves, skip
+     size-dependent structure (rings, labels, viewBox) */
+  if (lite && mod.paintLite) mod.paintLite();
+  else if (mod.paint) mod.paint();
+  if (ctxView && ctxView.mod === mod && document.contains(ctxView.lines)) {
+    renderCtxLines(mod, ctxView.lines);
+    /* keep the visible treatment honest: while DEFAULT (and not being
+       typed in), it follows the mod's current state */
+    if (!mod.treatOverride && document.activeElement !== ctxView.ta)
+      ctxView.ta.value = treatment(mod);
+  }
+}
+
+/* shared: an instance row header (name · value · remove) */
+function rowHead(parent, item, mod, valueText, removable) {
+  const rh = h('div', 'mod-row-head', parent);
+  const sub = h('span', 'mod-sub', rh);
+  renamable(sub, () => item.label, v => { item.label = v; refresh(mod); });
+  const val = h('span', 'mod-val', rh, valueText || '');
+  if (removable) {
+    rh.classList.add('has-x');
+    const x = h('button', 'row-x', rh, '×');
+    x.title = 'Remove';
+    x.addEventListener('click', removable);
+  }
+  return val;
+}
+
+/* ================= KINDS ================= */
+const KINDS = {};
+
+/* ---------- SLIDER — n horizontal sliders, one instrument ---------- */
+KINDS.slider = {
+  name: 'SLIDER', addWord: 'Add a slider', max: 8,
+  seed: s => ({
+    steps: s.steps || 0, stops: s.stops || [],
+    items: s.items || [{ label: 'WARMTH', v: 62, frame: '' }, { label: 'FORMALITY', v: 35, frame: '' }]
+  }),
+  add(mod) {
+    if (mod.state.items.length >= this.max) return;
+    mod.state.items.push({ label: 'SLIDER ' + (mod.state.items.length + 1), v: 50, frame: '' });
+  },
+  build(mod) {
+    const st = mod.state;
+    const paints = [];
+    st.items.forEach(item => {
+      const row = h('div', 'mod-row', mod.body);
+      const val = rowHead(row, item, mod, '', st.items.length > 1 ? () => {
+        st.items.splice(st.items.indexOf(item), 1); rebuild(mod);
+      } : null);
+      const line = h('div', 'i-sliderline', row);
+      const track = h('div', 'i-track', line);
+      h('div', 'i-fill', track);
+      /* detents depend only on steps — built once, never per paint */
+      if (st.steps >= 2) for (let i = 0; i <= st.steps; i++) {
+        const d = h('span', 'i-detent', track);
+        d.style.left = 'calc(' + 'var(--hd)/2 + 4px + (100% - var(--hd) - 8px) * ' + (i / st.steps) + ')';
+      }
+      const rail = h('div', 'i-rail', track);
+      h('div', 'i-handle', rail);
+      const paint = () => {
+        track.style.setProperty('--t', (item.v / 100).toFixed(4));
+        val.textContent = spoken(item.v, st.steps, st.stops);
+      };
+      let tr = null;
+      drag(track, (e, ph) => {
+        track.classList.toggle('is-dragging', ph !== 'end');
+        if (ph === 'end') return;
+        if (ph === 'start') tr = track.getBoundingClientRect();
+        const hd = 24;
+        const t = clamp((e.clientX - tr.left - 4 - hd / 2) / (tr.width - hd - 8), 0, 1);
+        item.v = snap(t * 100, st.steps);
+        refresh(mod);
+      });
+      paints.push(paint);
+    });
+    mod.paint = () => paints.forEach(p => p());
+  },
+  tape(mod) {
+    const st = mod.state;
+    return st.items.map(it => ({ html: say(it.frame, it.label, spoken(it.v, st.steps, st.stops)) }));
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    const f1 = fField(pop, 'Stops');
+    const f2 = fField(pop, 'Stop names');
+    const syncNames = stopNameList(mod, f2, st);
+    fStepper(f1, () => st.steps, v => { st.steps = v; st.items.forEach(i => i.v = snap(i.v, v)); syncNames(); rebuild(mod); });
+    sentenceAccordions(mod, pop, st.items);
+  }
+};
+
+/* ---------- DIAL — n dials in one card ---------- */
+KINDS.dial = {
+  name: 'DIALS', addWord: 'Add a dial', max: 12,
+  seed: s => ({
+    steps: s.steps || 0, stops: s.stops || [],
+    items: s.items || [
+      { label: 'DETAIL', v: 40, frame: '' },
+      { label: 'HUMOR', v: 20, frame: '' },
+      { label: 'PACE', v: 70, frame: '' }
+    ]
+  }),
+  add(mod) {
+    if (mod.state.items.length >= this.max) return;
+    mod.state.items.push({ label: 'DIAL ' + (mod.state.items.length + 1), v: 50, frame: '' });
+  },
+  build(mod) {
+    const st = mod.state;
+    const wrap = h('div', 'i-dials', mod.body);
+    const paints = [];
+    const R = 24, CX = 30, CY = 30, A0 = 135, SWEEP = 270;
+    const pt = deg => {
+      const a = (deg) * Math.PI / 180;
+      return [CX + R * Math.cos(a), CY + R * Math.sin(a)];
+    };
+    const arc = (from, to) => {
+      const [x1, y1] = pt(from), [x2, y2] = pt(to);
+      const large = (to - from) > 180 ? 1 : 0;
+      return 'M' + x1.toFixed(2) + ' ' + y1.toFixed(2) +
+        ' A' + R + ' ' + R + ' 0 ' + large + ' 1 ' + x2.toFixed(2) + ' ' + y2.toFixed(2);
+    };
+    st.items.forEach(item => {
+      const cell = h('div', 'i-dial', wrap);
+      const svg = sv('svg', { width: 60, height: 60, viewBox: '0 0 60 60' }, cell);
+      sv('path', { 'class': 'arc-track', d: arc(A0, A0 + SWEEP) }, svg);
+      const gTicks = sv('g', null, svg);
+      const vArc = sv('path', { 'class': 'arc-value' }, svg);
+      sv('circle', { 'class': 'core', cx: CX, cy: CY, r: 13 }, svg);
+      const needle = sv('line', { 'class': 'needle' }, svg);
+      const sub = h('span', 'mod-sub', cell);
+      renamable(sub, () => item.label, v => { item.label = v; refresh(mod); });
+      const val = h('span', 'mod-val', cell);
+      if (st.items.length > 1) {
+        const x = h('button', 'row-x', cell, '×');
+        x.addEventListener('click', () => { st.items.splice(st.items.indexOf(item), 1); rebuild(mod); });
+      }
+      /* ticks depend only on steps — built once, never per paint */
+      if (st.steps >= 2) for (let i = 0; i <= st.steps; i++) {
+        const d = A0 + SWEEP * i / st.steps;
+        const a = d * Math.PI / 180;
+        sv('line', {
+          'class': 'tick',
+          x1: CX + (R + 5) * Math.cos(a), y1: CY + (R + 5) * Math.sin(a),
+          x2: CX + (R + 8) * Math.cos(a), y2: CY + (R + 8) * Math.sin(a)
+        }, gTicks);
+      }
+      const paint = () => {
+        const deg = A0 + SWEEP * item.v / 100;
+        if (item.v <= 0.5) vArc.setAttribute('d', '');
+        else vArc.setAttribute('d', arc(A0, deg));
+        const [nx, ny] = pt(deg);
+        const inner = [(CX + (nx - CX) * 0.28), (CY + (ny - CY) * 0.28)];
+        const outer = [(CX + (nx - CX) * 0.52), (CY + (ny - CY) * 0.52)];
+        needle.setAttribute('x1', inner[0]); needle.setAttribute('y1', inner[1]);
+        needle.setAttribute('x2', outer[0]); needle.setAttribute('y2', outer[1]);
+        val.textContent = spoken(item.v, st.steps, st.stops);
+      };
+      let startV = 0, startY = 0;
+      drag(svg, (e, ph) => {
+        cell.classList.toggle('is-dragging', ph !== 'end');
+        if (ph === 'start') { startV = item.v; startY = e.clientY; return; }
+        if (ph === 'end') return;
+        const fine = e.shiftKey ? 0.25 : 1;
+        item.v = snap(clamp(startV + (startY - e.clientY) * (100 / 150) * fine, 0, 100), st.steps);
+        refresh(mod);
+      });
+      paints.push(paint);
+    });
+    mod.paint = () => paints.forEach(p => p());
+  },
+  tape(mod) {
+    const st = mod.state;
+    return st.items.map(it => ({ html: say(it.frame, it.label, spoken(it.v, st.steps, st.stops)) }));
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    const f1 = fField(pop, 'Stops');
+    const f2 = fField(pop, 'Stop names');
+    const syncNames = stopNameList(mod, f2, st);
+    fStepper(f1, () => st.steps, v => { st.steps = v; st.items.forEach(i => i.v = snap(i.v, v)); syncNames(); rebuild(mod); });
+    sentenceAccordions(mod, pop, st.items);
+  }
+};
+
+/* ---------- COUNT — n steppers ---------- */
+KINDS.count = {
+  name: 'COUNT', addWord: 'Add a counter', max: 6, TOP: 10,
+  MODES: ['number', 'percent', 'ratio'],
+  MODE_WORDS: { number: 'NUMBER', percent: 'PERCENT', ratio: 'RATIO' },
+  /* number counts to TOP; percent and ratio count over the stops */
+  cap(st) { return st.mode === 'number' ? KINDS.count.TOP : st.steps; },
+  word(st, n) {
+    if (st.mode === 'percent') return Math.round(n / st.steps * 100) + '%';
+    if (st.mode === 'ratio') return n + ' of ' + st.steps;
+    return String(n);
+  },
+  seed: s => ({
+    mode: s.mode || 'number',
+    steps: s.steps || 4,
+    items: s.items || [
+      { label: 'WORKED EXAMPLES', n: 2, frame: 'Include {value} worked examples.' },
+      { label: 'COUNTERPOINTS', n: 1, frame: 'Raise {value} counterpoint(s).' }
+    ]
+  }),
+  add(mod) {
+    if (mod.state.items.length >= this.max) return;
+    mod.state.items.push({ label: 'COUNT ' + (mod.state.items.length + 1), n: 3, frame: '' });
+  },
+  build(mod) {
+    const st = mod.state;
+    const paints = [];
+    st.items.forEach(item => {
+      const row = h('div', 'mod-row', mod.body);
+      const line = h('div', 'i-countrow', row);
+      const sub = h('span', 'mod-sub', line);
+      renamable(sub, () => item.label, v => { item.label = v; refresh(mod); });
+      const pill = h('div', 'i-count', line);
+      const minus = h('button', null, pill, '−');
+      const nEl = h('span', 'n', pill);
+      const plus = h('button', null, pill, '+');
+      if (st.items.length > 1) {
+        const x = h('button', 'row-x', line, '×');
+        x.title = 'Remove';
+        x.addEventListener('click', () => { st.items.splice(st.items.indexOf(item), 1); rebuild(mod); });
+      }
+      const paint = () => {
+        const cap2 = KINDS.count.cap(st);
+        item.n = Math.min(item.n, cap2);
+        /* number mode is just the number; only ratio spells "n / total" */
+        nEl.innerHTML = st.mode === 'ratio'
+          ? esc(String(item.n)) + '<i> / ' + cap2 + '</i>'
+          : esc(KINDS.count.word(st, item.n));
+      };
+      minus.addEventListener('click', () => { item.n = clamp(item.n - 1, 0, KINDS.count.cap(st)); refresh(mod); });
+      plus.addEventListener('click', () => { item.n = clamp(item.n + 1, 0, KINDS.count.cap(st)); refresh(mod); });
+      paints.push(paint);
+    });
+    /* the mode chip cycles NUMBER / PERCENT / RATIO, like the filter's mode chip */
+    const foot = h('div', 'i-count-foot', mod.body);
+    const chip = h('button', 'e-chip-key', foot);
+    chip.addEventListener('click', () => {
+      const M2 = KINDS.count.MODES;
+      const prev = KINDS.count.cap(st);
+      st.mode = M2[(M2.indexOf(st.mode) + 1) % M2.length];
+      const next = KINDS.count.cap(st);
+      st.items.forEach(i => i.n = clamp(Math.round(i.n / prev * next), 0, next));
+      refresh(mod);
+    });
+    paints.push(() => { chip.textContent = KINDS.count.MODE_WORDS[st.mode]; });
+    mod.paint = () => paints.forEach(p => p());
+  },
+  tape(mod) {
+    const st = mod.state;
+    return st.items.map(it => ({ html: say(it.frame, it.label, KINDS.count.word(st, it.n)) }));
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    const f1 = fField(pop, 'Stops');
+    fStepper(f1, () => st.steps, v => {
+      const prev = st.steps;
+      st.steps = clamp(v, 2, 10);
+      if (st.mode !== 'number')
+        st.items.forEach(i => i.n = clamp(Math.round(i.n / prev * st.steps), 0, st.steps));
+      refresh(mod);
+    }, { min: 2, max: 10, off: false });
+    fHelp(f1, 'Stops divide the percent and ratio modes.');
+    sentenceAccordions(mod, pop, mod.state.items);
+  }
+};
+
+/* ---------- SWITCH — a bank of toggles; OFF is visible silence ---------- */
+KINDS.switch = {
+  name: 'SWITCHES', addWord: 'Add a switch', max: 8,
+  seed: s => ({
+    items: s.items || [
+      { label: 'CITE SOURCES', on: true, frame: 'Cite sources for every claim.' },
+      { label: 'SUMMARY AT THE END', on: true, frame: 'End with a three-line summary.' },
+      { label: 'JARGON', on: false, frame: 'Technical jargon is fine, the reader is an expert.' }
+    ]
+  }),
+  add(mod) {
+    if (mod.state.items.length >= this.max) return;
+    mod.state.items.push({ label: 'SWITCH ' + (mod.state.items.length + 1), on: false, frame: '' });
+  },
+  build(mod) {
+    const st = mod.state;
+    const paints = [];
+    st.items.forEach(item => {
+      const row = h('div', 'mod-row', mod.body);
+      const line = h('div', 'i-swrow', row);
+      const sub = h('span', 'mod-sub', line);
+      renamable(sub, () => item.label, v => { item.label = v; refresh(mod); });
+      const sw = h('button', 'i-switch', line);
+      sw.addEventListener('click', () => { item.on = !item.on; refresh(mod); });
+      if (st.items.length > 1) {
+        const x = h('button', 'row-x', line, '×');
+        x.title = 'Remove';
+        x.addEventListener('click', () => { st.items.splice(st.items.indexOf(item), 1); rebuild(mod); });
+      }
+      paints.push(() => sw.classList.toggle('is-on', item.on));
+    });
+    mod.paint = () => paints.forEach(p => p());
+  },
+  tape(mod) {
+    return mod.state.items.map(it => it.on
+      ? { html: esc((it.frame || '').trim() || cap(low(it.label)) + '.') }
+      : { html: esc(low(it.label)) + ' is off, says nothing.', mute: true });
+  },
+  settings(mod, pop) {
+    sentenceAccordions(mod, pop, mod.state.items, {
+      defaultOf: it => cap(low(it.label)) + '.',
+      help: 'Spoken only while this switch is ON.'
+    });
+  }
+};
+
+/* ---------- PAD — two axes ARE the pad; no + ---------- */
+KINDS.pad = {
+  name: 'TONE PAD',
+  seed: s => ({
+    axes: s.axes || {
+      x: { label: 'WARMTH', lo: 'COOL', hi: 'WARM', steps: 0, frame: '' },
+      y: { label: 'DEPTH', lo: 'BRIEF', hi: 'THOROUGH', steps: 0, frame: '' }
+    },
+    v: s.v || { x: 62, y: 38 }
+  }),
+  build(mod) {
+    const st = mod.state;
+    const row = h('div', 'mod-row', mod.body);
+    const rh = h('div', 'mod-row-head', row);
+    const sub = h('span', 'mod-sub', rh);
+    sub.textContent = st.axes.x.label + ' × ' + st.axes.y.label;
+    const val = h('span', 'mod-val', rh);
+    const pad = h('div', 'i-pad', row);
+    const snapHost = h('div', null, pad);
+    /* crosshairs + handle ride transform wrappers (see .i-pad-plane) */
+    const plane = h('div', 'i-pad-plane', pad);
+    const wx = h('div', 'i-pad-wx', plane);
+    h('div', 'i-pad-ch i-pad-ch--v', wx);
+    const wxy = h('div', 'i-pad-wy', wx);
+    h('div', 'i-pad-handle', wxy);
+    const wy = h('div', 'i-pad-wy', plane);
+    h('div', 'i-pad-ch i-pad-ch--h', wy);
+    h('span', 'i-pad-end i-pad-end--xlo', pad, st.axes.x.lo);
+    h('span', 'i-pad-end i-pad-end--xhi', pad, st.axes.x.hi);
+    h('span', 'i-pad-end i-pad-end--yhi', pad, st.axes.y.hi);
+    h('span', 'i-pad-end i-pad-end--ylo', pad, st.axes.y.lo);
+    /* the snap grid IS the stops — no stops, no dots. Both axes stepped
+       → a dot at every stop intersection; one axis stepped → dotted
+       guide lines at that axis's stops (snapping is a line there, not
+       a point); neither → blank well. */
+    const paintSnaps = () => {
+      snapHost.innerHTML = '';
+      const sx = st.axes.x.steps, sy = st.axes.y.steps;
+      if (sx < 2 && sy < 2) return;
+      const dot = (tx, ty) => {
+        const d = h('span', 'i-pad-snap', snapHost);
+        d.style.left = 'calc(14px + (100% - 28px) * ' + tx + ')';
+        d.style.top = 'calc(14px + (100% - 28px) * ' + ty + ')';
+      };
+      const FILL = 12;   /* dot pitch along a guide line (free axis) */
+      if (sx >= 2 && sy >= 2) {
+        for (let i = 0; i <= sx; i++) for (let j = 0; j <= sy; j++) dot(i / sx, 1 - j / sy);
+      } else if (sx >= 2) {
+        for (let i = 0; i <= sx; i++) for (let j = 0; j <= FILL; j++) dot(i / sx, j / FILL);
+      } else {
+        for (let j = 0; j <= sy; j++) for (let i = 0; i <= FILL; i++) dot(i / FILL, 1 - j / sy);
+      }
+    };
+    paintSnaps();
+    mod.paint = () => {
+      pad.style.setProperty('--px', (st.v.x / 100).toFixed(4));
+      pad.style.setProperty('--py', (1 - st.v.y / 100).toFixed(4));
+      sub.textContent = st.axes.x.label + ' × ' + st.axes.y.label;
+      val.textContent = Math.round(st.v.x) + ' · ' + Math.round(st.v.y);
+    };
+    let pr = null;
+    drag(pad, (e, ph) => {
+      pad.classList.toggle('is-dragging', ph !== 'end');
+      if (ph === 'end') return;
+      if (ph === 'start') pr = pad.getBoundingClientRect();
+      st.v.x = snap(clamp((e.clientX - pr.left - 14) / (pr.width - 28), 0, 1) * 100, st.axes.x.steps);
+      st.v.y = snap(clamp(1 - (e.clientY - pr.top - 14) / (pr.height - 28), 0, 1) * 100, st.axes.y.steps);
+      refresh(mod);
+    });
+  },
+  tape(mod) {
+    const st = mod.state;
+    /* the sentence carries the axis's own words — the ends are the
+       user's language, so they live here, never in the treatment */
+    return ['x', 'y'].map(ax => {
+      const a = st.axes[ax];
+      const pct = Math.round(st.v[ax]);
+      const value = a.lo && a.hi
+        ? pct + '% of the way from ' + low(a.lo) + ' to ' + low(a.hi)
+        : pct + '%';
+      return { html: say(a.frame, a.label, value) };
+    });
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    ['x', 'y'].forEach(ax => {
+      const a = st.axes[ax];
+      const f = fField(pop, 'Axis ' + (ax === 'x' ? 'X ends' : 'Y ends'));
+      const ends = h('div', null, f);
+      ends.style.cssText = 'display:flex;gap:8px';
+      const lo = h('input', 'e-input', ends); lo.value = a.lo; lo.placeholder = ax === 'x' ? 'left end' : 'bottom end';
+      const hi = h('input', 'e-input', ends); hi.value = a.hi; hi.placeholder = ax === 'x' ? 'right end' : 'top end';
+      lo.addEventListener('input', () => { a.lo = lo.value.toUpperCase(); rebuild(mod); });
+      hi.addEventListener('input', () => { a.hi = hi.value.toUpperCase(); rebuild(mod); });
+    });
+    const f1 = fField(pop, 'Stops');
+    fStepper(f1, () => st.axes.x.steps, v => {
+      st.axes.x.steps = v; st.axes.y.steps = v;
+      st.v.x = snap(st.v.x, v); st.v.y = snap(st.v.y, v);
+      rebuild(mod);
+    });
+    sentenceAccordions(mod, pop, [st.axes.x, st.axes.y]);
+  }
+};
+
+/* ---------- SELECT — one of N; each option carries its own sentence ---------- */
+KINDS.select = {
+  name: 'AUDIENCE', addWord: 'Add an option', max: 7,
+  seed: s => ({
+    picked: s.picked || 0,
+    options: s.options || [
+      { label: 'FOUNDER', frame: 'Write for a founder: outcomes first, no hand-holding.' },
+      { label: 'TEAMMATE', frame: 'Write for a teammate: shared context, skip the basics.' },
+      { label: 'CLIENT', frame: 'Write for a client: warm, unhurried, build trust.' },
+      { label: 'PUBLIC', frame: '' }
+    ]
+  }),
+  add(mod) {
+    if (mod.state.options.length >= this.max) return;
+    mod.state.options.push({ label: 'OPTION ' + (mod.state.options.length + 1), frame: '' });
+  },
+  build(mod) {
+    const st = mod.state;
+    const row = h('div', 'mod-row', mod.body);
+    const segmented = st.options.length <= 4;
+    const host = h('div', segmented ? 'i-seg' : 'i-stack', row);
+    const cells = st.options.map((op, i) => {
+      const c = h('button', segmented ? 'i-seg-cell' : 'i-stack-row', host);
+      const nm = h('span', 'opt-name', c, op.label);
+      c.addEventListener('pointerdown', () => { st.picked = i; refresh(mod); });
+      c.addEventListener('pointerenter', e => { if (e.buttons) { st.picked = i; refresh(mod); } });
+      if (st.options.length > 2) {
+        const x = h('span', 'row-x', c, '×');
+        x.setAttribute('role', 'button');
+        x.title = 'Remove';
+        x.addEventListener('pointerdown', e => e.stopPropagation());
+        x.addEventListener('click', e => {
+          e.stopPropagation();
+          st.options.splice(i, 1);
+          st.picked = Math.min(st.picked, st.options.length - 1);
+          rebuild(mod);
+        });
+      }
+      return { c, nm };
+    });
+    mod.paint = () => cells.forEach(({ c, nm }, i) => {
+      nm.textContent = st.options[i].label;
+      const picked = i === st.picked;
+      c.classList.toggle('is-picked', picked);
+      c.style.color = picked ? inkFor(mod.accent) : '';
+    });
+  },
+  tape(mod) {
+    const st = mod.state, op = st.options[st.picked];
+    if (!op) return [];
+    if ((op.frame || '').trim()) return [{ html: esc(op.frame) }];
+    return [{ html: 'picks ' + esc(op.label) + ', no prompt written for it.', mute: true }];
+  },
+  settings(mod, pop) {
+    sentenceAccordions(mod, pop, mod.state.options, {
+      defaultOf: () => 'Write for …',
+      help: 'Said verbatim while this option is picked.'
+    });
+  }
+};
+
+/* ---------- ORDER — drag to rank; rank 1 wears the accent ---------- */
+KINDS.order = {
+  name: 'PRIORITIES', addWord: 'Add an item', max: 7,
+  seed: s => ({
+    items: s.items || [
+      { label: 'CLARITY', frame: '' },
+      { label: 'DEPTH', frame: '' },
+      { label: 'BREVITY', frame: '' }
+    ],
+    perm: s.perm || [0, 1, 2],
+    frame: s.frame || ''
+  }),
+  add(mod) {
+    const st = mod.state;
+    if (st.items.length >= this.max) return;
+    st.items.push({ label: 'ITEM ' + (st.items.length + 1), frame: '' });
+    st.perm.push(st.items.length - 1);
+  },
+  build(mod) {
+    const st = mod.state;
+    const row = h('div', 'mod-row', mod.body);
+    const well = h('div', 'i-order', row);
+    const nums = h('div', 'i-order-nums', well);
+    const list = h('div', 'i-order-list', well);
+    const byIdx = new Map();   /* item index → token element */
+    const paintTops = () => [...list.children].forEach((c, r) => {
+      c.classList.toggle('is-top', r === 0);
+      c.style.color = r === 0 ? inkFor(mod.accent) : '';
+    });
+    const render = () => {
+      nums.innerHTML = ''; list.innerHTML = ''; byIdx.clear();
+      st.perm.forEach((idx, rank) => {
+        h('div', 'i-order-num', nums, String(rank + 1));
+        const tk = h('div', 'i-order-token', list);
+        byIdx.set(idx, tk);
+        const nm = h('span', 'tk-name', tk);
+        renamable(nm, () => st.items[idx].label, v => { st.items[idx].label = v.toUpperCase(); refresh(mod); }, { dbl: true });
+        if (st.items.length > 2) {
+          const x = h('button', 'row-x', tk, '×');
+          x.addEventListener('click', () => {
+            st.items.splice(idx, 1);
+            st.perm = st.perm.filter(p => p !== idx).map(p => p > idx ? p - 1 : p);
+            rebuild(mod);
+          });
+        }
+        /* drag-to-rank — the lifted token follows the hand; siblings are
+           displaced by TRANSFORM only (the DOM never reorders mid-drag,
+           so pointer capture survives); the new order commits on release */
+        drag(tk, (e, ph) => {
+          if (ph === 'start') tk._pitch = tk.offsetHeight + 6; /* token height + gap, read once */
+          const pitch = tk._pitch || 30;
+          if (ph === 'start') {
+            tk.classList.add('is-lift');
+            tk._y0 = e.clientY;
+            tk._home = st.perm.indexOf(idx);
+            tk._slots = st.perm.slice();       /* DOM order at pickup */
+            return;
+          }
+          if (ph === 'end') {
+            tk.classList.remove('is-lift');
+            [...list.children].forEach(c => { c.style.transform = ''; });
+            render(); refresh(mod);
+            return;
+          }
+          const dy = e.clientY - tk._y0;
+          tk.style.transform = 'translateY(' + dy + 'px)';
+          const to = clamp(tk._home + Math.round(dy / pitch), 0, st.perm.length - 1);
+          const from = st.perm.indexOf(idx);
+          if (to !== from) {
+            st.perm.splice(from, 1);
+            st.perm.splice(to, 0, idx);
+            /* each sibling slides to its slot: (rank now − rank at pickup) */
+            tk._slots.forEach((p, dom) => {
+              if (p === idx) return;
+              const el2 = byIdx.get(p);
+              if (el2) el2.style.transform = 'translateY(' + (st.perm.indexOf(p) - dom) * pitch + 'px)';
+            });
+            [...list.children].forEach(c => {
+              const p = tk._slots[[...list.children].indexOf(c)];
+              c.classList.toggle('is-top', p === st.perm[0]);
+              c.style.color = p === st.perm[0] ? inkFor(mod.accent) : '';
+            });
+          }
+        });
+      });
+      paintTops();
+    };
+    render();
+    mod.paint = () => {};
+  },
+  tape(mod) {
+    const st = mod.state;
+    const seq = st.perm.map(i => {
+      const it = st.items[i];
+      return (it.frame || '').trim() || low(it.label);
+    }).join(', then ');
+    return [{ html: say(st.frame || 'Priorities: {value}.', 'Priorities', seq) }];
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    const f = fField(pop, 'Mod prompt');
+    fText(f, st.frame, v => { st.frame = v; refresh(mod); }, 'Priorities: {value}.');
+    fHelp(f, 'Insert values with "{value}".');
+    sentenceAccordions(mod, pop, st.items, {
+      defaultOf: it => low(it.label),
+      help: 'Spoken in the ranking in place of the name.'
+    });
+  }
+};
+
+/* ---------- FILTER — the constraint drawn in ink; + adds a lane ---------- */
+KINDS.filter = {
+  name: 'LIMITS', addWord: 'Add a limit', max: 3,
+  MODES: ['no-more-than', 'at-least', 'between'],
+  MODE_WORDS: { 'no-more-than': 'NO MORE THAN', 'at-least': 'AT LEAST', 'between': 'BETWEEN' },
+  seed: s => ({
+    steps: s.steps != null ? s.steps : 4,
+    stops: s.stops || ['a sentence', 'a paragraph', 'a section', 'a page', 'an essay'],
+    lanes: s.lanes || [{ label: 'LENGTH', mode: 'no-more-than', lo: 0, hi: 50, frame: 'Keep the whole answer to {value}.' }]
+  }),
+  add(mod) {
+    if (mod.state.lanes.length >= this.max) return;
+    mod.state.lanes.push({ label: 'LIMIT ' + (mod.state.lanes.length + 1), mode: 'no-more-than', lo: 0, hi: 60, frame: '' });
+  },
+  build(mod) {
+    const st = mod.state;
+    const paints = [];
+    st.lanes.forEach(lane => {
+      const row = h('div', 'mod-row', mod.body);
+      const val = rowHead(row, lane, mod, '', st.lanes.length > 1 ? () => {
+        st.lanes.splice(st.lanes.indexOf(lane), 1); rebuild(mod);
+      } : null);
+      const well = h('div', 'i-filter', row);
+      const svg = sv('svg', null, well);
+      const wash = sv('path', { 'class': 'wash' }, svg);
+      const curve = sv('path', { 'class': 'curve' }, svg);
+      const gDet = sv('g', null, svg);
+      const foot = h('div', 'i-filter-foot', row);
+      const chip = h('button', 'e-chip-key', foot);
+      chip.addEventListener('click', () => {
+        const M = KINDS.filter.MODES;
+        lane.mode = M[(M.indexOf(lane.mode) + 1) % M.length];
+        if (lane.mode === 'no-more-than') lane.lo = 0;
+        if (lane.mode === 'at-least') lane.hi = 100;
+        refresh(mod);
+      });
+      /* size + detents are STRUCTURE: rebuilt only when the well or the
+         stops change, never per drag frame (perf grammar: decoration is
+         built once, per-frame work touches only what moves) */
+      const padX = 10, roll = 22, top = 12;
+      let W = 300, H = 84, structKey = '';
+      const x = v => padX + (v / 100) * (W - padX * 2);
+      const structure = () => {
+        const nw = well.clientWidth || 300, nh = well.clientHeight || 84;
+        const key = nw + '|' + nh + '|' + st.steps;
+        if (key === structKey) return;
+        structKey = key; W = nw; H = nh;
+        svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+        gDet.innerHTML = '';
+        if (st.steps >= 2) for (let i = 0; i <= st.steps; i++)
+          sv('circle', { 'class': 'det', cx: x(i * 100 / st.steps), cy: H - 8 - 3, r: 2 }, gDet);
+      };
+      const paint = () => {
+        structure();
+        const bot = H - 8;
+        let d, x0;
+        if (lane.mode === 'no-more-than') {
+          x0 = -4;
+          d = 'M' + x0 + ' ' + top +
+            ' H' + Math.max(-4, x(lane.hi) - roll) +
+            ' C' + x(lane.hi) + ' ' + top + ' ' + x(lane.hi) + ' ' + bot + ' ' + Math.min(W + 4, x(lane.hi) + roll) + ' ' + bot;
+        } else if (lane.mode === 'at-least') {
+          x0 = Math.max(-4, x(lane.lo) - roll);
+          d = 'M' + x0 + ' ' + bot +
+            ' C' + x(lane.lo) + ' ' + bot + ' ' + x(lane.lo) + ' ' + top + ' ' + Math.min(W + 4, x(lane.lo) + roll) + ' ' + top +
+            ' H' + (W + 4);
+        } else {
+          x0 = Math.max(-4, x(lane.lo) - roll);
+          d = 'M' + x0 + ' ' + bot +
+            ' C' + x(lane.lo) + ' ' + bot + ' ' + x(lane.lo) + ' ' + top + ' ' + Math.min(x(lane.lo) + roll, x(lane.hi)) + ' ' + top +
+            ' H' + Math.max(x(lane.hi) - roll, x(lane.lo)) +
+            ' C' + x(lane.hi) + ' ' + top + ' ' + x(lane.hi) + ' ' + bot + ' ' + Math.min(W + 4, x(lane.hi) + roll) + ' ' + bot;
+        }
+        curve.setAttribute('d', d);
+        /* the wash closes straight down at the curve's own start — no
+           zero-height strip creeping along the floor to the left edge */
+        wash.setAttribute('d', d + ' V' + (H + 4) + ' H' + x0 + ' Z');
+        const mw = KINDS.filter.MODE_WORDS[lane.mode];
+        if (chip.textContent !== mw) chip.textContent = mw;
+        const vt = KINDS.filter.phrase(lane, st, true);
+        if (val.textContent !== vt) val.textContent = vt;
+      };
+      let grab = null, g0 = 0, lo0 = 0, hi0 = 0, wr = null;
+      drag(well, (e, ph) => {
+        /* the well can't resize mid-drag — read its rect once at start */
+        if (ph === 'start' || !wr) wr = well.getBoundingClientRect();
+        const vAt = clamp((e.clientX - wr.left - 10) / (wr.width - 20), 0, 1) * 100;
+        if (ph === 'start') {
+          g0 = vAt; lo0 = lane.lo; hi0 = lane.hi;
+          if (lane.mode === 'no-more-than') grab = 'hi';
+          else if (lane.mode === 'at-least') grab = 'lo';
+          else {
+            const dLo = Math.abs(vAt - lane.lo), dHi = Math.abs(vAt - lane.hi);
+            grab = (vAt > lane.lo + 8 && vAt < lane.hi - 8) ? 'band' : (dLo < dHi ? 'lo' : 'hi');
+          }
+          return;
+        }
+        if (ph === 'end') { grab = null; return; }
+        if (grab === 'hi') lane.hi = snap(Math.max(vAt, lane.lo), st.steps);
+        else if (grab === 'lo') lane.lo = snap(Math.min(vAt, lane.hi), st.steps);
+        else if (grab === 'band') {
+          const wdt = hi0 - lo0;
+          let nl = snap(clamp(lo0 + (vAt - g0), 0, 100 - wdt), st.steps);
+          lane.lo = nl; lane.hi = clamp(nl + wdt, 0, 100);
+        }
+        refresh(mod);
+      });
+      new ResizeObserver(paint).observe(well);
+      paints.push(paint);
+    });
+    mod.paint = () => paints.forEach(p => p());
+  },
+  phrase(lane, st, pill) {
+    const nm = v => spoken(v, st.steps, st.stops);
+    if (lane.mode === 'no-more-than') return pill ? '≤ ' + nm(lane.hi) : 'no more than ' + nm(lane.hi);
+    if (lane.mode === 'at-least') return pill ? '≥ ' + nm(lane.lo) : 'at least ' + nm(lane.lo);
+    return pill ? nm(lane.lo) + '–' + nm(lane.hi) : 'between ' + nm(lane.lo) + ' and ' + nm(lane.hi);
+  },
+  tape(mod) {
+    const st = mod.state;
+    return st.lanes.map(l => ({ html: say(l.frame, l.label, KINDS.filter.phrase(l, st)) }));
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    const f1 = fField(pop, 'Stops');
+    const f2 = fField(pop, 'Stop names');
+    const syncNames = stopNameList(mod, f2, st);
+    fStepper(f1, () => st.steps, v => {
+      st.steps = v;
+      st.lanes.forEach(l => { l.lo = snap(l.lo, v); l.hi = snap(l.hi, v); });
+      syncNames();
+      refresh(mod);
+    });
+    sentenceAccordions(mod, pop, st.lanes, { labelOf: l => l.label });
+  }
+};
+
+/* ---------- MIXER — one whole split into channels; drag a seam and only
+   its two neighbours trade share. Shares always sum to 100. ---------- */
+KINDS.mixer = {
+  name: 'MIXER', addWord: 'Add a channel', max: 6, MIN: 3,
+  normalize(items) {
+    const total = items.reduce((a, i) => a + i.v, 0) || 1;
+    items.forEach(i => i.v = i.v / total * 100);
+  },
+  seed(s) {
+    const items = s.items || [
+      { label: 'CLARITY', v: 50, frame: '' },
+      { label: 'DEPTH', v: 32, frame: '' },
+      { label: 'BREVITY', v: 18, frame: '' }
+    ];
+    KINDS.mixer.normalize(items);
+    return { frame: s.frame || 'Blend {value}.', items };
+  },
+  add(mod) {
+    const items = mod.state.items;
+    if (items.length >= this.max) return;
+    /* the new channel takes an even cut; the rest shrink in proportion */
+    const share = 100 / (items.length + 1);
+    items.forEach(i => i.v *= (100 - share) / 100);
+    items.push({ label: 'CHANNEL ' + (items.length + 1), v: share, frame: '' });
+  },
+  build(mod) {
+    const st = mod.state;
+    const row = h('div', 'mod-row', mod.body);
+    const wrap = h('div', 'i-bd', row);
+    const MIN = KINDS.mixer.MIN;
+    const bands = st.items.map((item, idx) => {
+      const b = h('div', 'bd-band', wrap);
+      const lbl = h('span', 'mod-sub bd-lbl', b);
+      renamable(lbl, () => item.label, v => { item.label = v.toUpperCase(); refresh(mod); });
+      const right = h('span', 'bd-right', b);
+      const share = h('span', 'bd-share', right);
+      if (st.items.length > 2) {
+        b.classList.add('has-x');
+        const x = h('button', 'row-x', b, '×');
+        x.addEventListener('click', () => {
+          st.items.splice(st.items.indexOf(item), 1);
+          KINDS.mixer.normalize(st.items);
+          rebuild(mod);
+        });
+      }
+      /* the seam grip — trades share between this channel and the next only */
+      if (idx < st.items.length - 1) {
+        const grip = h('div', 'bd-grip', b);
+        let a0 = 0, b0 = 0, y0 = 0, avail = 174;
+        drag(grip, (e, ph) => {
+          wrap.classList.toggle('is-dragging', ph !== 'end');
+          const next = st.items[idx + 1];
+          if (ph === 'start') { a0 = item.v; b0 = next.v; y0 = e.clientY; avail = wrap.clientHeight || 174; return; }
+          if (ph === 'end') return;
+          const d = (e.clientY - y0) / avail * 100;
+          const na = clamp(a0 + d, MIN, a0 + b0 - MIN);
+          item.v = na; next.v = a0 + b0 - na;
+          refresh(mod);
+        });
+      }
+      return { item, b, share };
+    });
+    let shadeKey = '';
+    mod.paint = () => {
+      /* border-box: the 1px seams live inside the band heights, so the
+         shares fill the well edge-to-edge — no leftover strip */
+      const avail = wrap.clientHeight || 174;
+      /* shade by rank — dominant channel takes the strongest mix, derived never hand-picked */
+      const order = st.items.map((it, i) => [it.v, i]).sort((a, b) => b[0] - a[0]).map(x => x[1]);
+      /* recolor only when the ranking (or accent) actually changes —
+         mid-drag frames then touch nothing but two band heights */
+      const key = order.join(',') + '|' + mod.accent;
+      const shade = key !== shadeKey; shadeKey = key;
+      bands.forEach(({ item, b, share }, i) => {
+        const px = Math.max(3, (item.v / 100) * avail);
+        const hpx = px.toFixed(2) + 'px';
+        if (b.style.height !== hpx) b.style.height = hpx;
+        if (shade) {
+          const rank = order.indexOf(i);
+          const mix = st.items.length > 1 ? 60 - rank * (30 / (st.items.length - 1)) : 60;
+          b.style.background = 'color-mix(in srgb, ' + mod.accent + ' ' + Math.round(mix) + '%, var(--e-surface-ground))';
+          const on = inkFor(mixHex(mod.accent, '#e8e4dc', mix / 100));
+          b.querySelector('.bd-lbl').style.color = on;
+          share.style.color = on;
+        }
+        const stx = Math.round(item.v) + '%';
+        if (share.textContent !== stx) share.textContent = stx;
+        b.classList.toggle('is-thin', px < 20);
+      });
+    };
+  },
+  tape(mod) {
+    const st = mod.state;
+    const parts = st.items.slice().sort((a, b) => b.v - a.v).map(i => {
+      const pct = Math.round(i.v) + '%';
+      return (i.frame || '').trim() ? i.frame.trim().split('{value}').join(pct) : pct + ' ' + low(i.label);
+    });
+    const mix = parts.length > 1
+      ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1]
+      : parts[0];
+    return [{ html: say(st.frame, 'Blend', mix) }];
+  },
+  settings(mod, pop) {
+    const f = fField(pop, 'Mod prompt');
+    fText(f, mod.state.frame, v => { mod.state.frame = v; refresh(mod); }, 'Blend {value}.');
+    fHelp(f, 'Insert values with "{value}".');
+    sentenceAccordions(mod, pop, mod.state.items, {
+      defaultOf: it => '{value} ' + low(it.label),
+      help: 'Insert values with "{value}".'
+    });
+  }
+};
+
+/* ---------- RADAR — drag the vertices; + adds an axis ---------- */
+KINDS.radar = {
+  name: 'TONE OF VOICE', addWord: 'Add an axis', max: 8,
+  seed: s => ({
+    steps: s.steps || 0,
+    axes: s.axes || [
+      { label: 'WARMTH', v: 70 },
+      { label: 'DETAIL', v: 50 },
+      { label: 'PACE', v: 40 },
+      { label: 'FORMALITY', v: 60 },
+      { label: 'CONFIDENCE', v: 80 }
+    ]
+  }),
+  add(mod) {
+    if (mod.state.axes.length >= this.max) return;
+    mod.state.axes.push({ label: 'AXIS ' + (mod.state.axes.length + 1), v: 50 });
+  },
+  build(mod) {
+    const st = mod.state;
+    const row = h('div', 'mod-row', mod.body);
+    const well = h('div', 'i-radar', row);
+    const svg = sv('svg', null, well);
+    const back = sv('g', { 'class': 'back' }, svg);
+    const fill = sv('polygon', { 'class': 'rd-fill' }, svg);
+    const line = sv('polygon', { 'class': 'rd-line' }, svg);
+    const gV = sv('g', null, svg);
+    let geo = null;
+    let verts = [];   /* persistent per-axis nodes — a drag must never lose its circle */
+    const structure = () => {
+      gV.innerHTML = '';
+      well.querySelectorAll('.rd-tipwrap').forEach(l => l.remove());
+      verts = st.axes.map((ax, i) => {
+        const g = sv('g', { 'class': 'rd-axis' }, gV);
+        const c = sv('circle', { 'class': 'rd-vert', r: 6 }, g);
+        attachVertexDrag(c, i);
+        const wrapEl = h('span', 'rd-tipwrap', well);
+        const tip = h('span', 'rd-lbl', wrapEl);
+        renamable(tip, () => st.axes[i].label, v => { st.axes[i].label = v.toUpperCase(); refresh(mod); });
+        const xb = h('button', 'row-x', wrapEl, '×');
+        xb.title = 'Remove';
+        xb.addEventListener('click', () => {
+          if (st.axes.length <= 3) return;
+          st.axes.splice(i, 1);
+          refresh(mod);
+        });
+        return { c, tip, wrap: wrapEl, xb };
+      });
+    };
+    const pt = (i, r) => {
+      const a = (i / geo.N) * Math.PI * 2 - Math.PI / 2;
+      return [geo.CX + r * Math.cos(a), geo.CY + r * Math.sin(a)];
+    };
+    /* values: only what a vertex drag moves — polygon and vertex dots.
+       Rings, spokes, labels and viewBox stay untouched per frame. */
+    const values = () => {
+      if (!geo) return;
+      const pts = st.axes.map((ax, i) => pt(i, geo.R * Math.max(.05, ax.v / 100)));
+      const ptStr = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+      fill.setAttribute('points', ptStr);
+      line.setAttribute('points', ptStr);
+      pts.forEach(([cx, cy], i) => {
+        verts[i].c.setAttribute('cx', cx); verts[i].c.setAttribute('cy', cy);
+      });
+    };
+    const paint = () => {
+      const w = well.clientWidth || 300, hh = well.clientHeight || 240;
+      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + hh);
+      svg.setAttribute('width', w); svg.setAttribute('height', hh);
+      const N = st.axes.length;
+      if (verts.length !== N) structure();
+      /* reserve breathing room for the labels: 100px each side, 30px top/bottom */
+      const CX = w / 2, CY = hh / 2, R = Math.max(24, Math.min(w / 2 - 100, hh / 2 - 30));
+      geo = { CX, CY, R, N };
+      /* grid rings match the stops — one ring per stop above zero.
+         Stops OFF = smooth: only the outer boundary, no inner rings. */
+      const NR = st.steps >= 2 ? st.steps : 1;
+      let b = '';
+      for (let g = 1; g <= NR; g++)
+        b += '<polygon points="' + st.axes.map((_, i) => pt(i, R * g / NR).join(',')).join(' ') + '"/>';
+      st.axes.forEach((_, i) => {
+        const [ex, ey] = pt(i, R);
+        b += '<line x1="' + CX + '" y1="' + CY + '" x2="' + ex + '" y2="' + ey + '"/>';
+      });
+      back.innerHTML = b;
+      st.axes.forEach((ax, i) => {
+        const vx = verts[i];
+        vx.xb.style.display = st.axes.length > 3 ? '' : 'none';
+        const [lx, ly] = pt(i, R + 14);
+        const anchor = Math.abs(lx - CX) < 10 ? 'middle' : (lx > CX ? 'start' : 'end');
+        vx.wrap.style.left = lx + 'px';
+        vx.wrap.style.top = ly + 'px';
+        vx.wrap.style.transform = 'translateY(-50%)' +
+          (anchor === 'middle' ? ' translateX(-50%)' : anchor === 'end' ? ' translateX(-100%)' : '');
+        if (document.activeElement !== vx.tip) vx.tip.textContent = ax.label;
+      });
+      values();
+    };
+    function attachVertexDrag(c, i) {
+      let wr = null;
+      drag(c, (e, ph) => {
+        c.classList.toggle('is-dragging', ph !== 'end');
+        if (ph === 'end' || !geo) return;
+        if (ph === 'start' || !wr) wr = well.getBoundingClientRect();
+        const px = e.clientX - wr.left - geo.CX;
+        const py = e.clientY - wr.top - geo.CY;
+        const a = (i / geo.N) * Math.PI * 2 - Math.PI / 2;
+        const t = clamp((px * Math.cos(a) + py * Math.sin(a)) / geo.R, 0, 1);
+        st.axes[i].v = snap(t * 100, st.steps);
+        refresh(mod, true);
+      });
+    }
+    new ResizeObserver(paint).observe(well);
+    mod.paint = paint;
+    mod.paintLite = values;
+  },
+  tape(mod) {
+    const st = mod.state;
+    const seq = st.axes.map(a => {
+      const val = spoken(a.v, st.steps, null);
+      return (a.frame || '').trim() ? a.frame.trim().split('{value}').join(val) : low(a.label) + ' ' + val;
+    }).join(', ');
+    return [{ html: say('', mod.title, seq) }];
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    const f1 = fField(pop, 'Stops');
+    fStepper(f1, () => st.steps, v => { st.steps = v; st.axes.forEach(a => a.v = snap(a.v, v)); refresh(mod); });
+    sentenceAccordions(mod, pop, st.axes, {
+      defaultOf: a => low(a.label) + ' {value}',
+      help: 'Insert values with "{value}".'
+    });
+  }
+};
+
+/* ---------- MATRIX — click a cell to step its value ---------- */
+KINDS.matrix = {
+  name: 'EMPHASIS',
+  seed: s => ({
+    steps: s.steps || 3,
+    stepNames: s.stepNames || ['none', 'lightly', 'strongly'],
+    rows: s.rows || ['WARMTH', 'DETAIL'],
+    cols: s.cols || ['INTRO', 'BODY', 'CLOSE'],
+    cells: s.cells || [[2, 0, 1], [0, 1, 0]]
+  }),
+  build(mod) {
+    const st = mod.state;
+    const R = st.rows.length, C = st.cols.length;
+    const wrap = h('div', 'i-mx-wrap', mod.body);
+    const grid = h('div', 'i-mx-grid', wrap);
+    const pitch = 44;
+    grid.style.gridTemplateColumns = 'minmax(52px,auto) repeat(' + C + ', ' + pitch + 'px)';
+    grid.style.gridTemplateRows = 'auto repeat(' + R + ', ' + pitch + 'px)';
+    /* corner + column labels */
+    h('div', 'mx-corner', grid);
+    st.cols.forEach((cl, j) => {
+      const l = h('div', 'mx-lbl mx-lbl--col', grid);
+      const s = h('span', 'mod-sub', l);
+      renamable(s, () => st.cols[j], v => { st.cols[j] = v.toUpperCase(); refresh(mod); });
+      if (C > 1) {
+        const x = h('button', 'row-x', l, '×');
+        x.addEventListener('click', () => {
+          st.cols.splice(j, 1);
+          st.cells.forEach(r => r.splice(j, 1));
+          rebuild(mod);
+        });
+      }
+    });
+    /* rows: label + cells */
+    const dots = [];
+    st.rows.forEach((rl, i) => {
+      const l = h('div', 'mx-lbl mx-lbl--row', grid);
+      if (R > 1) {
+        const x = h('button', 'row-x', l, '×');
+        x.addEventListener('click', () => {
+          st.rows.splice(i, 1); st.cells.splice(i, 1); rebuild(mod);
+        });
+      }
+      const s = h('span', 'mod-sub', l);
+      renamable(s, () => st.rows[i], v => { st.rows[i] = v.toUpperCase(); refresh(mod); });
+      st.cols.forEach((cl, j) => {
+        const cell = h('button', 'mx-cell' + (j === C - 1 ? ' eR' : '') + (i === R - 1 ? ' eB' : ''), grid);
+        const dot = h('span', 'mx-dot', cell);
+        dot.style.width = dot.style.height = Math.max(6, pitch * 0.62) + 'px';
+        cell.addEventListener('click', () => {
+          st.cells[i][j] = (st.cells[i][j] + 1) % st.steps;
+          refresh(mod);
+        });
+        dots.push({ i, j, dot, cell });
+      });
+    });
+    /* the cell block's outer border + the ghost row/column, all seated from
+       live offsets (offsetParent = the wrap) — and the CELL BLOCK, not
+       labels+cells, is what centers horizontally. Runs on every paint so
+       renames and card resizes keep the chrome true. */
+    const frame = h('div', null, wrap);
+    frame.style.cssText = 'position:absolute;border:1px solid var(--e-line);border-radius:var(--e-r-chip);pointer-events:none';
+    const gRow = h('button', 'mx-ghost', wrap, '+');
+    const gCol = h('button', 'mx-ghost', wrap, '+');
+    const place = () => {
+      const first = dots[0] && dots[0].cell;
+      if (!first) return;
+      const lblW = first.offsetLeft - grid.offsetLeft;   /* label column width */
+      const padL = 20;
+      const desired = Math.max(padL + lblW, (wrap.clientWidth - C * pitch) / 2);
+      grid.style.marginLeft = Math.round(desired - lblW - padL) + 'px';
+      const left = first.offsetLeft, top = first.offsetTop;
+      frame.style.left = left + 'px';
+      frame.style.top = top + 'px';
+      frame.style.width = (C * pitch) + 'px';
+      frame.style.height = (R * pitch) + 'px';
+      gRow.style.left = left + 'px'; gRow.style.width = (C * pitch) + 'px';
+      gRow.style.height = '18px'; gRow.style.top = (top + R * pitch + 6) + 'px';
+      gCol.style.top = top + 'px'; gCol.style.height = (R * pitch) + 'px';
+      gCol.style.width = '18px'; gCol.style.left = (left + C * pitch + 6) + 'px';
+    };
+    requestAnimationFrame(place);
+    mod.place = place;
+    gRow.title = 'Add a row';
+    gCol.title = 'Add a column';
+    gRow.addEventListener('click', () => {
+      if (st.rows.length >= 6) return;
+      st.rows.push('ROW ' + (st.rows.length + 1));
+      st.cells.push(st.cols.map(() => 0));
+      rebuild(mod);
+    });
+    gCol.addEventListener('click', () => {
+      if (st.cols.length >= 6) return;
+      st.cols.push('COL ' + (st.cols.length + 1));
+      st.cells.forEach(r => r.push(0));
+      rebuild(mod);
+    });
+    const maxD = Math.max(6, pitch * 0.62);
+    mod.paint = () => {
+      dots.forEach(({ i, j, dot, cell }) => {
+        const v = st.cells[i][j];
+        if (v < 1) {
+          dot.style.setProperty('--s', (2 / maxD).toFixed(4));
+          dot.style.background = 'var(--e-dot)';
+        } else {
+          const d = Math.max(6, (v / (st.steps - 1)) * maxD);
+          dot.style.setProperty('--s', (d / maxD).toFixed(4));
+          dot.style.background = mod.accent;
+        }
+        cell.title = st.rows[i] + ' on ' + st.cols[j] + ': ' + KINDS.matrix.word(st, v);
+      });
+      place();
+    };
+  },
+  word(st, v) {
+    const nm = st.stepNames && st.stepNames[v];
+    if (nm) return low(nm);
+    if (v < 1) return 'none';
+    return Math.round(v / (st.steps - 1) * 100) + '%';
+  },
+  tape(mod) {
+    const st = mod.state;
+    const lines = [];
+    st.rows.forEach((rl, i) => {
+      const parts = [];
+      st.cols.forEach((cl, j) => {
+        const v = st.cells[i][j];
+        if (v >= 1) parts.push(low(cl) + ' ' + KINDS.matrix.word(st, v));
+      });
+      if (parts.length) lines.push({ html: say('', rl, parts.join(', ')) });
+    });
+    if (!lines.length) lines.push({ html: 'every cell is empty, says nothing.', mute: true });
+    return lines;
+  },
+  settings(mod, pop) {
+    const st = mod.state;
+    const f1 = fField(pop, 'Stops');
+    const f2 = fField(pop, 'Stop names');
+    const list = h('div', null, f2);
+    list.style.cssText = 'display:flex;flex-direction:column;gap:6px';
+    /* one input per stop, following the stepper — stop 0 defaults to "none" */
+    const syncNames = () => {
+      while (st.stepNames.length < st.steps)
+        st.stepNames.push(st.stepNames.length === 0 ? 'none' : '');
+      st.stepNames.length = st.steps;
+      if (!st.stepNames[0]) st.stepNames[0] = 'none';
+      list.innerHTML = '';
+      st.stepNames.forEach((nm, i) => {
+        const inp = h('input', 'e-input', list);
+        inp.type = 'text';
+        inp.value = nm;
+        inp.placeholder = i === 0 ? 'none' : Math.round(i / (st.steps - 1) * 100) + '%';
+        inp.addEventListener('input', () => { st.stepNames[i] = inp.value.trim(); refresh(mod); });
+      });
+    };
+    fStepper(f1, () => st.steps, v => {
+      st.steps = clamp(v, 2, 5);
+      st.cells.forEach(r => r.forEach((c, j) => r[j] = Math.min(c, st.steps - 1)));
+      syncNames();
+      refresh(mod);
+    }, { min: 2, max: 5, off: false });
+    fHelp(f1, 'Clicking a cell walks through the stops.');
+    syncNames();
+    fHelp(f2, 'This order between stop names.');
+  }
+};
+
+/* ================= shared: sentence accordions ================= */
+/* one accordion per option: rename it and write its sentence.
+   Removal never lives here — options are removed on the mod face. */
+function sentenceAccordions(mod, pop, items, opts) {
+  const o = opts || {};
+  const lab = h('label', 'e-pop-label', pop, 'Options');
+  lab.style.marginBottom = '6px';
+  items.forEach(item => {
+    const name = () => o.labelOf ? o.labelOf(item) : item.label;
+    const fallback = () => o.defaultOf ? o.defaultOf(item) : cap(low(name())) + ': {value}.';
+    let acc;
+    acc = fAcc(pop, name(), null, body => {
+      const fn = fField(body, 'Name');
+      fInput(fn, name(), v => {
+        if (o.rename) o.rename(item, v); else item.label = v.toUpperCase();
+        acc.querySelector('.e-acc-head span').textContent = name();
+        rebuild(mod);
+      });
+      const f = fField(body, o.word || 'Option prompt');
+      fText(f, item.frame, v => { item.frame = v; refresh(mod); }, fallback());
+      fHelp(f, o.help || 'Insert values with "{value}".');
+    });
+  });
+}
+
+/* ================= settings popup ================= */
+function openSettings(mod, anchor) {
+  const pop = openPop(anchor);
+  const f = fField(pop, 'Name');
+  fInput(f, mod.title, v => {
+    mod.title = v;
+    mod.el.querySelector('.mod-title').textContent = v;
+    refresh(mod);
+  });
+  if (mod.K.settings) mod.K.settings(mod, pop);
+}
+
+/* text on solid accent: ink on light accents, paper on dark (YIQ .55) */
+function inkFor(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const yiq = (((n >> 16) & 255) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 255000;
+  return yiq >= 0.55 ? '#232019' : '#f8f6f1';
+}
+/* mix two hexes in sRGB (t = share of a), for contrast decisions on derived fills */
+function mixHex(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ch = sh => Math.round(((pa >> sh) & 255) * t + ((pb >> sh) & 255) * (1 - t));
+  return '#' + ((ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).padStart(6, '0');
+}
+
+/* ================= add-mod menu + seed scene ================= */
+const addBtn = $('#addMod'), addMenu = $('#addModMenu');
+const KIND_ORDER = ['mixer', 'filter', 'slider', 'dial', 'count', 'switch', 'pad', 'select', 'order', 'radar', 'matrix'];
+KIND_ORDER.forEach(k => {
+  const r = h('button', 'addmod-row', addMenu, k.toUpperCase());
+  r.addEventListener('click', () => {
+    addMenu.classList.remove('is-open');
+    const mod = createMod(k, { title: k.toUpperCase() });
+    boardCards.unshift(mod.el);
+    layoutBoard();
+    refresh(mod);
+    layoutBoard();
+    mod.el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+});
+addBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  addMenu.classList.toggle('is-open');
+});
+document.addEventListener('pointerdown', e => {
+  if (!addMenu.contains(e.target) && e.target !== addBtn) addMenu.classList.remove('is-open');
+});
+
+/* seed: one of each, in a deliberate order, wearing distinct identities */
+const SEED_ACCENTS = {
+  mixer: '#9c3fba', filter: '#b5540f', slider: '#3568c6', dial: '#eca23b',
+  count: '#48a2ef', switch: '#1b7550', pad: '#d66be8', select: '#f1666d',
+  order: '#65b563', radar: '#c9282e', matrix: '#2e2b25'
+};
+KIND_ORDER.forEach(k => boardCards.push(createMod(k, { accent: SEED_ACCENTS[k] }).el));
+layoutBoard();
+MODS.forEach(refresh);
+layoutBoard();   /* second deal: balance with painted heights */
+
+/* test hooks */
+window.__mods = { MODS, KINDS, createMod, refresh, treatment, layoutBoard, boardCards, v: 37 };
+</script>
+</body>
+</html>

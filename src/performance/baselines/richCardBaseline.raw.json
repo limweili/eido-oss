@@ -1,0 +1,5835 @@
+{
+  "schemaVersion": 2,
+  "contractId": "eido-rich-card-reading-v1",
+  "candidate": {
+    "id": "current-reading-baseline",
+    "description": "Unmodified production renderer, LOD, occupancy, settle, and interaction policy."
+  },
+  "environment": {
+    "provider": "github-actions",
+    "os": "linux 6.17.0-1018-azure",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logicalCores": 2,
+    "memoryBytes": 8323981312,
+    "browser": "Chromium 149.0.7827.55",
+    "viewport": {
+      "width": 1440,
+      "height": 1000,
+      "deviceScaleFactor": 1
+    },
+    "node": "v20.20.2",
+    "commit": "1e8900fb38432b00f807c45125395baf634483f1",
+    "capturedAt": "2026-07-14T13:12:56.132Z"
+  },
+  "capture": {
+    "commands": [
+      "npm run perf:rich-card:capture"
+    ],
+    "runner": "GitHub Actions 1000000645",
+    "sourceRunUrl": "https://github.com/limweili/eido/actions/runs/29335289304"
+  },
+  "noise": {
+    "sharedRunner": true,
+    "caveats": [
+      "GitHub-hosted runners are shared and not a stable same-machine timing gate; three repetitions expose spread but do not remove host noise.",
+      "Chromium headless paint/composite behavior and software/GPU availability can differ from the managed Mac product environment.",
+      "The harness records observed JS heap and trace events; it cannot observe GPU texture residency or production React work without new instrumentation."
+    ]
+  },
+  "repetitionPolicy": {
+    "repetitions": 3,
+    "order": "scenario-major"
+  },
+  "fixture": {
+    "id": "rich-card-board-v1",
+    "generationMs": 23.23,
+    "cards": 131,
+    "connections": 132,
+    "outputs": 2,
+    "boardJsonBytes": 360372,
+    "serializationMs": 0.66,
+    "storedImageBytes": 2375,
+    "decodedPixelEstimateBytes": 51019524,
+    "imageIngestion": {
+      "status": "unavailable",
+      "value": null,
+      "method": "Fixture data URLs are prebuilt deterministically; production paste compression is not invoked or timed."
+    }
+  },
+  "correctness": {
+    "search": {
+      "status": "observed",
+      "found": true,
+      "method": "window.find over the mounted synthetic giant Note."
+    },
+    "selection": {
+      "status": "observed",
+      "selectedCharacters": 20,
+      "method": "DOM Selection matched a non-whitespace substring rendered by the live synthetic giant Note editor."
+    },
+    "copy": {
+      "status": "unavailable",
+      "copiedCharacters": null,
+      "method": "System clipboard copy was not invoked or read by this browser harness."
+    },
+    "accessibility": {
+      "status": "observed",
+      "richTextNodes": 626,
+      "method": "Chromium Accessibility.getFullAXTree static-text count; not a complete assistive-technology audit."
+    }
+  },
+  "runs": [
+    {
+      "scenarioId": "ordinary-reading-pan",
+      "repetition": 1,
+      "durationMs": 1707.8,
+      "frameIntervalsMs": [
+        183.4000000000001,
+        33.299999999999955,
+        50,
+        66.59999999999991,
+        16.700000000000045,
+        33.299999999999955,
+        16.700000000000045,
+        166.5999999999999,
+        33.40000000000009,
+        16.59999999999991,
+        16.700000000000273,
+        166.5999999999999,
+        16.799999999999727,
+        49.90000000000009,
+        33.40000000000009,
+        50,
+        16.699999999999818,
+        49.90000000000009,
+        16.700000000000273,
+        50,
+        16.699999999999818,
+        66.59999999999991,
+        16.700000000000273,
+        33.29999999999973,
+        16.700000000000273,
+        66.69999999999982,
+        16.59999999999991,
+        33.40000000000009,
+        16.59999999999991,
+        66.70000000000027,
+        16.699999999999818,
+        50,
+        16.699999999999818,
+        66.60000000000036,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        16.699999999999818,
+        150,
+        33.19999999999982
+      ],
+      "missedFrames": 59,
+      "slowFrames": 22,
+      "longTasks": [
+        {
+          "startTime": 1585.6,
+          "duration": 96
+        },
+        {
+          "startTime": 1681.8,
+          "duration": 104
+        },
+        {
+          "startTime": 1840.7,
+          "duration": 64
+        },
+        {
+          "startTime": 1986.6,
+          "duration": 177
+        },
+        {
+          "startTime": 2223.6,
+          "duration": 168
+        },
+        {
+          "startTime": 2410.9,
+          "duration": 53
+        },
+        {
+          "startTime": 2494.3,
+          "duration": 51
+        },
+        {
+          "startTime": 2558.9,
+          "duration": 59
+        },
+        {
+          "startTime": 2631.6,
+          "duration": 51
+        },
+        {
+          "startTime": 2696.6,
+          "duration": 56
+        },
+        {
+          "startTime": 2830.4,
+          "duration": 56
+        },
+        {
+          "startTime": 2965.3,
+          "duration": 60
+        },
+        {
+          "startTime": 3036.7,
+          "duration": 51
+        },
+        {
+          "startTime": 3289.7,
+          "duration": 108
+        }
+      ],
+      "interactionLatencyMs": 1352.8,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 105.13,
+      "paintCompositeMs": 34.43,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 45492232,
+        "afterBytes": 64704172,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 556.15,
+        "lightweightReadyMs": 1000.28,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 28,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "ordinary-reading-pan",
+      "repetition": 2,
+      "durationMs": 1721.54,
+      "frameIntervalsMs": [
+        216.69999999999982,
+        16.699999999999818,
+        16.600000000000364,
+        16.699999999999818,
+        16.699999999999818,
+        16.600000000000364,
+        16.699999999999818,
+        166.60000000000036,
+        16.699999999999818,
+        16.699999999999818,
+        16.699999999999818,
+        233.30000000000018,
+        16.600000000000364,
+        66.80000000000018,
+        16.599999999999454,
+        49.900000000000546,
+        16.699999999999818,
+        50,
+        16.699999999999818,
+        66.60000000000036,
+        16.699999999999818,
+        50,
+        16.699999999999818,
+        50,
+        33.399999999999636,
+        49.900000000000546,
+        16.699999999999818,
+        50,
+        16.600000000000364,
+        50.099999999999454,
+        16.699999999999818,
+        66.60000000000036,
+        16.600000000000364,
+        50.099999999999454,
+        16.699999999999818,
+        16.5,
+        16.800000000000182,
+        16.600000000000364,
+        16.599999999999454,
+        166.80000000000018,
+        16.600000000000364
+      ],
+      "missedFrames": 63,
+      "slowFrames": 16,
+      "longTasks": [
+        {
+          "startTime": 4947.7,
+          "duration": 114
+        },
+        {
+          "startTime": 5062.2,
+          "duration": 109
+        },
+        {
+          "startTime": 5269.4,
+          "duration": 170
+        },
+        {
+          "startTime": 5473.5,
+          "duration": 105
+        },
+        {
+          "startTime": 5578.8,
+          "duration": 140
+        },
+        {
+          "startTime": 5757,
+          "duration": 53
+        },
+        {
+          "startTime": 5823.3,
+          "duration": 61
+        },
+        {
+          "startTime": 5962.4,
+          "duration": 62
+        },
+        {
+          "startTime": 6039.1,
+          "duration": 54
+        },
+        {
+          "startTime": 6107.4,
+          "duration": 61
+        },
+        {
+          "startTime": 6186.5,
+          "duration": 57
+        },
+        {
+          "startTime": 6256.4,
+          "duration": 60
+        },
+        {
+          "startTime": 6402.5,
+          "duration": 53
+        },
+        {
+          "startTime": 6665.7,
+          "duration": 105
+        }
+      ],
+      "interactionLatencyMs": 1352.61,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 90.99,
+      "paintCompositeMs": 34.48,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 112079232,
+        "afterBytes": 59391100,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 650.21,
+        "lightweightReadyMs": 1301.72,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 28,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "ordinary-reading-pan",
+      "repetition": 3,
+      "durationMs": 1721.67,
+      "frameIntervalsMs": [
+        183.39999999999964,
+        33.29999999999927,
+        16.700000000000728,
+        16.600000000000364,
+        16.69999999999891,
+        33.399999999999636,
+        16.600000000000364,
+        150,
+        16.700000000000728,
+        16.600000000000364,
+        16.69999999999891,
+        166.60000000000036,
+        16.700000000000728,
+        50,
+        33.399999999999636,
+        16.600000000000364,
+        33.399999999999636,
+        16.600000000000364,
+        83.29999999999927,
+        16.700000000000728,
+        50,
+        16.69999999999891,
+        66.60000000000036,
+        16.700000000000728,
+        66.69999999999891,
+        16.600000000000364,
+        50,
+        16.700000000000728,
+        50,
+        16.69999999999891,
+        66.60000000000036,
+        16.700000000000728,
+        50,
+        16.69999999999891,
+        49.899999999999636,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        83.29999999999927,
+        150.10000000000036,
+        16.600000000000364,
+        16.700000000000728
+      ],
+      "missedFrames": 61,
+      "slowFrames": 19,
+      "longTasks": [
+        {
+          "startTime": 8427.4,
+          "duration": 99
+        },
+        {
+          "startTime": 8526.7,
+          "duration": 97
+        },
+        {
+          "startTime": 8761.4,
+          "duration": 146
+        },
+        {
+          "startTime": 8975.8,
+          "duration": 154
+        },
+        {
+          "startTime": 9298.5,
+          "duration": 72
+        },
+        {
+          "startTime": 9389.4,
+          "duration": 59
+        },
+        {
+          "startTime": 9468,
+          "duration": 62
+        },
+        {
+          "startTime": 9544,
+          "duration": 61
+        },
+        {
+          "startTime": 9619.8,
+          "duration": 65
+        },
+        {
+          "startTime": 9698.5,
+          "duration": 51
+        },
+        {
+          "startTime": 9764.1,
+          "duration": 60
+        },
+        {
+          "startTime": 9891.6,
+          "duration": 52
+        },
+        {
+          "startTime": 10016.3,
+          "duration": 87
+        },
+        {
+          "startTime": 10145.9,
+          "duration": 114
+        }
+      ],
+      "interactionLatencyMs": 1318.44,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 94.71,
+      "paintCompositeMs": 42.09,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 135494652,
+        "afterBytes": 54543276,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 619.7,
+        "lightweightReadyMs": 1490.09,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 28,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "exceptionally-fast-pan",
+      "repetition": 1,
+      "durationMs": 774.44,
+      "frameIntervalsMs": [
+        150,
+        33.399999999999636,
+        16.600000000000364,
+        33.399999999999636,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728,
+        133.29999999999927,
+        16.700000000000728,
+        16.69999999999891,
+        33.30000000000109,
+        16.69999999999891,
+        33.30000000000109,
+        16.600000000000364,
+        50.099999999998545,
+        16.600000000000364,
+        16.700000000000728,
+        16.600000000000364,
+        100,
+        16.69999999999891,
+        16.600000000000364,
+        16.700000000000728
+      ],
+      "missedFrames": 23,
+      "slowFrames": 8,
+      "longTasks": [
+        {
+          "startTime": 11696.4,
+          "duration": 85
+        },
+        {
+          "startTime": 11781.4,
+          "duration": 83
+        },
+        {
+          "startTime": 11985.7,
+          "duration": 143
+        },
+        {
+          "startTime": 12392.9,
+          "duration": 60
+        }
+      ],
+      "interactionLatencyMs": 423.43,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 74.12,
+      "paintCompositeMs": 12.02,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 106568212,
+        "afterBytes": 144871628,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 482.58,
+        "lightweightReadyMs": 1279.28,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 6,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "exceptionally-fast-pan",
+      "repetition": 2,
+      "durationMs": 1011.01,
+      "frameIntervalsMs": [
+        166.70000000000073,
+        16.69999999999891,
+        16.600000000000364,
+        33.399999999999636,
+        16.600000000000364,
+        33.29999999999927,
+        166.70000000000073,
+        16.600000000000364,
+        16.799999999999272,
+        149.89999999999964,
+        16.700000000000728,
+        16.600000000000364,
+        33.399999999999636,
+        49.899999999999636,
+        33.399999999999636,
+        166.70000000000073,
+        16.600000000000364,
+        16.69999999999891,
+        16.700000000000728,
+        16.600000000000364,
+        16.69999999999891
+      ],
+      "missedFrames": 38,
+      "slowFrames": 9,
+      "longTasks": [
+        {
+          "startTime": 13926.8,
+          "duration": 87
+        },
+        {
+          "startTime": 14014.2,
+          "duration": 95
+        },
+        {
+          "startTime": 14228.6,
+          "duration": 143
+        },
+        {
+          "startTime": 14440.4,
+          "duration": 140
+        },
+        {
+          "startTime": 14773.2,
+          "duration": 119
+        }
+      ],
+      "interactionLatencyMs": 650.41,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 88.71,
+      "paintCompositeMs": 13.85,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 58341852,
+        "afterBytes": 81562056,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 529.12,
+        "lightweightReadyMs": 1362.12,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 8,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "exceptionally-fast-pan",
+      "repetition": 3,
+      "durationMs": 810.59,
+      "frameIntervalsMs": [
+        150,
+        33.30000000000291,
+        16.69999999999709,
+        33.30000000000291,
+        33.39999999999782,
+        16.600000000002183,
+        150,
+        16.69999999999709,
+        50,
+        16.600000000002183,
+        33.39999999999782,
+        16.600000000002183,
+        50,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        116.70000000000073,
+        16.69999999999709,
+        16.600000000002183,
+        16.700000000000728
+      ],
+      "missedFrames": 28,
+      "slowFrames": 9,
+      "longTasks": [
+        {
+          "startTime": 16394.1,
+          "duration": 90
+        },
+        {
+          "startTime": 16485,
+          "duration": 81
+        },
+        {
+          "startTime": 16685.6,
+          "duration": 150
+        },
+        {
+          "startTime": 16854.1,
+          "duration": 50
+        },
+        {
+          "startTime": 17114.6,
+          "duration": 76
+        }
+      ],
+      "interactionLatencyMs": 438.75,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 69.54,
+      "paintCompositeMs": 11.62,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 135102816,
+        "afterBytes": 174914224,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 443.44,
+        "lightweightReadyMs": 1222.51,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 6,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "rapid-zoom-out",
+      "repetition": 1,
+      "durationMs": 956.48,
+      "frameIntervalsMs": [
+        16.599999999998545,
+        16.700000000000728,
+        16.599999999998545,
+        200.10000000000218,
+        33.29999999999927,
+        16.700000000000728,
+        200,
+        49.89999999999782,
+        100,
+        50.10000000000218,
+        16.599999999998545,
+        16.700000000000728,
+        99.90000000000146,
+        16.69999999999709,
+        16.700000000000728,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.600000000002183,
+        16.69999999999709,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728
+      ],
+      "missedFrames": 34,
+      "slowFrames": 7,
+      "longTasks": [
+        {
+          "startTime": 18735.6,
+          "duration": 186
+        },
+        {
+          "startTime": 18998,
+          "duration": 173
+        },
+        {
+          "startTime": 19249,
+          "duration": 78
+        },
+        {
+          "startTime": 19406.5,
+          "duration": 107
+        }
+      ],
+      "interactionLatencyMs": 896.51,
+      "residentDom": {
+        "min": 0,
+        "max": 131
+      },
+      "styleLayoutMs": 70.85,
+      "paintCompositeMs": 35.14,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 89241828,
+        "afterBytes": 120993336,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 404.91,
+        "lightweightReadyMs": 1259.79,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 16,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "rapid-zoom-out",
+      "repetition": 2,
+      "durationMs": 743.73,
+      "frameIntervalsMs": [
+        16.600000000002183,
+        16.69999999999709,
+        166.70000000000073,
+        16.600000000002183,
+        16.69999999999709,
+        66.60000000000218,
+        33.39999999999782,
+        16.600000000002183,
+        16.700000000000728,
+        83.29999999999927,
+        33.29999999999927,
+        16.700000000000728,
+        16.700000000000728,
+        83.39999999999782,
+        16.600000000002183,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728,
+        16.69999999999709,
+        16.600000000002183,
+        16.700000000000728,
+        16.69999999999709,
+        16.600000000002183,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728
+      ],
+      "missedFrames": 19,
+      "slowFrames": 6,
+      "longTasks": [
+        {
+          "startTime": 20218.7,
+          "duration": 169
+        },
+        {
+          "startTime": 20422.4,
+          "duration": 68
+        },
+        {
+          "startTime": 20555.4,
+          "duration": 90
+        },
+        {
+          "startTime": 20706.6,
+          "duration": 90
+        }
+      ],
+      "interactionLatencyMs": 677.91,
+      "residentDom": {
+        "min": 0,
+        "max": 131
+      },
+      "styleLayoutMs": 75.19,
+      "paintCompositeMs": 39.24,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 131635388,
+        "afterBytes": 132085720,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 432.26,
+        "lightweightReadyMs": 422.55,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 14,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "rapid-zoom-out",
+      "repetition": 3,
+      "durationMs": 930.46,
+      "frameIntervalsMs": [
+        16.599999999998545,
+        33.400000000001455,
+        16.69999999999709,
+        16.600000000002183,
+        166.59999999999854,
+        50.10000000000218,
+        200,
+        49.89999999999782,
+        116.79999999999927,
+        33.30000000000291,
+        16.599999999998545,
+        16.599999999998545,
+        83.5,
+        16.5,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728
+      ],
+      "missedFrames": 33,
+      "slowFrames": 8,
+      "longTasks": [
+        {
+          "startTime": 21637.8,
+          "duration": 182
+        },
+        {
+          "startTime": 21837.3,
+          "duration": 52
+        },
+        {
+          "startTime": 21890,
+          "duration": 163
+        },
+        {
+          "startTime": 22126.6,
+          "duration": 98
+        },
+        {
+          "startTime": 22285.7,
+          "duration": 83
+        }
+      ],
+      "interactionLatencyMs": 832.63,
+      "residentDom": {
+        "min": 0,
+        "max": 131
+      },
+      "styleLayoutMs": 71.84,
+      "paintCompositeMs": 36.64,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 149628332,
+        "afterBytes": 52702140,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 499.01,
+        "lightweightReadyMs": 468.48,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 16,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "direction-reversal",
+      "repetition": 1,
+      "durationMs": 2461.19,
+      "frameIntervalsMs": [
+        150.09999999999854,
+        16.599999999998545,
+        33.400000000001455,
+        33.29999999999927,
+        166.70000000000073,
+        83.29999999999927,
+        83.40000000000146,
+        16.599999999998545,
+        66.70000000000073,
+        16.599999999998545,
+        50,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        66.70000000000073,
+        33.29999999999927,
+        16.700000000000728,
+        50,
+        16.600000000002183,
+        150,
+        16.69999999999709,
+        150,
+        33.30000000000291,
+        200,
+        50,
+        66.69999999999709,
+        16.700000000000728,
+        16.600000000002183,
+        16.69999999999709,
+        16.600000000002183,
+        16.799999999999272,
+        16.599999999998545,
+        33.30000000000291,
+        50,
+        33.29999999999927,
+        16.700000000000728,
+        150,
+        16.69999999999709,
+        149.90000000000146,
+        16.700000000000728,
+        50.099999999998545,
+        33.29999999999927,
+        66.70000000000073,
+        16.600000000002183,
+        16.69999999999709,
+        16.600000000002183,
+        16.700000000000728,
+        150,
+        16.599999999998545,
+        16.799999999999272
+      ],
+      "missedFrames": 97,
+      "slowFrames": 26,
+      "longTasks": [
+        {
+          "startTime": 23059.7,
+          "duration": 89
+        },
+        {
+          "startTime": 23149.1,
+          "duration": 79
+        },
+        {
+          "startTime": 23302.5,
+          "duration": 145
+        },
+        {
+          "startTime": 23472.1,
+          "duration": 52
+        },
+        {
+          "startTime": 23552,
+          "duration": 100
+        },
+        {
+          "startTime": 23668.5,
+          "duration": 51
+        },
+        {
+          "startTime": 23725.8,
+          "duration": 53
+        },
+        {
+          "startTime": 23828.2,
+          "duration": 66
+        },
+        {
+          "startTime": 24019.7,
+          "duration": 152
+        },
+        {
+          "startTime": 24190.5,
+          "duration": 154
+        },
+        {
+          "startTime": 24408.6,
+          "duration": 162
+        },
+        {
+          "startTime": 24573.1,
+          "duration": 60
+        },
+        {
+          "startTime": 24918.6,
+          "duration": 151
+        },
+        {
+          "startTime": 25094.4,
+          "duration": 148
+        },
+        {
+          "startTime": 25517.7,
+          "duration": 117
+        }
+      ],
+      "interactionLatencyMs": 882.62,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 179.06,
+      "paintCompositeMs": 51.83,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 75577664,
+        "afterBytes": 137022360,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 467.63,
+        "lightweightReadyMs": 445.23,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 32,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "direction-reversal",
+      "repetition": 2,
+      "durationMs": 2274.64,
+      "frameIntervalsMs": [
+        166.59999999999854,
+        33.400000000001455,
+        33.29999999999927,
+        66.70000000000073,
+        16.599999999998545,
+        33.400000000001455,
+        16.700000000000728,
+        116.59999999999854,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728,
+        50,
+        16.700000000000728,
+        66.70000000000073,
+        16.599999999998545,
+        33.29999999999927,
+        16.700000000000728,
+        66.59999999999854,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        50,
+        16.700000000000728,
+        33.400000000001455,
+        16.599999999998545,
+        33.29999999999927,
+        16.700000000000728,
+        150,
+        33.29999999999927,
+        150,
+        33.29999999999927,
+        50.10000000000218,
+        49.89999999999782,
+        33.400000000001455,
+        16.700000000000728,
+        33.29999999999927,
+        16.599999999998545,
+        16.700000000000728,
+        16.600000000002183,
+        16.799999999999272,
+        16.599999999998545,
+        16.600000000002183,
+        16.69999999999709,
+        66.60000000000218,
+        16.799999999999272,
+        33.29999999999927,
+        33.400000000001455,
+        33.29999999999927,
+        66.59999999999854,
+        16.700000000000728,
+        133.29999999999927,
+        33.30000000000291,
+        66.69999999999709,
+        16.700000000000728,
+        16.600000000002183,
+        16.69999999999709,
+        16.700000000000728,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        16.600000000002183,
+        16.69999999999709
+      ],
+      "missedFrames": 62,
+      "slowFrames": 29,
+      "longTasks": [
+        {
+          "startTime": 26195.7,
+          "duration": 91
+        },
+        {
+          "startTime": 26287.6,
+          "duration": 90
+        },
+        {
+          "startTime": 26449,
+          "duration": 56
+        },
+        {
+          "startTime": 26570.9,
+          "duration": 130
+        },
+        {
+          "startTime": 26805.4,
+          "duration": 63
+        },
+        {
+          "startTime": 26938.2,
+          "duration": 55
+        },
+        {
+          "startTime": 27062.9,
+          "duration": 65
+        },
+        {
+          "startTime": 27248.1,
+          "duration": 152
+        },
+        {
+          "startTime": 27418.9,
+          "duration": 159
+        },
+        {
+          "startTime": 27602.8,
+          "duration": 53
+        },
+        {
+          "startTime": 27676.6,
+          "duration": 51
+        },
+        {
+          "startTime": 27910.1,
+          "duration": 62
+        },
+        {
+          "startTime": 28089,
+          "duration": 66
+        },
+        {
+          "startTime": 28175.6,
+          "duration": 137
+        }
+      ],
+      "interactionLatencyMs": 730.7,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 172.37,
+      "paintCompositeMs": 44.54,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 154921136,
+        "afterBytes": 88342260,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 87.83,
+        "lightweightReadyMs": 471.46,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 28,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "direction-reversal",
+      "repetition": 3,
+      "durationMs": 2542.24,
+      "frameIntervalsMs": [
+        183.29999999999927,
+        16.700000000000728,
+        16.69999999999709,
+        33.30000000000291,
+        33.39999999999782,
+        149.90000000000146,
+        16.700000000000728,
+        16.599999999998545,
+        50,
+        16.700000000000728,
+        50,
+        16.700000000000728,
+        50,
+        33.39999999999782,
+        49.900000000001455,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        16.599999999998545,
+        50,
+        16.700000000000728,
+        33.400000000001455,
+        16.69999999999709,
+        33.30000000000291,
+        16.599999999998545,
+        150.09999999999854,
+        16.600000000002183,
+        166.70000000000073,
+        16.599999999998545,
+        200,
+        50,
+        66.59999999999854,
+        16.80000000000291,
+        16.69999999999709,
+        16.600000000002183,
+        16.700000000000728,
+        16.599999999998545,
+        16.700000000000728,
+        33.29999999999927,
+        16.700000000000728,
+        166.59999999999854,
+        33.400000000001455,
+        16.700000000000728,
+        166.59999999999854,
+        16.599999999998545,
+        66.70000000000073,
+        33.29999999999927,
+        33.400000000001455,
+        33.29999999999927,
+        66.60000000000218,
+        16.799999999999272,
+        16.599999999998545,
+        16.700000000000728,
+        16.700000000000728,
+        149.89999999999782,
+        16.700000000000728,
+        16.700000000000728
+      ],
+      "missedFrames": 90,
+      "slowFrames": 27,
+      "longTasks": [
+        {
+          "startTime": 29080.9,
+          "duration": 93
+        },
+        {
+          "startTime": 29174,
+          "duration": 96
+        },
+        {
+          "startTime": 29368.8,
+          "duration": 154
+        },
+        {
+          "startTime": 29552.2,
+          "duration": 59
+        },
+        {
+          "startTime": 29878,
+          "duration": 64
+        },
+        {
+          "startTime": 30064.2,
+          "duration": 147
+        },
+        {
+          "startTime": 30233.3,
+          "duration": 155
+        },
+        {
+          "startTime": 30440.1,
+          "duration": 164
+        },
+        {
+          "startTime": 30648.5,
+          "duration": 63
+        },
+        {
+          "startTime": 30891.7,
+          "duration": 153
+        },
+        {
+          "startTime": 31111.1,
+          "duration": 149
+        },
+        {
+          "startTime": 31284.1,
+          "duration": 61
+        },
+        {
+          "startTime": 31369.1,
+          "duration": 52
+        },
+        {
+          "startTime": 31619.8,
+          "duration": 102
+        }
+      ],
+      "interactionLatencyMs": 867.85,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 177.17,
+      "paintCompositeMs": 46.21,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 106696912,
+        "afterBytes": 156507592,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 88.85,
+        "lightweightReadyMs": 466.42,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 36,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "rare-far-programmatic-jump",
+      "repetition": 1,
+      "durationMs": 485.11,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        133.40000000000146,
+        99.90000000000146,
+        50.099999999998545,
+        99.90000000000146,
+        50,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545
+      ],
+      "missedFrames": 19,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 32407.2,
+          "duration": 74
+        },
+        {
+          "startTime": 32482.1,
+          "duration": 88
+        },
+        {
+          "startTime": 32570.8,
+          "duration": 61
+        },
+        {
+          "startTime": 32755.5,
+          "duration": 56
+        }
+      ],
+      "interactionLatencyMs": 351.91,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 11.95,
+      "paintCompositeMs": 15.59,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 49874152,
+        "afterBytes": 62282420,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 98.36,
+        "lightweightReadyMs": 576.24,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "rare-far-programmatic-jump",
+      "repetition": 2,
+      "durationMs": 426.93,
+      "frameIntervalsMs": [
+        116.69999999999709,
+        83.30000000000291,
+        16.69999999999709,
+        16.599999999998545,
+        116.70000000000437,
+        33.299999999995634,
+        16.60000000000582,
+        16.799999999995634,
+        16.599999999998545
+      ],
+      "missedFrames": 15,
+      "slowFrames": 4,
+      "longTasks": [
+        {
+          "startTime": 33596.1,
+          "duration": 75
+        },
+        {
+          "startTime": 33671.5,
+          "duration": 57
+        },
+        {
+          "startTime": 33729.4,
+          "duration": 61
+        },
+        {
+          "startTime": 33893.5,
+          "duration": 68
+        }
+      ],
+      "interactionLatencyMs": 251.68,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 11.69,
+      "paintCompositeMs": 16.49,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 90988608,
+        "afterBytes": 103827536,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 420.59,
+        "lightweightReadyMs": 627.55,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "rare-far-programmatic-jump",
+      "repetition": 3,
+      "durationMs": 426.81,
+      "frameIntervalsMs": [
+        133.29999999999563,
+        66.60000000000582,
+        50,
+        116.69999999999709,
+        16.599999999998545,
+        16.80000000000291,
+        16.599999999998545,
+        16.599999999998545
+      ],
+      "missedFrames": 16,
+      "slowFrames": 4,
+      "longTasks": [
+        {
+          "startTime": 34744.7,
+          "duration": 76
+        },
+        {
+          "startTime": 34821.4,
+          "duration": 75
+        },
+        {
+          "startTime": 35046.2,
+          "duration": 74
+        }
+      ],
+      "interactionLatencyMs": 304.27,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 12.26,
+      "paintCompositeMs": 16.95,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 129548776,
+        "afterBytes": 141815024,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 427.01,
+        "lightweightReadyMs": 636.22,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "post-gesture-settle",
+      "repetition": 1,
+      "durationMs": 1427.13,
+      "frameIntervalsMs": [
+        166.6999999999971,
+        33.30000000000291,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        150.09999999999854,
+        16.5,
+        16.700000000004366,
+        16.69999999999709,
+        16.700000000004366,
+        166.59999999999854,
+        16.69999999999709,
+        50,
+        16.700000000004366,
+        66.59999999999854,
+        16.69999999999709,
+        33.30000000000291,
+        33.400000000001455,
+        50,
+        33.299999999995634,
+        66.70000000000437,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        83.29999999999563,
+        100,
+        33.30000000000291,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709
+      ],
+      "missedFrames": 43,
+      "slowFrames": 14,
+      "longTasks": [
+        {
+          "startTime": 35893.2,
+          "duration": 89
+        },
+        {
+          "startTime": 35983.1,
+          "duration": 95
+        },
+        {
+          "startTime": 36201.2,
+          "duration": 141
+        },
+        {
+          "startTime": 36414.8,
+          "duration": 160
+        },
+        {
+          "startTime": 36665.8,
+          "duration": 57
+        },
+        {
+          "startTime": 36809.1,
+          "duration": 56
+        },
+        {
+          "startTime": 36879.2,
+          "duration": 59
+        },
+        {
+          "startTime": 36993.5,
+          "duration": 93
+        },
+        {
+          "startTime": 37127.6,
+          "duration": 71
+        }
+      ],
+      "interactionLatencyMs": 1364.28,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 82.81,
+      "paintCompositeMs": 26.12,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 167101032,
+        "afterBytes": 58332236,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 426.45,
+        "lightweightReadyMs": 559.16,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 16,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "post-gesture-settle",
+      "repetition": 2,
+      "durationMs": 1393.8,
+      "frameIntervalsMs": [
+        166.70000000000437,
+        33.299999999995634,
+        16.700000000004366,
+        16.69999999999709,
+        16.69999999999709,
+        16.700000000004366,
+        16.69999999999709,
+        149.90000000000146,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        166.6999999999971,
+        16.60000000000582,
+        66.69999999999709,
+        16.599999999998545,
+        50,
+        16.700000000004366,
+        50,
+        16.69999999999709,
+        50,
+        16.599999999998545,
+        66.70000000000437,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        116.70000000000437,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709
+      ],
+      "missedFrames": 43,
+      "slowFrames": 10,
+      "longTasks": [
+        {
+          "startTime": 38892.7,
+          "duration": 92
+        },
+        {
+          "startTime": 38985.3,
+          "duration": 93
+        },
+        {
+          "startTime": 39190.4,
+          "duration": 156
+        },
+        {
+          "startTime": 39406.6,
+          "duration": 155
+        },
+        {
+          "startTime": 39576.7,
+          "duration": 65
+        },
+        {
+          "startTime": 39730.6,
+          "duration": 50
+        },
+        {
+          "startTime": 39795.2,
+          "duration": 52
+        },
+        {
+          "startTime": 40000.2,
+          "duration": 50
+        },
+        {
+          "startTime": 40051.2,
+          "duration": 71
+        }
+      ],
+      "interactionLatencyMs": 1326.22,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 80.4,
+      "paintCompositeMs": 24.6,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 113811828,
+        "afterBytes": 144609716,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 592.25,
+        "lightweightReadyMs": 1366.91,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 16,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "post-gesture-settle",
+      "repetition": 3,
+      "durationMs": 1260.33,
+      "frameIntervalsMs": [
+        166.6999999999971,
+        16.700000000004366,
+        33.299999999995634,
+        33.30000000000291,
+        16.599999999998545,
+        50.099999999998545,
+        166.59999999999854,
+        50,
+        33.30000000000291,
+        50.099999999998545,
+        16.599999999998545,
+        50,
+        16.700000000004366,
+        50,
+        16.599999999998545,
+        50,
+        16.69999999999709,
+        66.70000000000437,
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582,
+        16.799999999995634,
+        16.599999999998545,
+        116.70000000000437,
+        16.69999999999709,
+        16.599999999998545,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582
+      ],
+      "missedFrames": 38,
+      "slowFrames": 13,
+      "longTasks": [
+        {
+          "startTime": 41876.1,
+          "duration": 88
+        },
+        {
+          "startTime": 41964.8,
+          "duration": 96
+        },
+        {
+          "startTime": 42203.1,
+          "duration": 147
+        },
+        {
+          "startTime": 42383.3,
+          "duration": 50
+        },
+        {
+          "startTime": 42451.9,
+          "duration": 59
+        },
+        {
+          "startTime": 42587.2,
+          "duration": 56
+        },
+        {
+          "startTime": 42655.4,
+          "duration": 52
+        },
+        {
+          "startTime": 42713.2,
+          "duration": 52
+        },
+        {
+          "startTime": 42916.3,
+          "duration": 71
+        }
+      ],
+      "interactionLatencyMs": 1197.23,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 80.09,
+      "paintCompositeMs": 24.67,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 72046340,
+        "afterBytes": 80864400,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 530.41,
+        "lightweightReadyMs": 1381.66,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 14,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "card-body-scroll",
+      "repetition": 1,
+      "durationMs": 3826.78,
+      "frameIntervalsMs": [
+        16.60000000000582,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        433.29999999999563,
+        50,
+        116.80000000000291,
+        33.19999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        33.30000000000291,
+        16.599999999998545,
+        183.40000000000146,
+        66.69999999999709,
+        16.599999999998545,
+        50,
+        116.70000000000437,
+        83.40000000000146,
+        16.599999999998545,
+        16.69999999999709,
+        33.200000000004366,
+        16.799999999995634,
+        300,
+        50,
+        166.70000000000437,
+        33.299999999995634,
+        16.599999999998545,
+        16.60000000000582,
+        16.799999999995634,
+        16.599999999998545,
+        16.60000000000582,
+        66.79999999999563,
+        16.599999999998545,
+        16.60000000000582,
+        16.799999999995634,
+        33.30000000000291,
+        16.69999999999709,
+        49.900000000001455,
+        50,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.700000000004366,
+        150,
+        50,
+        33.299999999995634,
+        33.30000000000291,
+        116.69999999999709,
+        66.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        233.29999999999563,
+        50,
+        150,
+        33.400000000001455,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.599999999998545,
+        16.799999999995634,
+        16.60000000000582,
+        16.69999999999709,
+        16.599999999998545,
+        33.400000000001455,
+        16.599999999998545,
+        16.80000000000291,
+        16.5,
+        16.69999999999709,
+        16.700000000004366,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.599999999998545
+      ],
+      "missedFrames": 133,
+      "slowFrames": 30,
+      "longTasks": [
+        {
+          "startTime": 44771.4,
+          "duration": 336
+        },
+        {
+          "startTime": 45108.1,
+          "duration": 86
+        },
+        {
+          "startTime": 45235.5,
+          "duration": 57
+        },
+        {
+          "startTime": 45292.9,
+          "duration": 71
+        },
+        {
+          "startTime": 45561.3,
+          "duration": 92
+        },
+        {
+          "startTime": 45654.7,
+          "duration": 107
+        },
+        {
+          "startTime": 45930.3,
+          "duration": 85
+        },
+        {
+          "startTime": 46169.4,
+          "duration": 211
+        },
+        {
+          "startTime": 46381.1,
+          "duration": 96
+        },
+        {
+          "startTime": 46528.8,
+          "duration": 56
+        },
+        {
+          "startTime": 46590.6,
+          "duration": 98
+        },
+        {
+          "startTime": 46790.8,
+          "duration": 76
+        },
+        {
+          "startTime": 47253.2,
+          "duration": 77
+        },
+        {
+          "startTime": 47331.3,
+          "duration": 77
+        },
+        {
+          "startTime": 47525.8,
+          "duration": 51
+        },
+        {
+          "startTime": 47577.7,
+          "duration": 62
+        },
+        {
+          "startTime": 47640.7,
+          "duration": 52
+        },
+        {
+          "startTime": 47740.7,
+          "duration": 161
+        },
+        {
+          "startTime": 47902.5,
+          "duration": 85
+        },
+        {
+          "startTime": 47987.7,
+          "duration": 53
+        },
+        {
+          "startTime": 48089.1,
+          "duration": 97
+        }
+      ],
+      "interactionLatencyMs": 124.31,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 193.83,
+      "paintCompositeMs": 157.64,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 141721464,
+        "afterBytes": 105355204,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 451.29,
+        "lightweightReadyMs": 1380.52,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 20,
+        "cardMetricVisits": 132
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "card-body-scroll",
+      "repetition": 2,
+      "durationMs": 3675.53,
+      "frameIntervalsMs": [
+        16.599999999998545,
+        16.599999999998545,
+        16.700000000004366,
+        16.599999999998545,
+        433.40000000000146,
+        66.69999999999709,
+        116.59999999999854,
+        16.700000000004366,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        33.400000000001455,
+        16.599999999998545,
+        133.29999999999563,
+        83.40000000000146,
+        16.599999999998545,
+        33.30000000000291,
+        150,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        266.6999999999971,
+        66.60000000000582,
+        150,
+        33.39999999999418,
+        33.30000000000291,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        100,
+        16.599999999998545,
+        16.80000000000291,
+        16.599999999998545,
+        50,
+        33.30000000000291,
+        33.39999999999418,
+        16.60000000000582,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        33.30000000000291,
+        16.799999999995634,
+        149.90000000000146,
+        66.70000000000437,
+        16.69999999999709,
+        33.30000000000291,
+        133.29999999999563,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        216.70000000000437,
+        50,
+        150,
+        33.299999999995634,
+        16.700000000004366,
+        16.599999999998545,
+        16.799999999995634,
+        16.60000000000582,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709
+      ],
+      "missedFrames": 124,
+      "slowFrames": 26,
+      "longTasks": [
+        {
+          "startTime": 49873.9,
+          "duration": 384
+        },
+        {
+          "startTime": 50258.7,
+          "duration": 72
+        },
+        {
+          "startTime": 50429.7,
+          "duration": 84
+        },
+        {
+          "startTime": 50717.4,
+          "duration": 77
+        },
+        {
+          "startTime": 50795.4,
+          "duration": 70
+        },
+        {
+          "startTime": 50866,
+          "duration": 63
+        },
+        {
+          "startTime": 50997.5,
+          "duration": 56
+        },
+        {
+          "startTime": 51054.7,
+          "duration": 83
+        },
+        {
+          "startTime": 51180.1,
+          "duration": 203
+        },
+        {
+          "startTime": 51384,
+          "duration": 77
+        },
+        {
+          "startTime": 51461.8,
+          "duration": 60
+        },
+        {
+          "startTime": 51569.1,
+          "duration": 104
+        },
+        {
+          "startTime": 51836,
+          "duration": 84
+        },
+        {
+          "startTime": 51976.8,
+          "duration": 54
+        },
+        {
+          "startTime": 52301.6,
+          "duration": 76
+        },
+        {
+          "startTime": 52379.1,
+          "duration": 74
+        },
+        {
+          "startTime": 52453.3,
+          "duration": 60
+        },
+        {
+          "startTime": 52566,
+          "duration": 54
+        },
+        {
+          "startTime": 52621,
+          "duration": 82
+        },
+        {
+          "startTime": 52740.8,
+          "duration": 154
+        },
+        {
+          "startTime": 52894.9,
+          "duration": 84
+        },
+        {
+          "startTime": 53020.1,
+          "duration": 59
+        },
+        {
+          "startTime": 53079.6,
+          "duration": 92
+        }
+      ],
+      "interactionLatencyMs": 99.03,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 194.09,
+      "paintCompositeMs": 135.31,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 129739300,
+        "afterBytes": 77647432,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 583.61,
+        "lightweightReadyMs": 972.17,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 16,
+        "cardMetricVisits": 132
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "card-body-scroll",
+      "repetition": 3,
+      "durationMs": 3710.34,
+      "frameIntervalsMs": [
+        16.599999999998545,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        433.29999999999563,
+        50,
+        133.3000000000029,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        33.39999999999418,
+        16.60000000000582,
+        150.09999999999854,
+        66.59999999999854,
+        33.30000000000291,
+        33.39999999999418,
+        133.3000000000029,
+        33.400000000001455,
+        16.599999999998545,
+        16.599999999998545,
+        283.40000000000146,
+        66.69999999999709,
+        133.3000000000029,
+        50,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.60000000000582,
+        83.29999999999563,
+        16.700000000004366,
+        16.69999999999709,
+        33.30000000000291,
+        16.69999999999709,
+        50,
+        50,
+        16.599999999998545,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.799999999995634,
+        16.60000000000582,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.799999999995634,
+        149.90000000000146,
+        50,
+        33.400000000001455,
+        16.599999999998545,
+        133.3000000000029,
+        16.69999999999709,
+        16.599999999998545,
+        16.80000000000291,
+        16.599999999998545,
+        16.700000000004366,
+        283.29999999999563,
+        66.70000000000437,
+        133.29999999999563,
+        33.30000000000291,
+        16.69999999999709,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.700000000004366,
+        16.599999999998545,
+        16.599999999998545,
+        16.69999999999709,
+        16.700000000004366,
+        16.69999999999709,
+        16.700000000004366
+      ],
+      "missedFrames": 125,
+      "slowFrames": 26,
+      "longTasks": [
+        {
+          "startTime": 54822.6,
+          "duration": 363
+        },
+        {
+          "startTime": 55186.4,
+          "duration": 88
+        },
+        {
+          "startTime": 55274.9,
+          "duration": 51
+        },
+        {
+          "startTime": 55372.4,
+          "duration": 84
+        },
+        {
+          "startTime": 55637,
+          "duration": 76
+        },
+        {
+          "startTime": 55713.7,
+          "duration": 74
+        },
+        {
+          "startTime": 55788.7,
+          "duration": 59
+        },
+        {
+          "startTime": 55915.1,
+          "duration": 54
+        },
+        {
+          "startTime": 55970.1,
+          "duration": 89
+        },
+        {
+          "startTime": 56107.3,
+          "duration": 215
+        },
+        {
+          "startTime": 56322.6,
+          "duration": 81
+        },
+        {
+          "startTime": 56404,
+          "duration": 61
+        },
+        {
+          "startTime": 56509.2,
+          "duration": 100
+        },
+        {
+          "startTime": 56723.5,
+          "duration": 92
+        },
+        {
+          "startTime": 57216.4,
+          "duration": 82
+        },
+        {
+          "startTime": 57300,
+          "duration": 68
+        },
+        {
+          "startTime": 57368,
+          "duration": 57
+        },
+        {
+          "startTime": 57479.5,
+          "duration": 52
+        },
+        {
+          "startTime": 57531.9,
+          "duration": 77
+        },
+        {
+          "startTime": 57687.3,
+          "duration": 287
+        },
+        {
+          "startTime": 57975,
+          "duration": 56
+        },
+        {
+          "startTime": 58040.9,
+          "duration": 54
+        },
+        {
+          "startTime": 58095.5,
+          "duration": 82
+        }
+      ],
+      "interactionLatencyMs": 99.32,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 206.52,
+      "paintCompositeMs": 149.15,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 115549040,
+        "afterBytes": 76606464,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 570.12,
+        "lightweightReadyMs": 979.58,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 16,
+        "cardMetricVisits": 132
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "selection",
+      "repetition": 1,
+      "durationMs": 742.57,
+      "frameIntervalsMs": [
+        16.700000000004366,
+        16.69999999999709,
+        450,
+        183.3000000000029,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.69999999999709
+      ],
+      "missedFrames": 34,
+      "slowFrames": 2,
+      "longTasks": [
+        {
+          "startTime": 59806.8,
+          "duration": 394
+        },
+        {
+          "startTime": 60201.5,
+          "duration": 85
+        },
+        {
+          "startTime": 60320.5,
+          "duration": 52
+        },
+        {
+          "startTime": 60373.2,
+          "duration": 85
+        }
+      ],
+      "interactionLatencyMs": 693.46,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 49.85,
+      "paintCompositeMs": 18.29,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 112888152,
+        "afterBytes": 125297596,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 580.85,
+        "lightweightReadyMs": 1008.2,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "selection",
+      "repetition": 2,
+      "durationMs": 754.55,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.69999999999709,
+        366.6000000000058,
+        33.299999999995634,
+        166.70000000000437,
+        16.69999999999709,
+        66.59999999999854,
+        33.400000000001455,
+        16.599999999998545,
+        16.599999999998545,
+        16.700000000004366
+      ],
+      "missedFrames": 32,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 61271.9,
+          "duration": 305
+        },
+        {
+          "startTime": 61577.2,
+          "duration": 83
+        },
+        {
+          "startTime": 61696.7,
+          "duration": 64
+        },
+        {
+          "startTime": 61776.1,
+          "duration": 87
+        }
+      ],
+      "interactionLatencyMs": 626.47,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 48.86,
+      "paintCompositeMs": 32.47,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 149619768,
+        "afterBytes": 188931808,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 135.51,
+        "lightweightReadyMs": 639.33,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "selection",
+      "repetition": 3,
+      "durationMs": 826.86,
+      "frameIntervalsMs": [
+        16.599999999998545,
+        16.69999999999709,
+        400,
+        166.60000000000582,
+        50.099999999998545,
+        16.599999999998545,
+        66.69999999999709,
+        33.30000000000291,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582
+      ],
+      "missedFrames": 36,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 62838.9,
+          "duration": 353
+        },
+        {
+          "startTime": 63192.1,
+          "duration": 73
+        },
+        {
+          "startTime": 63351.2,
+          "duration": 76
+        },
+        {
+          "startTime": 63469.8,
+          "duration": 66
+        }
+      ],
+      "interactionLatencyMs": 783.05,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 49.97,
+      "paintCompositeMs": 30.42,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 67729504,
+        "afterBytes": 87922164,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 167.64,
+        "lightweightReadyMs": 720.93,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "hover-before-click",
+      "repetition": 1,
+      "durationMs": 844.08,
+      "frameIntervalsMs": [
+        16.700000000004366,
+        16.599999999998545,
+        16.599999999998545,
+        366.70000000000437,
+        50,
+        150,
+        16.69999999999709,
+        66.69999999999709,
+        33.30000000000291,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366,
+        16.69999999999709,
+        16.599999999998545,
+        16.700000000004366
+      ],
+      "missedFrames": 34,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 64399.4,
+          "duration": 295
+        },
+        {
+          "startTime": 64694.7,
+          "duration": 80
+        },
+        {
+          "startTime": 64818.6,
+          "duration": 60
+        },
+        {
+          "startTime": 64901.9,
+          "duration": 81
+        }
+      ],
+      "interactionLatencyMs": 731.76,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 47.46,
+      "paintCompositeMs": 30.55,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 111808020,
+        "afterBytes": 151979420,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 130.01,
+        "lightweightReadyMs": 619.27,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "hover-before-click",
+      "repetition": 2,
+      "durationMs": 861.46,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.59999999999127,
+        16.70000000001164,
+        366.6999999999971,
+        66.59999999999127,
+        150,
+        16.60000000000582,
+        83.39999999999418,
+        33.40000000000873,
+        16.59999999999127,
+        16.70000000001164,
+        16.69999999999709,
+        16.59999999999127,
+        16.70000000001164,
+        16.69999999999709,
+        33.30000000000291,
+        16.69999999999709,
+        16.59999999999127,
+        16.70000000001164
+      ],
+      "missedFrames": 36,
+      "slowFrames": 6,
+      "longTasks": [
+        {
+          "startTime": 65937.3,
+          "duration": 312
+        },
+        {
+          "startTime": 66250,
+          "duration": 75
+        },
+        {
+          "startTime": 66325.5,
+          "duration": 53
+        },
+        {
+          "startTime": 66387.6,
+          "duration": 54
+        },
+        {
+          "startTime": 66464.2,
+          "duration": 82
+        },
+        {
+          "startTime": 66552.9,
+          "duration": 64
+        }
+      ],
+      "interactionLatencyMs": 756.3,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 50.19,
+      "paintCompositeMs": 30.53,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 168646372,
+        "afterBytes": 46311740,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 149.92,
+        "lightweightReadyMs": 613.13,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "hover-before-click",
+      "repetition": 3,
+      "durationMs": 892.57,
+      "frameIntervalsMs": [
+        16.70000000001164,
+        16.59999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        400.1000000000058,
+        166.59999999999127,
+        50,
+        16.60000000000582,
+        50,
+        33.39999999999418,
+        16.60000000000582,
+        16.80000000000291,
+        16.5,
+        16.69999999999709,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709
+      ],
+      "missedFrames": 36,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 67586,
+          "duration": 345
+        },
+        {
+          "startTime": 67931,
+          "duration": 84
+        },
+        {
+          "startTime": 68052.1,
+          "duration": 55
+        },
+        {
+          "startTime": 68107.2,
+          "duration": 77
+        },
+        {
+          "startTime": 68228.9,
+          "duration": 54
+        }
+      ],
+      "interactionLatencyMs": 764.72,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 51.38,
+      "paintCompositeMs": 27.38,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 88242284,
+        "afterBytes": 117374356,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 140.44,
+        "lightweightReadyMs": 611.72,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "click-before-activation",
+      "repetition": 1,
+      "durationMs": 860.98,
+      "frameIntervalsMs": [
+        16.79999999998836,
+        16.60000000000582,
+        16.69999999999709,
+        399.90000000000873,
+        166.6999999999971,
+        50,
+        16.69999999999709,
+        49.89999999999418,
+        33.40000000000873,
+        16.59999999999127,
+        16.80000000000291,
+        16.60000000000582,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.59999999999127
+      ],
+      "missedFrames": 35,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 69184,
+          "duration": 398
+        },
+        {
+          "startTime": 69618.8,
+          "duration": 52
+        },
+        {
+          "startTime": 69670.8,
+          "duration": 79
+        }
+      ],
+      "interactionLatencyMs": 743.75,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 47.58,
+      "paintCompositeMs": 28.63,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 132472792,
+        "afterBytes": 163608652,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 146,
+        "lightweightReadyMs": 596.87,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "click-before-activation",
+      "repetition": 2,
+      "durationMs": 893.37,
+      "frameIntervalsMs": [
+        16.59999999999127,
+        16.70000000001164,
+        16.59999999999127,
+        33.30000000000291,
+        383.3999999999942,
+        50,
+        149.90000000000873,
+        16.69999999999709,
+        83.30000000000291,
+        50.09999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        33.30000000000291,
+        16.69999999999709
+      ],
+      "missedFrames": 36,
+      "slowFrames": 7,
+      "longTasks": [
+        {
+          "startTime": 70770.9,
+          "duration": 294
+        },
+        {
+          "startTime": 71065.8,
+          "duration": 93
+        },
+        {
+          "startTime": 71201.5,
+          "duration": 62
+        },
+        {
+          "startTime": 71283.5,
+          "duration": 76
+        },
+        {
+          "startTime": 71364.7,
+          "duration": 82
+        }
+      ],
+      "interactionLatencyMs": 780.65,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 49.59,
+      "paintCompositeMs": 38.25,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 179999348,
+        "afterBytes": 47505700,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 152.79,
+        "lightweightReadyMs": 611.9,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "click-before-activation",
+      "repetition": 3,
+      "durationMs": 909.91,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.60000000000582,
+        16.60000000000582,
+        433.3999999999942,
+        166.6999999999971,
+        50,
+        16.60000000000582,
+        50,
+        50,
+        16.59999999999127,
+        16.80000000000291,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.59999999999127
+      ],
+      "missedFrames": 40,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 72396.7,
+          "duration": 431
+        },
+        {
+          "startTime": 72879.9,
+          "duration": 51
+        },
+        {
+          "startTime": 72931.4,
+          "duration": 68
+        },
+        {
+          "startTime": 73044.2,
+          "duration": 54
+        }
+      ],
+      "interactionLatencyMs": 788.64,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 52.52,
+      "paintCompositeMs": 29.18,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 73094716,
+        "afterBytes": 106408244,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 135.85,
+        "lightweightReadyMs": 597.47,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "editing-activation",
+      "repetition": 1,
+      "durationMs": 893.43,
+      "frameIntervalsMs": [
+        16.59999999999127,
+        16.80000000000291,
+        16.60000000000582,
+        416.59999999999127,
+        166.70000000001164,
+        33.39999999999418,
+        33.30000000000291,
+        49.89999999999418,
+        50,
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.69999999999709,
+        16.59999999999127
+      ],
+      "missedFrames": 36,
+      "slowFrames": 6,
+      "longTasks": [
+        {
+          "startTime": 74014,
+          "duration": 404
+        },
+        {
+          "startTime": 74471,
+          "duration": 53
+        },
+        {
+          "startTime": 74524.1,
+          "duration": 65
+        },
+        {
+          "startTime": 74635.4,
+          "duration": 56
+        }
+      ],
+      "interactionLatencyMs": 764.38,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 50.6,
+      "paintCompositeMs": 28.32,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 128511860,
+        "afterBytes": 160673304,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 137.09,
+        "lightweightReadyMs": 612.12,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "editing-activation",
+      "repetition": 2,
+      "durationMs": 895.46,
+      "frameIntervalsMs": [
+        16.80000000000291,
+        16.59999999999127,
+        16.60000000000582,
+        16.80000000000291,
+        383.1999999999971,
+        183.3000000000029,
+        33.39999999999418,
+        16.69999999999709,
+        66.60000000000582,
+        16.69999999999709,
+        50,
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709
+      ],
+      "missedFrames": 35,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 75603.5,
+          "duration": 312
+        },
+        {
+          "startTime": 75915.7,
+          "duration": 79
+        },
+        {
+          "startTime": 76086.3,
+          "duration": 81
+        },
+        {
+          "startTime": 76213.2,
+          "duration": 58
+        }
+      ],
+      "interactionLatencyMs": 768.59,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 50.31,
+      "paintCompositeMs": 36.64,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 183426608,
+        "afterBytes": 48866988,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 138.59,
+        "lightweightReadyMs": 592.92,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "editing-activation",
+      "repetition": 3,
+      "durationMs": 909.51,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.59999999999127,
+        433.40000000000873,
+        166.6999999999971,
+        33.30000000000291,
+        16.59999999999127,
+        50.10000000000582,
+        49.89999999999418,
+        16.70000000001164,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.59999999999127,
+        16.70000000001164
+      ],
+      "missedFrames": 37,
+      "slowFrames": 5,
+      "longTasks": [
+        {
+          "startTime": 77300.3,
+          "duration": 421
+        },
+        {
+          "startTime": 77823.3,
+          "duration": 62
+        },
+        {
+          "startTime": 77928.6,
+          "duration": 55
+        }
+      ],
+      "interactionLatencyMs": 774.48,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 51.82,
+      "paintCompositeMs": 26.47,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 90885592,
+        "afterBytes": 107567420,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 130.3,
+        "lightweightReadyMs": 640.43,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 0,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "typing",
+      "repetition": 1,
+      "durationMs": 6171.59,
+      "frameIntervalsMs": [
+        16.59999999999127,
+        16.70000000001164,
+        16.69999999999709,
+        383.3000000000029,
+        166.6999999999971,
+        49.89999999999418,
+        16.69999999999709,
+        50,
+        33.30000000000291,
+        33.30000000000291,
+        16.69999999999709,
+        16.69999999999709,
+        166.60000000000582,
+        16.69999999999709,
+        166.6999999999971,
+        16.60000000000582,
+        183.39999999999418,
+        16.60000000000582,
+        166.60000000000582,
+        16.69999999999709,
+        166.6999999999971,
+        16.69999999999709,
+        183.3000000000029,
+        16.69999999999709,
+        183.3000000000029,
+        16.69999999999709,
+        266.6000000000058,
+        16.69999999999709,
+        183.3000000000029,
+        16.69999999999709,
+        166.6999999999971,
+        16.60000000000582,
+        183.39999999999418,
+        16.60000000000582,
+        183.39999999999418,
+        16.5,
+        183.40000000000873,
+        16.69999999999709,
+        166.59999999999127,
+        16.70000000001164,
+        150,
+        16.69999999999709,
+        249.89999999999418,
+        16.80000000000291,
+        183.1999999999971,
+        16.69999999999709,
+        183.40000000000873,
+        16.59999999999127,
+        166.70000000001164,
+        16.59999999999127,
+        200,
+        16.60000000000582,
+        166.6999999999971,
+        16.69999999999709,
+        183.40000000000873,
+        16.59999999999127,
+        183.3000000000029,
+        16.69999999999709,
+        166.6999999999971,
+        16.60000000000582,
+        166.6999999999971,
+        33.30000000000291,
+        233.3000000000029,
+        16.69999999999709,
+        33.30000000000291,
+        16.69999999999709,
+        16.60000000000582,
+        16.79999999998836,
+        16.60000000000582,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        33.30000000000291,
+        16.80000000000291,
+        16.59999999999127,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.60000000000582
+      ],
+      "missedFrames": 283,
+      "slowFrames": 35,
+      "longTasks": [
+        {
+          "startTime": 78879.5,
+          "duration": 383
+        },
+        {
+          "startTime": 79348,
+          "duration": 78
+        },
+        {
+          "startTime": 79473.7,
+          "duration": 58
+        },
+        {
+          "startTime": 79621.4,
+          "duration": 101
+        },
+        {
+          "startTime": 79722.9,
+          "duration": 83
+        },
+        {
+          "startTime": 79810.2,
+          "duration": 101
+        },
+        {
+          "startTime": 79911.7,
+          "duration": 82
+        },
+        {
+          "startTime": 79998.1,
+          "duration": 107
+        },
+        {
+          "startTime": 80105.4,
+          "duration": 81
+        },
+        {
+          "startTime": 80191.1,
+          "duration": 118
+        },
+        {
+          "startTime": 80309.2,
+          "duration": 67
+        },
+        {
+          "startTime": 80380.3,
+          "duration": 114
+        },
+        {
+          "startTime": 80494.4,
+          "duration": 63
+        },
+        {
+          "startTime": 80561.6,
+          "duration": 116
+        },
+        {
+          "startTime": 80678.3,
+          "duration": 81
+        },
+        {
+          "startTime": 80763.3,
+          "duration": 106
+        },
+        {
+          "startTime": 80870.2,
+          "duration": 82
+        },
+        {
+          "startTime": 80956.3,
+          "duration": 208
+        },
+        {
+          "startTime": 81165.3,
+          "duration": 82
+        },
+        {
+          "startTime": 81251.4,
+          "duration": 107
+        },
+        {
+          "startTime": 81358.6,
+          "duration": 85
+        },
+        {
+          "startTime": 81447.2,
+          "duration": 99
+        },
+        {
+          "startTime": 81547.1,
+          "duration": 77
+        },
+        {
+          "startTime": 81628.6,
+          "duration": 129
+        },
+        {
+          "startTime": 81757.9,
+          "duration": 67
+        },
+        {
+          "startTime": 81829.1,
+          "duration": 112
+        },
+        {
+          "startTime": 81942.1,
+          "duration": 77
+        },
+        {
+          "startTime": 82023.4,
+          "duration": 118
+        },
+        {
+          "startTime": 82141.8,
+          "duration": 76
+        },
+        {
+          "startTime": 82221.4,
+          "duration": 101
+        },
+        {
+          "startTime": 82323.1,
+          "duration": 81
+        },
+        {
+          "startTime": 82408,
+          "duration": 94
+        },
+        {
+          "startTime": 82503,
+          "duration": 80
+        },
+        {
+          "startTime": 82633.2,
+          "duration": 111
+        },
+        {
+          "startTime": 82744.6,
+          "duration": 101
+        },
+        {
+          "startTime": 82851.5,
+          "duration": 114
+        },
+        {
+          "startTime": 82966.5,
+          "duration": 84
+        },
+        {
+          "startTime": 83054.6,
+          "duration": 101
+        },
+        {
+          "startTime": 83155.8,
+          "duration": 82
+        },
+        {
+          "startTime": 83242.8,
+          "duration": 117
+        },
+        {
+          "startTime": 83360.5,
+          "duration": 68
+        },
+        {
+          "startTime": 83434,
+          "duration": 118
+        },
+        {
+          "startTime": 83552.2,
+          "duration": 84
+        },
+        {
+          "startTime": 83640.7,
+          "duration": 110
+        },
+        {
+          "startTime": 83751.1,
+          "duration": 82
+        },
+        {
+          "startTime": 83837.2,
+          "duration": 103
+        },
+        {
+          "startTime": 83941,
+          "duration": 84
+        },
+        {
+          "startTime": 84029.5,
+          "duration": 105
+        },
+        {
+          "startTime": 84135.5,
+          "duration": 84
+        },
+        {
+          "startTime": 84224,
+          "duration": 117
+        },
+        {
+          "startTime": 84341.2,
+          "duration": 66
+        },
+        {
+          "startTime": 84412.3,
+          "duration": 120
+        },
+        {
+          "startTime": 84533.2,
+          "duration": 66
+        },
+        {
+          "startTime": 84603.8,
+          "duration": 159
+        },
+        {
+          "startTime": 84763.4,
+          "duration": 92
+        }
+      ],
+      "interactionLatencyMs": 5294.33,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 246.8,
+      "paintCompositeMs": 219.95,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 129896664,
+        "afterBytes": 51957064,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 136.17,
+        "lightweightReadyMs": 596.43,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 52,
+        "cardMetricVisits": 3432
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "typing",
+      "repetition": 2,
+      "durationMs": 5742.23,
+      "frameIntervalsMs": [
+        16.59999999999127,
+        16.70000000001164,
+        16.69999999999709,
+        433.3000000000029,
+        166.6999999999971,
+        50,
+        16.59999999999127,
+        50,
+        33.40000000000873,
+        16.69999999999709,
+        16.60000000000582,
+        16.59999999999127,
+        150.10000000000582,
+        16.69999999999709,
+        166.60000000000582,
+        16.69999999999709,
+        149.89999999999418,
+        33.30000000000291,
+        166.8000000000029,
+        16.59999999999127,
+        166.70000000001164,
+        16.69999999999709,
+        166.5,
+        16.69999999999709,
+        150,
+        16.69999999999709,
+        150,
+        33.30000000000291,
+        166.6999999999971,
+        16.69999999999709,
+        166.70000000001164,
+        16.59999999999127,
+        150,
+        16.60000000000582,
+        166.6999999999971,
+        183.39999999999418,
+        16.60000000000582,
+        183.3000000000029,
+        16.69999999999709,
+        150,
+        33.39999999999418,
+        233.20000000001164,
+        16.69999999999709,
+        183.39999999999418,
+        16.60000000000582,
+        150,
+        16.59999999999127,
+        166.70000000001164,
+        16.69999999999709,
+        150,
+        16.59999999999127,
+        166.70000000001164,
+        33.39999999999418,
+        133.3000000000029,
+        16.69999999999709,
+        183.3000000000029,
+        16.59999999999127,
+        150,
+        16.70000000001164,
+        150,
+        16.59999999999127,
+        183.3000000000029,
+        16.69999999999709,
+        50.10000000000582,
+        16.59999999999127,
+        16.70000000001164,
+        16.69999999999709,
+        16.59999999999127,
+        16.70000000001164,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.69999999999709,
+        16.59999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709
+      ],
+      "missedFrames": 265,
+      "slowFrames": 36,
+      "longTasks": [
+        {
+          "startTime": 86061.5,
+          "duration": 430
+        },
+        {
+          "startTime": 86530.1,
+          "duration": 52
+        },
+        {
+          "startTime": 86582.4,
+          "duration": 76
+        },
+        {
+          "startTime": 86836.1,
+          "duration": 93
+        },
+        {
+          "startTime": 86929.2,
+          "duration": 80
+        },
+        {
+          "startTime": 87012.5,
+          "duration": 110
+        },
+        {
+          "startTime": 87123.4,
+          "duration": 63
+        },
+        {
+          "startTime": 87190.1,
+          "duration": 112
+        },
+        {
+          "startTime": 87302.4,
+          "duration": 61
+        },
+        {
+          "startTime": 87368.6,
+          "duration": 116
+        },
+        {
+          "startTime": 87485.5,
+          "duration": 77
+        },
+        {
+          "startTime": 87565.9,
+          "duration": 97
+        },
+        {
+          "startTime": 87663.8,
+          "duration": 76
+        },
+        {
+          "startTime": 87744.3,
+          "duration": 98
+        },
+        {
+          "startTime": 87843.1,
+          "duration": 77
+        },
+        {
+          "startTime": 87923.8,
+          "duration": 105
+        },
+        {
+          "startTime": 88029.4,
+          "duration": 63
+        },
+        {
+          "startTime": 88095.6,
+          "duration": 107
+        },
+        {
+          "startTime": 88203.1,
+          "duration": 60
+        },
+        {
+          "startTime": 88267.1,
+          "duration": 112
+        },
+        {
+          "startTime": 88379.2,
+          "duration": 73
+        },
+        {
+          "startTime": 88456.4,
+          "duration": 98
+        },
+        {
+          "startTime": 88555.1,
+          "duration": 78
+        },
+        {
+          "startTime": 88637.2,
+          "duration": 97
+        },
+        {
+          "startTime": 88735,
+          "duration": 77
+        },
+        {
+          "startTime": 88816.1,
+          "duration": 100
+        },
+        {
+          "startTime": 88916.3,
+          "duration": 75
+        },
+        {
+          "startTime": 88993.3,
+          "duration": 183
+        },
+        {
+          "startTime": 89179.9,
+          "duration": 118
+        },
+        {
+          "startTime": 89298.6,
+          "duration": 75
+        },
+        {
+          "startTime": 89377.3,
+          "duration": 96
+        },
+        {
+          "startTime": 89473.9,
+          "duration": 74
+        },
+        {
+          "startTime": 89551.6,
+          "duration": 188
+        },
+        {
+          "startTime": 89739.9,
+          "duration": 67
+        },
+        {
+          "startTime": 89810.6,
+          "duration": 117
+        },
+        {
+          "startTime": 89928.1,
+          "duration": 77
+        },
+        {
+          "startTime": 90008.7,
+          "duration": 96
+        },
+        {
+          "startTime": 90105,
+          "duration": 75
+        },
+        {
+          "startTime": 90183.3,
+          "duration": 95
+        },
+        {
+          "startTime": 90279.1,
+          "duration": 75
+        },
+        {
+          "startTime": 90357.6,
+          "duration": 92
+        },
+        {
+          "startTime": 90449.8,
+          "duration": 80
+        },
+        {
+          "startTime": 90533.3,
+          "duration": 106
+        },
+        {
+          "startTime": 90639.6,
+          "duration": 62
+        },
+        {
+          "startTime": 90705.6,
+          "duration": 109
+        },
+        {
+          "startTime": 90815.3,
+          "duration": 63
+        },
+        {
+          "startTime": 90882.2,
+          "duration": 110
+        },
+        {
+          "startTime": 90993.2,
+          "duration": 76
+        },
+        {
+          "startTime": 91073.1,
+          "duration": 93
+        },
+        {
+          "startTime": 91166.5,
+          "duration": 78
+        },
+        {
+          "startTime": 91248.2,
+          "duration": 92
+        },
+        {
+          "startTime": 91341,
+          "duration": 75
+        },
+        {
+          "startTime": 91419.9,
+          "duration": 118
+        },
+        {
+          "startTime": 91538.8,
+          "duration": 62
+        },
+        {
+          "startTime": 91605.1,
+          "duration": 52
+        }
+      ],
+      "interactionLatencyMs": 4840.82,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 233.87,
+      "paintCompositeMs": 203.93,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 84634644,
+        "afterBytes": 168864284,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 143.86,
+        "lightweightReadyMs": 721.22,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 52,
+        "cardMetricVisits": 3432
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "typing",
+      "repetition": 3,
+      "durationMs": 5905.1,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        449.90000000000873,
+        150,
+        50.09999999999127,
+        16.69999999999709,
+        16.60000000000582,
+        33.30000000000291,
+        50.09999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        149.90000000000873,
+        16.69999999999709,
+        150,
+        16.69999999999709,
+        166.60000000000582,
+        16.79999999998836,
+        249.90000000000873,
+        16.59999999999127,
+        166.70000000001164,
+        183.29999999998836,
+        33.40000000000873,
+        183.3000000000029,
+        16.69999999999709,
+        183.3000000000029,
+        16.59999999999127,
+        166.6999999999971,
+        16.70000000001164,
+        150,
+        16.69999999999709,
+        166.59999999999127,
+        16.70000000001164,
+        183.29999999998836,
+        16.70000000001164,
+        150,
+        16.59999999999127,
+        166.6999999999971,
+        16.60000000000582,
+        166.6999999999971,
+        16.69999999999709,
+        149.90000000000873,
+        16.80000000000291,
+        183.1999999999971,
+        16.80000000000291,
+        150,
+        16.59999999999127,
+        166.60000000000582,
+        16.69999999999709,
+        150,
+        16.69999999999709,
+        166.60000000000582,
+        16.69999999999709,
+        150.10000000000582,
+        16.5,
+        183.39999999999418,
+        16.69999999999709,
+        166.60000000000582,
+        16.69999999999709,
+        266.6000000000058,
+        16.69999999999709,
+        166.6999999999971,
+        16.60000000000582,
+        50,
+        33.39999999999418,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.59999999999127,
+        16.70000000001164,
+        16.69999999999709,
+        16.59999999999127
+      ],
+      "missedFrames": 270,
+      "slowFrames": 34,
+      "longTasks": [
+        {
+          "startTime": 92736.4,
+          "duration": 431
+        },
+        {
+          "startTime": 93204.6,
+          "duration": 51
+        },
+        {
+          "startTime": 93256,
+          "duration": 62
+        },
+        {
+          "startTime": 93507.7,
+          "duration": 89
+        },
+        {
+          "startTime": 93597.1,
+          "duration": 78
+        },
+        {
+          "startTime": 93679,
+          "duration": 93
+        },
+        {
+          "startTime": 93772.3,
+          "duration": 77
+        },
+        {
+          "startTime": 93853.4,
+          "duration": 96
+        },
+        {
+          "startTime": 93950.1,
+          "duration": 74
+        },
+        {
+          "startTime": 94028.2,
+          "duration": 206
+        },
+        {
+          "startTime": 94234.2,
+          "duration": 63
+        },
+        {
+          "startTime": 94301.7,
+          "duration": 115
+        },
+        {
+          "startTime": 94417.3,
+          "duration": 66
+        },
+        {
+          "startTime": 94485,
+          "duration": 177
+        },
+        {
+          "startTime": 94666.3,
+          "duration": 117
+        },
+        {
+          "startTime": 94783.7,
+          "duration": 90
+        },
+        {
+          "startTime": 94878.5,
+          "duration": 111
+        },
+        {
+          "startTime": 94989.9,
+          "duration": 83
+        },
+        {
+          "startTime": 95076.8,
+          "duration": 96
+        },
+        {
+          "startTime": 95173.6,
+          "duration": 78
+        },
+        {
+          "startTime": 95255.6,
+          "duration": 92
+        },
+        {
+          "startTime": 95348.1,
+          "duration": 76
+        },
+        {
+          "startTime": 95428.8,
+          "duration": 113
+        },
+        {
+          "startTime": 95542.6,
+          "duration": 65
+        },
+        {
+          "startTime": 95611.1,
+          "duration": 113
+        },
+        {
+          "startTime": 95724.7,
+          "duration": 75
+        },
+        {
+          "startTime": 95803.5,
+          "duration": 97
+        },
+        {
+          "startTime": 95900.9,
+          "duration": 79
+        },
+        {
+          "startTime": 95983.7,
+          "duration": 95
+        },
+        {
+          "startTime": 96079.7,
+          "duration": 77
+        },
+        {
+          "startTime": 96161.1,
+          "duration": 95
+        },
+        {
+          "startTime": 96256.4,
+          "duration": 77
+        },
+        {
+          "startTime": 96337.2,
+          "duration": 108
+        },
+        {
+          "startTime": 96445.9,
+          "duration": 63
+        },
+        {
+          "startTime": 96513,
+          "duration": 112
+        },
+        {
+          "startTime": 96625.3,
+          "duration": 78
+        },
+        {
+          "startTime": 96706,
+          "duration": 93
+        },
+        {
+          "startTime": 96799.6,
+          "duration": 77
+        },
+        {
+          "startTime": 96881.4,
+          "duration": 96
+        },
+        {
+          "startTime": 96978.1,
+          "duration": 75
+        },
+        {
+          "startTime": 97056.7,
+          "duration": 93
+        },
+        {
+          "startTime": 97150.6,
+          "duration": 77
+        },
+        {
+          "startTime": 97231.9,
+          "duration": 105
+        },
+        {
+          "startTime": 97337.3,
+          "duration": 65
+        },
+        {
+          "startTime": 97406.3,
+          "duration": 114
+        },
+        {
+          "startTime": 97520.6,
+          "duration": 61
+        },
+        {
+          "startTime": 97585.7,
+          "duration": 113
+        },
+        {
+          "startTime": 97698.8,
+          "duration": 80
+        },
+        {
+          "startTime": 97782.4,
+          "duration": 95
+        },
+        {
+          "startTime": 97877.7,
+          "duration": 78
+        },
+        {
+          "startTime": 97959.5,
+          "duration": 197
+        },
+        {
+          "startTime": 98157.1,
+          "duration": 83
+        },
+        {
+          "startTime": 98244.6,
+          "duration": 104
+        },
+        {
+          "startTime": 98349.2,
+          "duration": 80
+        }
+      ],
+      "interactionLatencyMs": 5000.28,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 236.34,
+      "paintCompositeMs": 206.63,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 187863676,
+        "afterBytes": 82624400,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 150.86,
+        "lightweightReadyMs": 706.86,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 52,
+        "cardMetricVisits": 3432
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "dragging",
+      "repetition": 1,
+      "durationMs": 2024.49,
+      "frameIntervalsMs": [
+        16.59999999999127,
+        16.70000000001164,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        33.40000000000873,
+        16.59999999999127,
+        100,
+        216.6999999999971,
+        83.30000000000291,
+        16.69999999999709,
+        133.3000000000029,
+        50,
+        166.6999999999971,
+        83.30000000000291,
+        150,
+        66.60000000000582,
+        150,
+        66.80000000000291,
+        149.89999999999418,
+        66.60000000000582,
+        150,
+        150,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.79999999998836
+      ],
+      "missedFrames": 87,
+      "slowFrames": 16,
+      "longTasks": [
+        {
+          "startTime": 100138.9,
+          "duration": 50
+        },
+        {
+          "startTime": 100189.3,
+          "duration": 70
+        },
+        {
+          "startTime": 100302,
+          "duration": 172
+        },
+        {
+          "startTime": 100475.3,
+          "duration": 67
+        },
+        {
+          "startTime": 100565.5,
+          "duration": 147
+        },
+        {
+          "startTime": 100778.4,
+          "duration": 155
+        },
+        {
+          "startTime": 100934,
+          "duration": 62
+        },
+        {
+          "startTime": 101007.8,
+          "duration": 142
+        },
+        {
+          "startTime": 101150.4,
+          "duration": 61
+        },
+        {
+          "startTime": 101223,
+          "duration": 153
+        },
+        {
+          "startTime": 101436.1,
+          "duration": 153
+        },
+        {
+          "startTime": 101590,
+          "duration": 60
+        },
+        {
+          "startTime": 101663.3,
+          "duration": 143
+        },
+        {
+          "startTime": 101806.9,
+          "duration": 60
+        },
+        {
+          "startTime": 101867.8,
+          "duration": 74
+        }
+      ],
+      "interactionLatencyMs": 1939.77,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 73.86,
+      "paintCompositeMs": 58.25,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 117769060,
+        "afterBytes": 171255032,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 634.27,
+        "lightweightReadyMs": 1077.58,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 14,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "dragging",
+      "repetition": 2,
+      "durationMs": 2041.03,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.59999999999127,
+        16.70000000001164,
+        16.59999999999127,
+        16.80000000000291,
+        16.60000000000582,
+        116.69999999999709,
+        166.6999999999971,
+        66.60000000000582,
+        183.39999999999418,
+        50,
+        16.60000000000582,
+        133.29999999998836,
+        66.70000000001164,
+        150,
+        50,
+        166.59999999999127,
+        50,
+        166.6999999999971,
+        66.60000000000582,
+        166.6999999999971,
+        233.40000000000873,
+        33.29999999998836,
+        16.70000000001164,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.69999999999709,
+        16.59999999999127
+      ],
+      "missedFrames": 91,
+      "slowFrames": 16,
+      "longTasks": [
+        {
+          "startTime": 102993.8,
+          "duration": 64
+        },
+        {
+          "startTime": 103058.1,
+          "duration": 61
+        },
+        {
+          "startTime": 103119.2,
+          "duration": 169
+        },
+        {
+          "startTime": 103288.9,
+          "duration": 61
+        },
+        {
+          "startTime": 103393.8,
+          "duration": 139
+        },
+        {
+          "startTime": 103610.3,
+          "duration": 129
+        },
+        {
+          "startTime": 103740.5,
+          "duration": 59
+        },
+        {
+          "startTime": 103810.7,
+          "duration": 150
+        },
+        {
+          "startTime": 104019.8,
+          "duration": 151
+        },
+        {
+          "startTime": 104260.2,
+          "duration": 133
+        },
+        {
+          "startTime": 104393.7,
+          "duration": 66
+        },
+        {
+          "startTime": 104470.5,
+          "duration": 152
+        },
+        {
+          "startTime": 104623.8,
+          "duration": 154
+        },
+        {
+          "startTime": 104778.2,
+          "duration": 66
+        }
+      ],
+      "interactionLatencyMs": 1951.33,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 76.32,
+      "paintCompositeMs": 52.38,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 194180560,
+        "afterBytes": 57796580,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 258.53,
+        "lightweightReadyMs": 744.29,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 14,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "dragging",
+      "repetition": 3,
+      "durationMs": 2024.55,
+      "frameIntervalsMs": [
+        16.60000000000582,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        100,
+        216.6999999999971,
+        66.60000000000582,
+        16.69999999999709,
+        150,
+        66.69999999999709,
+        150,
+        66.60000000000582,
+        166.6999999999971,
+        66.69999999999709,
+        166.60000000000582,
+        83.39999999999418,
+        150,
+        66.60000000000582,
+        166.6999999999971,
+        150,
+        16.59999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        16.80000000000291,
+        16.60000000000582,
+        16.69999999999709,
+        16.59999999999127
+      ],
+      "missedFrames": 91,
+      "slowFrames": 15,
+      "longTasks": [
+        {
+          "startTime": 105974.6,
+          "duration": 58
+        },
+        {
+          "startTime": 106033,
+          "duration": 62
+        },
+        {
+          "startTime": 106096.2,
+          "duration": 60
+        },
+        {
+          "startTime": 106156.9,
+          "duration": 155
+        },
+        {
+          "startTime": 106382.4,
+          "duration": 157
+        },
+        {
+          "startTime": 106540.2,
+          "duration": 59
+        },
+        {
+          "startTime": 106613.2,
+          "duration": 146
+        },
+        {
+          "startTime": 106760.6,
+          "duration": 65
+        },
+        {
+          "startTime": 106837.3,
+          "duration": 161
+        },
+        {
+          "startTime": 107062.9,
+          "duration": 164
+        },
+        {
+          "startTime": 107228.1,
+          "duration": 61
+        },
+        {
+          "startTime": 107304,
+          "duration": 146
+        },
+        {
+          "startTime": 107451.1,
+          "duration": 64
+        },
+        {
+          "startTime": 107528.1,
+          "duration": 162
+        },
+        {
+          "startTime": 107733.5,
+          "duration": 89
+        }
+      ],
+      "interactionLatencyMs": 1939.12,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 77.04,
+      "paintCompositeMs": 55.02,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 83963180,
+        "afterBytes": 147057536,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 261.88,
+        "lightweightReadyMs": 826.4,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 14,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "connecting",
+      "repetition": 1,
+      "durationMs": 1094.87,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.69999999999709,
+        16.59999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        116.69999999999709,
+        116.60000000000582,
+        16.80000000000291,
+        16.59999999999127,
+        49.90000000000873,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.80000000000291,
+        16.59999999999127,
+        50,
+        16.60000000000582,
+        16.69999999999709,
+        33.39999999999418,
+        233.20000000001164,
+        50.09999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        33.39999999999418,
+        133.20000000001164
+      ],
+      "missedFrames": 36,
+      "slowFrames": 9,
+      "longTasks": [
+        {
+          "startTime": 109013.4,
+          "duration": 72
+        },
+        {
+          "startTime": 109104.9,
+          "duration": 94
+        },
+        {
+          "startTime": 109489.4,
+          "duration": 170
+        },
+        {
+          "startTime": 109660.1,
+          "duration": 81
+        },
+        {
+          "startTime": 109843.4,
+          "duration": 51
+        },
+        {
+          "startTime": 109894.7,
+          "duration": 103
+        }
+      ],
+      "interactionLatencyMs": 838.61,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 73,
+      "paintCompositeMs": 30.06,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 165502732,
+        "afterBytes": 183098180,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 251.4,
+        "lightweightReadyMs": 746.92,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 2,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "connecting",
+      "repetition": 2,
+      "durationMs": 1244.26,
+      "frameIntervalsMs": [
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.60000000000582,
+        33.39999999999418,
+        33.30000000000291,
+        83.30000000000291,
+        83.29999999998836,
+        50,
+        16.70000000001164,
+        50.09999999999127,
+        33.30000000000291,
+        16.60000000000582,
+        16.69999999999709,
+        16.59999999999127,
+        16.80000000000291,
+        16.60000000000582,
+        16.69999999999709,
+        49.89999999999418,
+        16.80000000000291,
+        49.90000000000873,
+        16.69999999999709,
+        200,
+        66.59999999999127,
+        50.10000000000582,
+        16.60000000000582,
+        50,
+        150
+      ],
+      "missedFrames": 38,
+      "slowFrames": 14,
+      "longTasks": [
+        {
+          "startTime": 111153.7,
+          "duration": 74
+        },
+        {
+          "startTime": 111250.7,
+          "duration": 78
+        },
+        {
+          "startTime": 111697.8,
+          "duration": 142
+        },
+        {
+          "startTime": 111840.1,
+          "duration": 69
+        },
+        {
+          "startTime": 112025.7,
+          "duration": 64
+        },
+        {
+          "startTime": 112131.9,
+          "duration": 109
+        }
+      ],
+      "interactionLatencyMs": 869.22,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 79.98,
+      "paintCompositeMs": 33.56,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 217971540,
+        "afterBytes": 74262256,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 158.62,
+        "lightweightReadyMs": 811.48,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 2,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "connecting",
+      "repetition": 3,
+      "durationMs": 1086.25,
+      "frameIntervalsMs": [
+        16.60000000000582,
+        16.80000000000291,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        16.69999999999709,
+        16.70000000001164,
+        16.59999999999127,
+        33.40000000000873,
+        16.59999999999127,
+        33.30000000000291,
+        66.69999999999709,
+        83.40000000000873,
+        33.29999999998836,
+        16.60000000000582,
+        50,
+        16.69999999999709,
+        16.60000000000582,
+        16.80000000000291,
+        16.59999999999127,
+        16.60000000000582,
+        16.69999999999709,
+        16.69999999999709,
+        16.69999999999709,
+        66.60000000000582,
+        50,
+        16.69999999999709,
+        200,
+        50,
+        16.60000000000582,
+        16.80000000000291,
+        16.59999999999127,
+        33.30000000000291
+      ],
+      "missedFrames": 27,
+      "slowFrames": 11,
+      "longTasks": [
+        {
+          "startTime": 113387,
+          "duration": 52
+        },
+        {
+          "startTime": 113463.1,
+          "duration": 83
+        },
+        {
+          "startTime": 113904.8,
+          "duration": 136
+        },
+        {
+          "startTime": 114041.6,
+          "duration": 70
+        }
+      ],
+      "interactionLatencyMs": 856.26,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 70.39,
+      "paintCompositeMs": 32.73,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 90432696,
+        "afterBytes": 118110552,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 108.47,
+        "lightweightReadyMs": 801.1,
+        "settledImageReadyMs": null
+      },
+      "boardWork": {
+        "sceneDerivations": 2,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 0,
+        "decodeMs": null,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "cold-image-traversal",
+      "repetition": 1,
+      "durationMs": 615.29,
+      "frameIntervalsMs": [
+        16.59999999999991,
+        250.10000000000014,
+        33.200000000000045,
+        50.09999999999991,
+        150,
+        16.59999999999991,
+        16.700000000000045,
+        16.600000000000136,
+        16.699999999999818,
+        16.700000000000045,
+        16.700000000000045,
+        16.59999999999991,
+        16.700000000000045,
+        16.600000000000136
+      ],
+      "missedFrames": 24,
+      "slowFrames": 4,
+      "longTasks": [
+        {
+          "startTime": 1116.1,
+          "duration": 116
+        },
+        {
+          "startTime": 1233.1,
+          "duration": 145
+        },
+        {
+          "startTime": 1383.9,
+          "duration": 86
+        },
+        {
+          "startTime": 1521.9,
+          "duration": 89
+        }
+      ],
+      "interactionLatencyMs": 546.51,
+      "residentDom": {
+        "min": 0,
+        "max": 131
+      },
+      "styleLayoutMs": 45.86,
+      "paintCompositeMs": 26.52,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 18766420,
+        "afterBytes": 50324384,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 502.54,
+        "lightweightReadyMs": 0,
+        "settledImageReadyMs": 546.54
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 9,
+        "decodeMs": 38.92,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "cold-image-traversal",
+      "repetition": 2,
+      "durationMs": 621.2,
+      "frameIntervalsMs": [
+        250,
+        66.69999999999982,
+        33.30000000000018,
+        150,
+        16.699999999999818,
+        16.700000000000045,
+        16.600000000000136,
+        16.59999999999991,
+        16.799999999999955,
+        16.600000000000136,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045
+      ],
+      "missedFrames": 24,
+      "slowFrames": 4,
+      "longTasks": [
+        {
+          "startTime": 1038.8,
+          "duration": 124
+        },
+        {
+          "startTime": 1162.9,
+          "duration": 141
+        },
+        {
+          "startTime": 1311.8,
+          "duration": 90
+        },
+        {
+          "startTime": 1404.9,
+          "duration": 50
+        },
+        {
+          "startTime": 1455.4,
+          "duration": 87
+        }
+      ],
+      "interactionLatencyMs": 552.43,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 48.22,
+      "paintCompositeMs": 26.36,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 38350708,
+        "afterBytes": 69925416,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 511.87,
+        "lightweightReadyMs": 0,
+        "settledImageReadyMs": 552.44
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 9,
+        "decodeMs": 36.54,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "cold-image-traversal",
+      "repetition": 3,
+      "durationMs": 591.53,
+      "frameIntervalsMs": [
+        249.9000000000001,
+        50.09999999999991,
+        50,
+        133.30000000000018,
+        16.59999999999991,
+        16.700000000000045,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136,
+        16.700000000000045,
+        16.699999999999818,
+        16.600000000000136
+      ],
+      "missedFrames": 23,
+      "slowFrames": 4,
+      "longTasks": [
+        {
+          "startTime": 1086.5,
+          "duration": 119
+        },
+        {
+          "startTime": 1206,
+          "duration": 137
+        },
+        {
+          "startTime": 1350.1,
+          "duration": 92
+        },
+        {
+          "startTime": 1494.8,
+          "duration": 90
+        }
+      ],
+      "interactionLatencyMs": 528.22,
+      "residentDom": {
+        "min": 131,
+        "max": 131
+      },
+      "styleLayoutMs": 46.74,
+      "paintCompositeMs": 26.76,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 58445116,
+        "afterBytes": 90096900,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 505.4,
+        "lightweightReadyMs": 0,
+        "settledImageReadyMs": 528.23
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 9,
+        "decodeMs": 18.99,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "warm-image-revisit",
+      "repetition": 1,
+      "durationMs": 396.16,
+      "frameIntervalsMs": [
+        16.700000000000273,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        149.9000000000001,
+        50,
+        16.699999999999818,
+        16.699999999999818,
+        16.600000000000364,
+        16.799999999999727,
+        16.59999999999991,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818
+      ],
+      "missedFrames": 9,
+      "slowFrames": 2,
+      "longTasks": [
+        {
+          "startTime": 2209.5,
+          "duration": 110
+        },
+        {
+          "startTime": 2319.7,
+          "duration": 66
+        }
+      ],
+      "interactionLatencyMs": 266.76,
+      "residentDom": {
+        "min": 0,
+        "max": 131
+      },
+      "styleLayoutMs": 31.2,
+      "paintCompositeMs": 4.72,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 100129252,
+        "afterBytes": 106663752,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 223.59,
+        "lightweightReadyMs": 0,
+        "settledImageReadyMs": 266.77
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 9,
+        "decodeMs": 40.04,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "warm-image-revisit",
+      "repetition": 2,
+      "durationMs": 362.72,
+      "frameIntervalsMs": [
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.600000000000364,
+        16.59999999999991,
+        150.0999999999999,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991,
+        16.699999999999818,
+        16.700000000000273,
+        16.59999999999991
+      ],
+      "missedFrames": 8,
+      "slowFrames": 1,
+      "longTasks": [
+        {
+          "startTime": 3026.5,
+          "duration": 83
+        },
+        {
+          "startTime": 3111.5,
+          "duration": 84
+        }
+      ],
+      "interactionLatencyMs": 233.55,
+      "residentDom": {
+        "min": 0,
+        "max": 131
+      },
+      "styleLayoutMs": 31.61,
+      "paintCompositeMs": 5.21,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 115796636,
+        "afterBytes": 141134808,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 200.95,
+        "lightweightReadyMs": 0,
+        "settledImageReadyMs": 233.55
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 9,
+        "decodeMs": 30.07,
+        "cacheGrowthBytes": null
+      }
+    },
+    {
+      "scenarioId": "warm-image-revisit",
+      "repetition": 3,
+      "durationMs": 381.51,
+      "frameIntervalsMs": [
+        16.699999999999818,
+        16.699999999999818,
+        16.600000000000364,
+        16.59999999999991,
+        16.699999999999818,
+        166.70000000000027,
+        16.699999999999818,
+        16.59999999999991,
+        16.700000000000273,
+        16.699999999999818,
+        16.600000000000364,
+        16.699999999999818,
+        16.599999999999454,
+        16.800000000000182,
+        16.600000000000364
+      ],
+      "missedFrames": 9,
+      "slowFrames": 1,
+      "longTasks": [
+        {
+          "startTime": 3843.7,
+          "duration": 96
+        },
+        {
+          "startTime": 3941.1,
+          "duration": 86
+        }
+      ],
+      "interactionLatencyMs": 250.21,
+      "residentDom": {
+        "min": 0,
+        "max": 131
+      },
+      "styleLayoutMs": 32.67,
+      "paintCompositeMs": 5.22,
+      "reactWork": {
+        "status": "unavailable",
+        "reason": "The production root exposes no React Profiler timing and forbidden Card/renderer instrumentation was not added.",
+        "followUp": "Add a benchmark-only Profiler at the application root or a React-supported performance track, then populate the existing reactWork field without changing this schema or renderer policy."
+      },
+      "memory": {
+        "beforeBytes": 159212132,
+        "afterBytes": 158606784,
+        "supported": true,
+        "scope": "Chromium JSHeapUsedSize; excludes DOM native memory, decoded image pixels, compositor surfaces, and GPU textures."
+      },
+      "readiness": {
+        "blankBoardFrames": 0,
+        "missingRepresentationFrames": 0,
+        "detailedReadyMs": 215.63,
+        "lightweightReadyMs": 0,
+        "settledImageReadyMs": 250.23
+      },
+      "boardWork": {
+        "sceneDerivations": 4,
+        "cardMetricVisits": 0
+      },
+      "images": {
+        "decodedCount": 9,
+        "decodeMs": 31.06,
+        "cacheGrowthBytes": null
+      }
+    }
+  ],
+  "trace": {
+    "source": "chromium-cdp-devtools.timeline",
+    "totalStyleLayoutMs": 4147.35,
+    "totalPaintCompositeMs": 2313.04
+  }
+}

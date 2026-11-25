@@ -1,0 +1,380 @@
+/* Mixer, filter, and matrix face recipes (#770). */
+
+/* Mixer — thickness is share; shade is derived from rank. */
+.mod-face--mixer .mod-row--mixer {
+  min-height: 176px;
+}
+
+.mod-face--mixer .i-bd {
+  display: flex;
+  height: 176px;
+  flex-direction: column;
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-well);
+  background: var(--e-surface-ground);
+  overflow: hidden;
+}
+
+.mod-face--mixer .bd-band {
+  position: relative;
+  min-height: 3px;
+  flex: none;
+  border-bottom: 1px solid var(--e-line);
+  background: color-mix(
+    in srgb,
+    var(--e-mod-face-accent, var(--e-mod)) var(--e-mod-mixer-strength),
+    var(--e-surface-ground)
+  );
+  block-size: calc(var(--e-mod-mixer-share) * 1%);
+  color: var(--identity-body-ink, var(--e-ink));
+  transition:
+    block-size var(--e-t-move) var(--e-ease-out),
+    background-color var(--e-t-move) var(--e-ease-out);
+}
+
+.mod-face--mixer .bd-band:last-child {
+  border-bottom: 0;
+}
+
+.mod-face--mixer .i-bd.is-dragging .bd-band {
+  transition: none;
+}
+
+.mod-face--mixer .bd-grip {
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  left: 0;
+  z-index: var(--e-z-canvas-chrome);
+  height: var(--e-sp-3);
+  cursor: row-resize;
+  touch-action: none;
+}
+
+.mod-face--mixer .bd-grip:focus-visible {
+  outline: 1px solid var(--e-go);
+  outline-offset: -2px;
+}
+
+.mod-face--mixer .bd-lbl {
+  position: absolute;
+  top: 50%;
+  left: var(--e-sp-3);
+  max-width: 55%;
+  color: inherit;
+  transform: translateY(-50%);
+}
+
+.mod-face--mixer .bd-right {
+  position: absolute;
+  top: 50%;
+  right: var(--e-sp-2);
+  display: inline-flex;
+  align-items: center;
+  transform: translateY(-50%);
+}
+
+.mod-face--mixer .bd-band.has-x .bd-right {
+  right: var(--e-sp-6);
+}
+
+.mod-face--mixer .bd-share {
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.mod-face--mixer .bd-band > .row-x {
+  right: var(--e-sp-2);
+  opacity: 0;
+}
+
+.mod-face--mixer .bd-band:hover > .row-x,
+.mod-face--mixer .bd-band:focus-within > .row-x {
+  opacity: 1;
+}
+
+.mod-face--mixer .bd-band.is-thin :is(.bd-lbl, .bd-share) {
+  display: none;
+}
+
+/* Filter — decoration is static; only the curve and wash move per frame. */
+.mod-face--filter .i-filter {
+  position: relative;
+  height: 84px;
+  border-radius: var(--e-r-card);
+  background-color: var(--e-surface-recessed);
+  background-image: radial-gradient(
+    circle 1px at 1px 1px,
+    color-mix(in srgb, var(--e-ink) 14%, transparent) 98%,
+    transparent
+  );
+  background-position: 7px 7px;
+  background-size: 14px 14px;
+  cursor: ew-resize;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.mod-face--filter .i-filter:focus-visible {
+  outline: 1px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+.mod-face--filter .i-filter-geometry {
+  position: absolute;
+  inset: 0 var(--e-sp-3);
+  pointer-events: none;
+}
+
+.mod-face--filter .i-filter svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mod-face--filter .curve {
+  fill: none;
+  stroke: var(--e-ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.mod-face--filter .wash {
+  fill: color-mix(in srgb, var(--e-mod-face-accent, var(--e-mod)) 12%, transparent);
+  stroke: none;
+}
+
+.mod-face--filter .det {
+  fill: var(--e-dot);
+}
+
+.mod-face--filter .i-filter-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-sp-2);
+  margin-top: var(--e-sp-2);
+}
+
+.mod-face--filter .e-chip-key {
+  min-height: var(--e-sp-5);
+  flex: none;
+  padding: 0 var(--e-sp-2);
+  border: 1px solid var(--e-ink);
+  border-radius: var(--e-r-chip);
+  background: transparent;
+  color: var(--e-ink);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--filter .e-chip-key:hover:not(:disabled),
+.mod-face--filter .e-chip-key:focus-visible {
+  outline: none;
+  background: color-mix(in srgb, var(--e-ink) 7%, transparent);
+}
+
+.mod-face--filter .e-chip-key:active:not(:disabled) {
+  transform: scale(var(--e-scale-press));
+}
+
+/* Matrix — the cell block remains the placement authority at every zoom. */
+.mod-face--matrix .i-mx-wrap {
+  position: relative;
+  display: flex;
+  min-height: 148px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--e-sp-5);
+}
+
+.mod-face--matrix .i-mx-grid {
+  display: grid;
+  width: max-content;
+  align-self: center;
+}
+
+.mod-face--matrix .mx-lbl {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  color: var(--e-ink-soft);
+}
+
+.mod-face--matrix .mx-lbl .mod-sub {
+  flex: 0 1 auto;
+}
+
+.mod-face--matrix .mx-lbl--row {
+  justify-content: flex-end;
+  padding-right: var(--e-sp-2);
+  text-align: right;
+}
+
+.mod-face--matrix .mx-lbl--col {
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: var(--e-sp-2);
+}
+
+.mod-face--matrix .mx-lbl .row-x {
+  transform: none;
+}
+
+.mod-face--matrix .mx-lbl--col .row-x {
+  top: -18px;
+  right: -6px;
+}
+
+.mod-face--matrix .mx-lbl--row .row-x {
+  top: -8px;
+  right: 0;
+}
+
+.mod-face--matrix .mx-cell {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid var(--e-line);
+  border-bottom: 1px solid var(--e-line);
+  background: transparent;
+  cursor: pointer;
+}
+
+.mod-face--matrix .mx-cell.eR {
+  border-right: 0;
+}
+
+.mod-face--matrix .mx-cell.eB {
+  border-bottom: 0;
+}
+
+.mod-face--matrix .mx-cell:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--e-ink) 4%, transparent);
+}
+
+.mod-face--matrix .mx-cell:focus-visible {
+  z-index: var(--e-z-canvas-chrome);
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--e-go);
+}
+
+.mod-face--matrix .mx-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--e-mod-face-accent, var(--e-mod));
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(var(--e-mod-matrix-scale));
+  transition:
+    transform var(--e-t-fast) var(--e-ease-out),
+    background-color var(--e-t-fast) var(--e-ease-out);
+  will-change: transform;
+}
+
+.mod-face--matrix .mx-dot.is-empty {
+  background: var(--e-dot);
+  transform: translate(-50%, -50%) scale(.0714);
+}
+
+.mod-face--matrix .mx-frame {
+  position: absolute;
+  top: var(--e-mod-matrix-top);
+  left: var(--e-mod-matrix-left);
+  width: var(--e-mod-matrix-width);
+  height: var(--e-mod-matrix-height);
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  pointer-events: none;
+}
+
+.mod-face--matrix .mx-ghost {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px dashed var(--e-line-strong);
+  border-radius: var(--e-r-chip);
+  background: transparent;
+  color: var(--e-ink-soft);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--matrix .mx-ghost--row {
+  top: calc(var(--e-mod-matrix-top) + var(--e-mod-matrix-height) + var(--e-sp-2));
+  left: var(--e-mod-matrix-left);
+  width: var(--e-mod-matrix-width);
+  height: 18px;
+}
+
+.mod-face--matrix .mx-ghost--column {
+  top: var(--e-mod-matrix-top);
+  left: calc(var(--e-mod-matrix-left) + var(--e-mod-matrix-width) + var(--e-sp-2));
+  width: 18px;
+  height: var(--e-mod-matrix-height);
+}
+
+.mod-face--matrix .mx-ghost::before {
+  position: absolute;
+  inset: -3px;
+  content: '';
+}
+
+.mod-face--matrix .i-mx-wrap:hover .mx-ghost,
+.mod-face--matrix .i-mx-wrap:focus-within .mx-ghost {
+  opacity: 1;
+}
+
+.mod-face--matrix .mx-ghost:hover {
+  border-color: var(--e-ink);
+  color: var(--e-ink);
+}
+
+.mod-face--matrix .mx-ghost:focus-visible {
+  border-color: var(--e-go);
+  outline: none;
+  color: var(--e-ink);
+}
+
+.mod-face--matrix .mx-summary {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: calc(-1 * var(--e-card-border-width));
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.mod-face-host[aria-disabled='true'] :is(.bd-grip, .i-filter, .mx-cell, .mx-ghost),
+.mod-face--filter .e-chip-key:disabled,
+.mod-face--matrix .mx-cell:disabled {
+  cursor: inherit;
+}
+
+@media (pointer: coarse) {
+  .mod-face--matrix .mx-ghost::before {
+    inset: -11px;
+  }
+}

@@ -1,0 +1,242 @@
+[
+  {
+    "version": 1,
+    "id": "v4-network-group",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "group",
+      "groupTitle": "DOMESTICATION + GENE FLOW · A RETICULATE PROCESS",
+      "compressionPrompt": "Preserve principal red-junglefowl ancestry, demographic-versus-archaeological date types, ambiguous tract directions, locus-specific claims, the single green candidate tract, supported domestic-to-wild backcrossing, and all DOI links. Never convert admixture statistics into whole-genome percentages unless the method does so.",
+      "position": { "x": 5272, "y": -10000 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-title",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "title",
+      "body": "Domestication and gene flow · the chicken genome is a network",
+      "position": { "x": 5272, "y": 3260 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-process",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Three histories, three representations**\n\nSpecies branching still needs alternative trees. Locus ancestry needs a reticulate network. Domestication needs a human–animal process because management, transport, selection, and backcrossing happened at different times. One ladder would create false precision.",
+      "position": { "x": 5300, "y": 3600 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-spadiceus",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Principal sampled source · G. g. spadiceus-like ancestry**\n\nAmong sampled surviving wild populations, domestic chickens are closest to spadiceus populations in southwestern China, northern Thailand, and Myanmar. This does not identify one founder village or an unchanged founder population. [Wang et al. 2020](https://doi.org/10.1038/s41422-020-0349-y)",
+      "position": { "x": 5740, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-split-caution",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**9,500 ± 3,300 years · demographic split estimate**\n\nThis is a population-model output. It is not a dated corral, domestication event, archaeological specimen, or proof of one exact founder locality. Population structure, sampling, bottlenecks, protracted management, and later wild gene flow can separate coalescence from human action. [Wang et al. 2020](https://doi.org/10.1038/s41422-020-0349-y)",
+      "position": { "x": 5740, "y": 3800 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-regional-red",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Later red-junglefowl inputs**\n\nRegional domestic populations also received ancestry from other red-junglefowl subspecies, including murghi, bankiva/gallus, and jabouillei. Domestic ancestry is principally spadiceus-like, not exclusively so. [Wang et al. 2020](https://doi.org/10.1038/s41422-020-0349-y)",
+      "position": { "x": 6180, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-domestic",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Domestic chicken · principally red-derived mosaic**\n\nThe robust conclusion is overwhelming red-junglefowl ancestry plus later red-subspecies and non-red introgression. The disputed living-Gallus root does not overturn this domestication-scale result. [Wang et al. 2020](https://doi.org/10.1038/s41422-020-0349-y); [Lawal et al. 2020](https://doi.org/10.1186/s12915-020-0738-1)",
+      "position": { "x": 6620, "y": 3800 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-direction-rule",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Direction hygiene**\n\nD, f, and related statistics detect non-tree history; they do not automatically prove donor, recipient, timing, phenotype, or a literal share of the whole modern genome. Closely related donors, incomplete lineage sorting, linked tracts, and sparse wild sampling weaken arrow direction.",
+      "position": { "x": 6180, "y": 4160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-grey",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Grey-junglefowl signal · exchange often direction-ambiguous**\n\nCandidate introgressed regions connect grey junglefowl with domestic/red lineages; much of the evidence is compatible with bidirectional exchange. Treat this as reticulation evidence, not a one-way whole-genome origin arrow. [Lawal et al. 2020](https://doi.org/10.1186/s12915-020-0738-1)",
+      "position": { "x": 7060, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-bco2",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**BCO2 yellow skin · locus-specific grey ancestry**\n\nThe yellow-skin haplotype and reduced tissue-specific expression were traced to grey junglefowl ancestry at BCDO2, now BCO2. A 2026 study identifies a 24-bp regulatory insertion as a candidate causal variant. This locus does not make the whole chicken grey-derived. [Eriksson et al. 2008](https://doi.org/10.1371/journal.pgen.1000010); [Rong et al. 2026](https://doi.org/10.1186/s12711-026-01067-4)",
+      "position": { "x": 7500, "y": 3440 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-srilankan",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Sri Lankan junglefowl · supported candidate regions**\n\nRestricted regions resemble Sri Lankan-junglefowl ancestry. Donor direction, timing, adaptive effect, and phenotype need locus-specific proof. [Lawal et al. 2020](https://doi.org/10.1186/s12915-020-0738-1)",
+      "position": { "x": 7060, "y": 3960 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-green-tract",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Green junglefowl · one candidate tract**\n\nA singular restricted green-junglefowl candidate tract contributes to the non-tree picture. It is not evidence for a green-junglefowl origin of the domestic genome; direction, timing, and phenotype remain unresolved. [Lawal et al. 2020](https://doi.org/10.1186/s12915-020-0738-1)",
+      "position": { "x": 7500, "y": 3960 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-backcross",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Supported direction · domestic → modern wild red junglefowl**\n\nHistorical-museum versus modern-genome comparison shows substantial, geographically heterogeneous domestic introgression into present-day red junglefowl. This is the network’s clearest broad directional arrow. [Wu et al. 2023](https://doi.org/10.1371/journal.pgen.1010551)",
+      "position": { "x": 7940, "y": 3800 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-wild-porous",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**‘Wild’ reference populations are porous**\n\nGlobal models often placed domestic contribution around 20–50%, while local-ancestry estimates varied much more and were method-sensitive. A modern wild label is not an unadmixed ancestral proxy; museum baselines and dense geographic sampling matter. [Wu et al. 2023](https://doi.org/10.1371/journal.pgen.1010551)",
+      "position": { "x": 8380, "y": 3800 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-tshr",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**TSHR · not a clean first-domestication mutation**\n\nThe derived state is already common in sampled spadiceus, weakening uniqueness. Ancient-DNA modeling instead places a strong rise around 920 CE, plausibly under intensified medieval husbandry. [Wang et al. 2020](https://doi.org/10.1038/s41422-020-0349-y); [Loog et al. 2017](https://doi.org/10.1093/molbev/msx142)",
+      "position": { "x": 6180, "y": 4680 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-crop-hypothesis",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Rice/millet commensal pathway · plausible, not proven**\n\nWild junglefowl attraction to cultivation followed by tolerance and management is spatially concordant with the current early record. Crop presence alone does not prove domestication, and the process may have been protracted and geographically broad. [Peters et al. 2022](https://doi.org/10.1073/pnas.2121978119)",
+      "position": { "x": 8820, "y": 3800 }
+    }
+  },
+  { "version": 1, "id": "v4-network-id-group", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-group" }, "identity": { "preset": "purple", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-network-id-process", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-process" }, "identity": { "preset": "charcoal", "fill": "soft" } } },
+  { "version": 1, "id": "v4-network-id-spadiceus", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-spadiceus" }, "identity": { "preset": "orange", "fill": "body" } } },
+  { "version": 1, "id": "v4-network-id-split", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-split-caution" }, "identity": { "preset": "coral", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-network-id-regional-red", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-regional-red" }, "identity": { "preset": "amber", "fill": "soft" } } },
+  { "version": 1, "id": "v4-network-id-domestic", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-domestic" }, "identity": { "preset": "orange", "fill": "body" } } },
+  { "version": 1, "id": "v4-network-id-direction", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-direction-rule" }, "identity": { "preset": "slate", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-network-id-grey", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-grey" }, "identity": { "preset": "slate", "fill": "soft" } } },
+  { "version": 1, "id": "v4-network-id-bco2", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-bco2" }, "identity": { "preset": "amber", "fill": "body" } } },
+  { "version": 1, "id": "v4-network-id-srilankan", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-srilankan" }, "identity": { "preset": "purple", "fill": "soft" } } },
+  { "version": 1, "id": "v4-network-id-green", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-green-tract" }, "identity": { "preset": "green", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-network-id-backcross", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-backcross" }, "identity": { "preset": "purple", "fill": "body" } } },
+  { "version": 1, "id": "v4-network-id-wild", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-wild-porous" }, "identity": { "preset": "coral", "fill": "soft" } } },
+  { "version": 1, "id": "v4-network-id-tshr", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-tshr" }, "identity": { "preset": "sky", "fill": "soft" } } },
+  { "version": 1, "id": "v4-network-id-crop", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-crop-hypothesis" }, "identity": { "preset": "mint", "fill": "soft" } } },
+  {
+    "version": 1,
+    "id": "v4-network-member-process",
+    "name": "group.membership.set",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-network-process" }, "group": { "createdByCommandId": "v4-network-group" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-network-arrange",
+    "name": "cards.arrange",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "frames": [
+        { "card": { "createdByCommandId": "v4-network-group" }, "position": { "x": 5272, "y": 3394 }, "size": { "width": 3936, "height": 1556 } },
+        { "card": { "createdByCommandId": "v4-network-title" }, "position": { "x": 5272, "y": 3260 }, "size": { "width": 980, "height": 82 } },
+        { "card": { "createdByCommandId": "v4-network-process" }, "position": { "x": 5300, "y": 3600 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-spadiceus" }, "position": { "x": 5740, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-split-caution" }, "position": { "x": 5740, "y": 3800 }, "size": { "width": 360, "height": 260 } },
+        { "card": { "createdByCommandId": "v4-network-regional-red" }, "position": { "x": 6180, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-domestic" }, "position": { "x": 6620, "y": 3800 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-direction-rule" }, "position": { "x": 6180, "y": 4160 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-grey" }, "position": { "x": 7060, "y": 3440 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-bco2" }, "position": { "x": 7500, "y": 3440 }, "size": { "width": 360, "height": 260 } },
+        { "card": { "createdByCommandId": "v4-network-srilankan" }, "position": { "x": 7060, "y": 3960 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-network-green-tract" }, "position": { "x": 7500, "y": 3960 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-backcross" }, "position": { "x": 7940, "y": 3800 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-wild-porous" }, "position": { "x": 8380, "y": 3800 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-tshr" }, "position": { "x": 6180, "y": 4680 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-network-crop-hypothesis" }, "position": { "x": 8820, "y": 3800 }, "size": { "width": 360, "height": 240 } }
+      ]
+    }
+  },
+  { "version": 1, "id": "v4-network-edge-process-source", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-process" }, "to": { "createdByCommandId": "v4-network-spadiceus" }, "strength": "strong", "polarity": "helps", "reason": "opens the principal surviving sampled source ancestry" } },
+  { "version": 1, "id": "v4-network-edge-source-domestic", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-spadiceus" }, "to": { "createdByCommandId": "v4-network-domestic" }, "strength": "strong", "polarity": "helps", "reason": "principal red-junglefowl source ancestry among sampled surviving populations" } },
+  { "version": 1, "id": "v4-network-edge-split-source", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-split-caution" }, "to": { "createdByCommandId": "v4-network-spadiceus" }, "strength": "weak", "polarity": "pushesAgainst", "reason": "prevents a demographic split estimate from being relabeled as a domestication date or place" } },
+  { "version": 1, "id": "v4-network-edge-regional-domestic", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-regional-red" }, "to": { "createdByCommandId": "v4-network-domestic" }, "strength": "weak", "polarity": "helps", "reason": "later red-subspecies ancestry contributes to the domestic mosaic" } },
+  { "version": 1, "id": "v4-network-edge-direction-grey", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-direction-rule" }, "to": { "createdByCommandId": "v4-network-grey" }, "strength": "weak", "polarity": "helps", "reason": "qualifies grey-junglefowl reticulation without forcing one donor arrow" } },
+  { "version": 1, "id": "v4-network-edge-direction-srilankan", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-direction-rule" }, "to": { "createdByCommandId": "v4-network-srilankan" }, "strength": "weak", "polarity": "helps", "reason": "qualifies candidate regions by separating admixture from direction and phenotype" } },
+  { "version": 1, "id": "v4-network-edge-direction-green", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-direction-rule" }, "to": { "createdByCommandId": "v4-network-green-tract" }, "strength": "weak", "polarity": "helps", "reason": "keeps the single green candidate tract restricted and direction-ambiguous" } },
+  { "version": 1, "id": "v4-network-edge-grey-domestic", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-grey" }, "to": { "createdByCommandId": "v4-network-domestic" }, "strength": "weak", "polarity": "helps", "reason": "candidate exchange contributes non-tree history without implying whole-genome grey origin" } },
+  { "version": 1, "id": "v4-network-edge-grey-bco2", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-grey" }, "to": { "createdByCommandId": "v4-network-bco2" }, "strength": "strong", "polarity": "helps", "reason": "validated phenotype-linked locus is the clearest grey-ancestry example" } },
+  { "version": 1, "id": "v4-network-edge-srilankan-domestic", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-srilankan" }, "to": { "createdByCommandId": "v4-network-domestic" }, "strength": "weak", "polarity": "helps", "reason": "supported candidate regions contribute to a mosaic; donor details remain conditional" } },
+  { "version": 1, "id": "v4-network-edge-green-domestic", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-green-tract" }, "to": { "createdByCommandId": "v4-network-domestic" }, "strength": "weak", "polarity": "helps", "reason": "one restricted candidate tract, not a green-derived domestic genome" } },
+  { "version": 1, "id": "v4-network-edge-domestic-backcross", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-domestic" }, "to": { "createdByCommandId": "v4-network-backcross" }, "strength": "strong", "polarity": "helps", "reason": "supported broad direction from domestic chickens into modern wild populations" } },
+  { "version": 1, "id": "v4-network-edge-backcross-wild", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-backcross" }, "to": { "createdByCommandId": "v4-network-wild-porous" }, "strength": "strong", "polarity": "helps", "reason": "historical-to-modern comparison makes wild-reference porosity a conservation issue" } },
+  { "version": 1, "id": "v4-network-edge-tshr-process", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-tshr" }, "to": { "createdByCommandId": "v4-network-process" }, "strength": "weak", "polarity": "pushesAgainst", "reason": "one allele's medieval frequency rise cannot stand in for first domestication" } },
+  { "version": 1, "id": "v4-network-edge-process-crop", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-process" }, "to": { "createdByCommandId": "v4-network-crop-hypothesis" }, "strength": "weak", "polarity": "helps", "reason": "adds a testable human-contact hypothesis without treating crop presence as proof" } },
+  { "version": 1, "id": "v4-network-edge-bco2-domestic", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-network-bco2" }, "to": { "createdByCommandId": "v4-network-domestic" }, "strength": "weak", "polarity": "helps", "reason": "a locus-specific phenotype contribution inside a principally red-derived genome" } }
+]

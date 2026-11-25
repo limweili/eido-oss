@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eido Scalability Pattern Matrix</title>
+    <link rel="stylesheet" href="../assets/course.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="eyebrow">Reference 0001</div>
+        <h1>Eido Scalability Pattern Matrix</h1>
+        <p class="lede">Use this when directing agents. First name the scalability problem, then choose the architectural pattern.</p>
+      </header>
+
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Scales Best At</th>
+            <th>Core Move</th>
+            <th>Tradeoff</th>
+            <th>Eido Translation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>tldraw</strong></td>
+            <td>Interactive editor state: many records, bindings, viewport changes, undo, migrations.</td>
+            <td>Typed record store plus incremental derived indexes and centralized culling.</td>
+            <td>Powerful editor machinery and commercial/source-available licensing concerns.</td>
+            <td>Create shared graph/render derivations. Keep canvas as a projection of Board records.</td>
+          </tr>
+          <tr>
+            <td><strong>Excalidraw</strong></td>
+            <td>Fast-feeling simple canvas rendering and low-friction drawing UX.</td>
+            <td>Scene maps, static canvas, interactive overlay, visible element filtering, restore repair.</td>
+            <td>Arrows are primarily visual elements, not semantic relationships.</td>
+            <td>Borrow render discipline, not the relationship model. Eido edges stay semantic.</td>
+          </tr>
+          <tr>
+            <td><strong>n8n</strong></td>
+            <td>Execution scalability: partial runs, waiting state, run data, provenance.</td>
+            <td>Separate authored graph from execution state and keep source lineage on outputs.</td>
+            <td>Workflow-builder density can overwhelm a thinking app.</td>
+            <td>Output versions and AI runs need graph snapshots, context traces, and re-run semantics.</td>
+          </tr>
+          <tr>
+            <td><strong>Neo4j</strong></td>
+            <td>Graph meaning: typed directed relationships with properties and traversals.</td>
+            <td>Treat nodes and relationships as first-class property-bearing entities.</td>
+            <td>Database and license complexity are too heavy for early local-first Eido.</td>
+            <td>Use property-graph ideas in Eido's own data model and context compiler.</td>
+          </tr>
+          <tr>
+            <td><strong>Penpot</strong></td>
+            <td>Product/system scale: browser app, backend, workers, pub/sub, exporters.</td>
+            <td>Move expensive or operational work behind worker, backend, storage, or service boundaries.</td>
+            <td>More infrastructure than an early local-first prototype should carry.</td>
+            <td>Useful later for sync, collaboration, exports, background AI work, and team workspaces.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>The Five Founder Questions</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>1. What is hot?</h3>
+          <p>Typing, dragging, streaming, pan/zoom, and animation frames must not scan the whole Board.</p>
+        </div>
+        <div class="card">
+          <h3>2. What is truth?</h3>
+          <p>The Board/property graph is truth. Canvas, compiler, playback, and exports are projections.</p>
+        </div>
+        <div class="card">
+          <h3>3. What is derived?</h3>
+          <p>If many callers ask the same expensive question, create a shared index or projection.</p>
+        </div>
+        <div class="card">
+          <h3>4. What is retained?</h3>
+          <p>Undo, playback, run records, output versions, and caches need different retention rules.</p>
+        </div>
+        <div class="card">
+          <h3>5. What proves it?</h3>
+          <p>Every scale-sensitive feature needs a deterministic fixture, unit gate, or browser perf gate.</p>
+        </div>
+      </div>
+
+      <h2>Agent Direction Template</h2>
+      <pre><code>Before implementing this feature, answer:
+1. Which Board records does it read and write?
+2. Is this on a hot path: typing, dragging, streaming, pan/zoom, or playback tick?
+3. What shared index, scene projection, run record, or worker boundary should own the expensive part?
+4. How does this preserve "one graph, three views"?
+5. Which test or performance command proves it holds at the large Board target?</code></pre>
+
+      <h2>Source Spine</h2>
+      <ul class="source-list">
+        <li>tldraw store: <code>/Users/weili/Documents/Projects/eido/research/repos/tldraw/packages/store/src/lib/Store.ts</code></li>
+        <li>tldraw binding index: <code>/Users/weili/Documents/Projects/eido/research/repos/tldraw/packages/editor/src/lib/editor/derivations/bindingsIndex.ts</code></li>
+        <li>tldraw culling: <code>/Users/weili/Documents/Projects/eido/research/repos/tldraw/packages/editor/src/lib/editor/derivations/notVisibleShapes.ts</code></li>
+        <li>Excalidraw scene: <code>/Users/weili/Documents/Projects/eido/research/repos/excalidraw/packages/element/src/Scene.ts</code></li>
+        <li>Excalidraw renderer: <code>/Users/weili/Documents/Projects/eido/research/repos/excalidraw/packages/excalidraw/scene/Renderer.ts</code></li>
+        <li>n8n workflow and execution: <code>/Users/weili/Documents/Projects/eido/research/repos/n8n/packages/workflow/src/workflow.ts</code>, <code>/Users/weili/Documents/Projects/eido/research/repos/n8n/packages/core/src/execution-engine/workflow-execute.ts</code></li>
+        <li>Neo4j graph API: <code>/Users/weili/Documents/Projects/eido/research/repos/neo4j/community/graphdb-api/src/main/java/org/neo4j/graphdb</code></li>
+        <li>Penpot architecture docs: <code>/Users/weili/Documents/Projects/eido/research/repos/penpot/docs/technical-guide/developer/architecture</code></li>
+      </ul>
+    </main>
+  </body>
+</html>

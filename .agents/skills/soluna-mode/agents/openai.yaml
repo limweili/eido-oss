@@ -1,0 +1,6 @@
+interface:
+  display_name: "Soluna Mode"
+  short_description: "Luna production with Sol adversarial review"
+  default_prompt: "Use $soluna-mode to run parallel Luna xhigh production, at least two Sol high adversarial reviewers, and converge to a verified completion gate."
+policy:
+  allow_implicit_invocation: false

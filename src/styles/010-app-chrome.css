@@ -1,0 +1,178 @@
+
+/* ---------- App shell ---------- */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  flex: 0 0 var(--e-topbar-height);
+  gap: var(--e-sp-3);
+  box-sizing: border-box;
+  height: var(--e-topbar-height);
+  min-width: 0;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--e-line);
+  background: var(--e-surface-panel);
+  box-shadow: none;
+  color: var(--e-ink);
+  /* The bar is a hard barrier, not ordinary canvas chrome: no floating
+     surface may paint across it. Floating layers stop at its bottom edge
+     (see useFloatingLayer), and this rank makes that visible even for a
+     surface that positions itself. Modals and toasts stay above, because
+     they legitimately cover the whole window including this bar. */
+  z-index: var(--e-z-chrome-barrier);
+}
+
+.topbar .brand {
+  flex: none;
+}
+
+.topbar-idea,
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.topbar-idea {
+  gap: var(--e-sp-2);
+}
+
+.topbar-actions {
+  flex: none;
+  gap: var(--e-sp-1);
+}
+
+.idea-pill {
+  justify-content: flex-start;
+  min-width: 0;
+  max-width: 260px;
+  padding-inline: 12px 9px;
+  border-color: var(--e-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--e-ink);
+  text-align: left;
+}
+
+.idea-pill span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.idea-pill svg {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  stroke-width: 2;
+}
+
+.idea-pill:hover {
+  border-color: var(--e-line-strong);
+  background: var(--e-wash);
+}
+
+.topbar .spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar-action[aria-pressed="true"] {
+  background: var(--e-wash);
+  color: var(--e-ink);
+}
+
+.save-state {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: var(--e-sp-2);
+  color: var(--e-ink-soft);
+  white-space: nowrap;
+}
+
+.save-state.failed {
+  color: var(--e-avoid-ink);
+}
+
+.save-state__pulse {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 999px;
+  background: currentColor;
+  animation: topbar-save-pulse var(--e-t-stream) var(--e-ease-out) infinite;
+}
+
+@keyframes topbar-save-pulse {
+  0%,
+  100% {
+    opacity: 0.38;
+    transform: scale(0.78);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+:root[data-reduced-motion="true"] .save-state__pulse {
+  animation: none;
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    gap: 8px;
+    padding-inline: 10px;
+  }
+
+  .topbar-idea {
+    flex: 1 1 auto;
+    gap: 8px;
+  }
+
+  .idea-pill {
+    flex: 1 1 auto;
+    max-width: 180px;
+  }
+
+  .topbar .spacer {
+    display: none;
+  }
+
+  .topbar-action {
+    padding-inline: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar {
+    gap: var(--e-sp-1);
+    padding-inline: 8px;
+  }
+
+  .topbar-idea {
+    gap: var(--e-sp-1);
+  }
+
+  .idea-pill {
+    max-width: 116px;
+    padding-inline: 9px 6px;
+  }
+
+  .topbar-actions {
+    gap: 0;
+  }
+
+  .topbar-action {
+    padding-inline: 6px;
+  }
+}

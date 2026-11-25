@@ -1,0 +1,176 @@
+/* Provider-owned document overlays. This sheet consumes the shared semantic
+   system; surfaces choose roles here and never author their own values. */
+
+#eido-overlay-root:empty {
+  display: none;
+}
+
+.e-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--e-z-modal);
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: var(--e-sp-5);
+  background: var(--e-veil);
+  opacity: 0;
+  transition: opacity var(--e-t-fade) var(--e-ease-out);
+}
+
+.e-overlay-backdrop[data-state="entered"] {
+  opacity: 1;
+}
+
+.e-overlay-backdrop[data-state="exiting"] {
+  transition-duration: var(--e-t-exit);
+  transition-timing-function: var(--e-ease-in);
+}
+
+.e-overlay-backdrop[data-backdrop-tone="deep"] {
+  background: var(--e-veil-deep);
+}
+
+.e-overlay-backdrop[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+.e-modal-floating-layer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--e-z-popover);
+  pointer-events: none;
+}
+
+.e-modal-floating-layer > .e-picker__listbox,
+.e-modal-floating-layer > .e-popover {
+  pointer-events: auto;
+}
+
+.e-modal-shell {
+  display: flex;
+  width: min(100%, 640px);
+  max-height: 80vh;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-modal);
+  outline: none;
+  background: var(--e-surface-panel);
+  box-shadow: var(--e-shadow-lift);
+  color: var(--e-ink);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--e-t-move) var(--e-ease-out),
+    transform var(--e-t-move) var(--e-ease-out);
+}
+
+.e-modal-shell[data-state="entered"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.e-modal-shell[data-state="exiting"] {
+  opacity: 0;
+  transform: translateY(0);
+  transition-duration: var(--e-t-exit), var(--e-t-exit);
+  transition-timing-function: var(--e-ease-in), var(--e-ease-in);
+}
+
+.e-modal-shell__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-sp-3);
+  padding:
+    calc(var(--e-sp-4) + var(--e-sp-1))
+    calc(var(--e-sp-4) + var(--e-sp-1))
+    var(--e-sp-4);
+  border-bottom: 1px solid var(--e-line);
+}
+
+.e-modal-shell__titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.e-modal-shell__title-line {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  min-width: 0;
+}
+
+.e-modal-shell__title-meta {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+.e-modal-shell__titles h2 {
+  margin: 0;
+}
+
+.e-modal-shell__titles .t-hint {
+  margin-top: var(--e-sp-1);
+}
+
+.e-modal-shell__body {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: calc(var(--e-sp-4) + var(--e-sp-1));
+}
+
+.e-modal-shell__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-4) calc(var(--e-sp-4) + var(--e-sp-1));
+  border-top: 1px solid var(--e-line);
+}
+
+.e-dialog-message {
+  max-width: 65ch;
+  margin: 0;
+  color: var(--e-ink);
+}
+
+.e-dialog-form {
+  display: grid;
+  gap: var(--e-sp-3);
+}
+
+.e-dialog-form .e-field-label {
+  margin: var(--e-sp-1) 0 calc(var(--e-sp-1) * -1);
+}
+
+:root[data-reduced-motion="true"] .e-overlay-backdrop {
+  transition-duration: var(--e-t-reduced-fade) !important;
+}
+
+:root[data-reduced-motion="true"] .e-modal-shell {
+  transition-duration: var(--e-t-reduced-fade), var(--e-t-fast) !important;
+}
+
+@media (max-width: 720px) {
+  .e-overlay-backdrop {
+    place-items: end stretch;
+    padding: var(--e-sp-3) 0 0;
+  }
+
+  .e-overlay-backdrop .e-modal-shell {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    max-height: calc(100dvh - var(--e-sp-3));
+    border-radius: var(--e-r-modal) var(--e-r-modal) 0 0;
+  }
+
+  .e-overlay-backdrop .e-modal-shell__body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docs-only merge"
+  short_description: "Land non-production docs with minimal proof"
+  default_prompt: "Use $docs-only-merge to land this documentation-only change without running production CI."

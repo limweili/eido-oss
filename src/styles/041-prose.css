@@ -1,0 +1,574 @@
+/* Paper is one material. Passive Markdown, its transition placeholder, and the
+   live editor all consume this sheet so activation cannot change text metrics. */
+.e-prose {
+  color: var(--e-ink);
+  font-family: var(--e-sans);
+  font-weight: 400;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.note-render {
+  min-height: 64px;
+  cursor: text;
+  contain: layout paint style;
+}
+.note-render:focus,
+.markdown-card-editor-content:focus {
+  outline: none;
+}
+
+.markdown-card-editor-transition {
+  display: grid;
+  width: 100%;
+}
+.markdown-card-editor-transition > .markdown-card-editor-placeholder,
+.markdown-card-editor-transition > .markdown-card-editor-boundary {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.markdown-card-editor-transition > .markdown-card-editor-placeholder {
+  opacity: 1;
+  pointer-events: none;
+}
+.markdown-card-editor-transition > .markdown-card-editor-boundary {
+  opacity: 0;
+  pointer-events: none;
+}
+.markdown-card-editor-transition.ready > .markdown-card-editor-placeholder {
+  opacity: 0;
+}
+.markdown-card-editor-transition.ready > .markdown-card-editor-boundary {
+  opacity: 1;
+  pointer-events: auto;
+}
+.markdown-card-editor,
+.markdown-card-editor-content {
+  width: 100%;
+}
+.markdown-card-editor .markdown-card-editor-content {
+  padding: 0 !important;
+  background: transparent;
+  color: var(--e-ink);
+  word-break: normal !important;
+}
+
+/* Editing adds no geometry of its own. A Card that scrolls must scroll exactly
+   as far while it is being written as while it is being read: any reserve
+   below the last line is room the writer never asked for, and it would have to
+   vanish again on exit, taking the text with it. Keeping the active line
+   visible is caret following's job (RichMarkdownEditor), not a spacer's.
+
+   The one editor-only box is the empty paragraph the library parks after a
+   trailing heading, list, or code fence so there is somewhere to type. It is a
+   place rather than a line, so it takes no room until the writer puts the
+   caret in it, which RichMarkdownEditor marks. */
+.markdown-card-editor-content > p[data-editor-spare] {
+  height: 0;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+/* The Eido-owned link dialog replaces the editor library's generic chrome
+   while publishing changes through its supported link-dialog signals. It is an
+   inline affordance rather than a modal, so it reads as the same floating
+   material as every other popover: the .e-popover surface supplies the border,
+   the lift and the paper, and these rules only lay out what sits on it. */
+
+/* The trigger the popover measures against. It stands exactly where the link
+   is on screen, and is portalled to the document body so `position: fixed`
+   means the window rather than the canvas transform the link lives inside. */
+.e-markdown-link-dialog__anchor {
+  position: fixed;
+  z-index: var(--e-z-popover);
+  pointer-events: none;
+}
+
+.e-markdown-link-dialog {
+  display: flex;
+  max-width: calc(var(--e-sp-7) * 8);
+  align-items: center;
+  gap: var(--e-sp-1);
+  padding: var(--e-sp-1);
+}
+
+/* The address, given the room and the link role. It is the one piece of
+   content here; the controls beside it are chrome. */
+.e-markdown-link-dialog__destination {
+  overflow: hidden;
+  min-width: 0;
+  padding: 0 var(--e-sp-1);
+  color: var(--e-go-ink);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.e-markdown-link-dialog__destination:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.e-markdown-link-dialog__destination:focus-visible {
+  border-radius: var(--e-r-inner);
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+/* The actions taken on the address, kept as one group beside it. They carry
+   their own bordered chrome, so the group needs no rule of its own. */
+.e-markdown-link-dialog__actions-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  flex-shrink: 0;
+}
+
+.e-markdown-link-dialog__form {
+  display: flex;
+  width: calc(var(--e-sp-7) * 6);
+  flex-direction: column;
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-2);
+}
+
+.e-markdown-link-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+}
+
+.e-markdown-link-dialog__field label {
+  color: var(--e-ink-soft);
+}
+
+/* The one thing the form refuses to apply. It appears only when an address
+   Eido would not render has been typed, and it says so where the founder is
+   looking rather than in a browser bubble that a per-keystroke form would
+   raise on every character. The system has no alarm colour, and this is not an
+   alarm: it reads at full ink strength beside the soft field labels, which is
+   the emphasis the message needs. */
+.e-markdown-link-dialog__message {
+  color: var(--e-ink);
+}
+
+/* The full Markdown vocabulary from SYSTEM §2.4. Block spacing is relative to
+   the selected S/M/L paper role and is identical in the cheap and rich trees. */
+.e-prose :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote, pre, table, hr) {
+  margin: 0;
+}
+/* A writer's run of spaces is content, the same way their blank lines are, and
+   a Card must show the same run whether it is being read or written: a space
+   that collapses on one surface and not the other moves every glyph after it,
+   and can move a wrap. The rule sits on the text-bearing blocks rather than on
+   the prose root because the passive renderer separates its blocks with
+   newlines, and whitespace that no longer collapses between block boxes would
+   draw a line of its own. A list item holding a nested list is the one block
+   that carries generated markup, so it stays collapsed - on both surfaces,
+   which is what keeps them identical. The editable root keeps the rule too,
+   because a browser decides from the host's own white-space whether a typed or
+   pasted newline becomes a character or a <br>, and only the character
+   survives being read back as the Card's text. */
+.note-render[contenteditable='true'],
+.note-render :where(p, h1, h2, h3, h4, h5, h6, blockquote, td, th),
+.note-render li:not(:has(ul, ol)) {
+  white-space: break-spaces;
+}
+.e-prose > * + *,
+.e-prose > div > * + * {
+  margin-top: 0.6em;
+}
+.e-prose h1 {
+  margin-top: 1em;
+  font-size: 1.3em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.e-prose h2 {
+  margin-top: 1em;
+  font-size: 1.15em;
+  font-weight: 600;
+}
+.e-prose h3 {
+  margin-top: 0.9em;
+  font-size: 1em;
+  font-weight: 700;
+}
+.e-prose h4,
+.e-prose h5,
+.e-prose h6 {
+  margin-top: 0.9em;
+  font-size: 1em;
+  font-weight: 700;
+}
+.e-prose h1 + *,
+.e-prose h2 + *,
+.e-prose h3 + *,
+.e-prose h4 + *,
+.e-prose h5 + *,
+.e-prose h6 + * {
+  margin-top: 0.4em;
+}
+.e-prose > :first-child,
+.e-prose > div > :first-child {
+  margin-top: 0;
+}
+.e-prose strong {
+  font-weight: 600;
+}
+.e-prose em {
+  font-style: italic;
+}
+.e-prose ul,
+.e-prose ol {
+  padding-left: 1.4em;
+}
+.e-prose ul {
+  list-style: none;
+}
+.e-prose ul > li:not(.task):not([role='checkbox']) {
+  position: relative;
+}
+.e-prose ul > li:not(.task):not([role='checkbox'])::before {
+  content: '–';
+  position: absolute;
+  left: -1.1em;
+  color: var(--e-ink-soft);
+}
+.e-prose ol {
+  font-variant-numeric: tabular-nums;
+}
+.e-prose li + li {
+  margin-top: 0.25em;
+}
+/* Lexical gives every list item an 8px block margin. Zero that library chrome
+   before the shared adjacent-item rhythm applies, or each list grows on edit. */
+.markdown-card-editor-content li {
+  margin-block: 0;
+}
+/* Lexical also carries a nested list in a list item of its own, where the
+   passive renderer nests it inside the item it belongs to. That wrapper is
+   structure rather than an item, so it must not take the space between two
+   items, or every nested list would gain a gap the moment editing began. */
+.markdown-card-editor-content li:has(> :is(ul, ol)) {
+  margin-top: 0;
+}
+.e-prose blockquote {
+  border-left: 2px solid var(--e-line-strong);
+  padding-left: 0.75em;
+  color: var(--e-ink-soft);
+}
+.e-prose blockquote > p {
+  margin: 0;
+}
+.e-prose code {
+  border-radius: var(--e-r-inner);
+  background: var(--e-surface-field);
+  padding: 0.1em 0.35em;
+  color: var(--e-ink);
+  font-family: var(--e-mono);
+  font-feature-settings: 'calt' 0;
+  font-size: 0.85em;
+}
+.e-prose pre {
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-field);
+  padding: 10px 12px;
+  overflow-x: auto;
+  color: var(--e-ink);
+}
+.e-prose pre code {
+  display: block;
+  border-radius: 0;
+  background: none;
+  padding: 0;
+  font-size: 0.85em;
+  line-height: 1.5;
+}
+.e-prose a {
+  color: var(--e-go-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.e-prose a:hover {
+  color: color-mix(in srgb, var(--e-go-ink) 80%, var(--e-ink));
+}
+.e-prose del {
+  color: var(--e-ink-faint);
+  text-decoration-color: var(--e-ink-faint);
+}
+.e-prose hr {
+  border: 0;
+  border-top: 1px solid var(--e-line);
+}
+.e-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.e-prose th,
+.e-prose td {
+  border: 1px solid var(--e-line);
+  padding: 0.35em 0.6em;
+  color: var(--e-ink);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.e-prose th {
+  background: var(--e-surface-field);
+  font-weight: 600;
+}
+
+/* Passive task syntax uses a disabled checkbox inside a label; Lexical exposes
+   the same state as a checkbox-role list item. Both share one 13px drawing. */
+.e-prose li.task,
+.markdown-card-editor-content li[role='checkbox'] {
+  position: relative;
+  margin-inline: 0;
+  padding-inline: 0;
+  list-style: none;
+  text-decoration: none;
+}
+.e-prose li.task > label,
+.markdown-card-editor-content li[role='checkbox'] {
+  display: block;
+  min-height: 13px;
+  padding-left: calc(var(--e-fs-ui) + 0.5em);
+}
+.e-prose li.task > label {
+  position: relative;
+}
+.e-prose li.task input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.e-prose li.task > label::before,
+.markdown-card-editor-content li[role='checkbox']::before {
+  content: '';
+  position: absolute;
+  top: 0.2em;
+  left: 0;
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-inner);
+  background: transparent;
+}
+.e-prose li.task.done,
+.markdown-card-editor-content li[role='checkbox'][aria-checked='true'] {
+  color: var(--e-ink-soft);
+  text-decoration: none;
+}
+.e-prose li.task.done > label::before,
+.markdown-card-editor-content li[role='checkbox'][aria-checked='true']::before {
+  border-color: var(--e-go);
+  background: var(--e-go);
+}
+.e-prose li.task.done > label::after,
+.markdown-card-editor-content li[role='checkbox'][aria-checked='true']::after {
+  content: '';
+  position: absolute;
+  top: calc(0.2em + 2px);
+  left: 4px;
+  width: 4px;
+  height: 7px;
+  border: solid var(--e-on-solid);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+
+.e-prose mark:not(.painted-highlight) {
+  border-radius: var(--e-r-inner);
+  background: var(--e-hl-yellow);
+  color: var(--e-ink);
+  padding: 0;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.e-prose > .result-empty,
+.e-prose > div > .result-empty,
+.markdown-card-editor-empty {
+  color: var(--e-ink-soft);
+  font-style: italic;
+}
+.markdown-card-editor-empty {
+  display: block;
+}
+.markdown-card-editor :has(> .markdown-card-editor-empty) {
+  padding: 0;
+  white-space: normal;
+}
+
+/* MDXEditor keeps table and code controls beside the document. Hide only its
+   tool cells and keep those controls out of flow so activation stays neutral. */
+.markdown-card-editor-content code > span {
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+}
+.markdown-card-editor-content > div:has(> .markdown-card-code-block) {
+  margin-top: 0.6em;
+}
+.note-render.e-prose .markdown-card-code-block {
+  margin: 0;
+}
+.markdown-card-editor-content table {
+  height: auto;
+  margin: 0;
+}
+.markdown-card-editor-content > div:has(> table) {
+  margin-top: 0.6em;
+}
+.markdown-card-editor-content table > thead,
+.markdown-card-editor-content table > tfoot {
+  display: none;
+}
+.markdown-card-editor-content table > tbody [data-tool-cell='true'] {
+  width: 0;
+  padding: 0;
+  border: 0;
+  visibility: hidden;
+}
+.markdown-card-editor-content table > tbody [data-tool-cell='true'] > * {
+  display: none;
+}
+.markdown-card-editor-content table > tbody > tr > th:not([data-tool-cell='true']),
+.markdown-card-editor-content table > tbody > tr > td:not([data-tool-cell='true']) {
+  border: 1px solid var(--e-line);
+  padding: 0.35em 0.6em !important;
+}
+.markdown-card-editor-content table > tbody > tr > :nth-child(2):not([data-tool-cell='true']) {
+  /* A collapsed zero-width tool column contributes half its shared border. */
+  padding-left: calc(0.6em + 0.5px) !important;
+}
+.markdown-card-editor-content table col:first-child,
+.markdown-card-editor-content table col:last-child {
+  width: 0;
+  visibility: collapse;
+}
+.markdown-card-editor-content table [contenteditable='true'] {
+  min-height: 0;
+  font: inherit;
+  line-height: inherit;
+}
+.markdown-card-editor-content table [contenteditable='true'] > p {
+  margin: 0;
+}
+
+/* Embedded Note assets remain instrument chrome around paper content. Images
+   left this file for the pinned attachment panels (040 § Attachment panels);
+   what stays here is the file row, which a narrow Card ellipsizes rather than
+   crops and so never needed a carousel. */
+.asset-list {
+  display: grid;
+  gap: var(--e-sp-2);
+  margin-top: var(--e-sp-2);
+}
+.asset-file {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  min-width: 0;
+  padding: var(--e-sp-1) var(--e-sp-2);
+  background: var(--e-surface-card);
+  color: var(--e-ink);
+}
+.asset-file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.asset-remove {
+  flex: 0 0 auto;
+}
+.asset-file {
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+}
+.asset-file-icon {
+  flex: 0 0 auto;
+  border-radius: var(--e-r-inner);
+  background: var(--e-surface-recessed);
+  padding: 2px var(--e-sp-1);
+  color: var(--e-ink);
+}
+.asset-file-size {
+  flex: 0 0 auto;
+  color: var(--e-ink-soft);
+}
+
+/* Title cards are canvas labels, not connectable CardShells. They borrow the
+   shell's one-line selection and round-corner resize vocabulary without chrome. */
+.title-card {
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: var(--e-r-card);
+  background: transparent;
+  padding: var(--e-sp-2) var(--e-sp-3);
+}
+.title-card.agent-unadopted:not(.selected) {
+  border-color: var(--e-agent-unadopted-accent);
+  border-style: dashed;
+}
+.title-card.selected {
+  border-color: var(--e-go);
+  background: transparent;
+  box-shadow: none;
+}
+.title-card-input {
+  width: 100%;
+  height: 100%;
+  min-height: 40px;
+  border: 0;
+  outline: 0;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  color: var(--e-ink);
+  padding: 0;
+}
+.title-card-input::placeholder {
+  color: var(--e-ink-soft);
+}
+/* The floor's safety net: a word too long to fit even at the smallest size
+   breaks instead of escaping the card. The fit itself rejects any size that
+   would break a word, so this only ever fires at the bottom of the range. */
+.title-card-input {
+  overflow-wrap: break-word;
+}
+/* The offscreen twin the fit measures. It shares the editor's typography role
+   rather than restating it, so only geometry is authored here: it must report
+   content size at a given width instead of filling the card, and it wraps at
+   word boundaries only so an overlong word reports as overflowing width. */
+.title-card-measure {
+  overflow-wrap: normal;
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-wrap;
+}
+.title-card-resize-line {
+  display: none;
+}
+.title-card-resize-handle {
+  width: 9px !important;
+  height: 9px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--e-go) !important;
+}
+.title-card-resize-handle:focus-visible {
+  outline: 1px solid var(--e-go);
+  outline-offset: 2px;
+}

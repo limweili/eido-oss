@@ -1,0 +1,103 @@
+{
+  "name": "eido",
+  "description": "A local-first canvas for connected thinking with your own AI API keys.",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/limweili/eido-oss.git"
+  },
+  "homepage": "https://eido.so/",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "engines": {
+    "node": ">=24 <25 || >=26.9 <27",
+    "npm": ">=11 <12"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24 <25 || >=26.9 <27",
+      "onFail": "warn"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11 <12",
+      "onFail": "warn"
+    }
+  },
+  "scripts": {
+    "preinstall": "node scripts/ci/toolchain-policy.mjs --runtime",
+    "ci:runtime": "node scripts/ci/toolchain-policy.mjs --runtime",
+    "start": "npm run ci:runtime --silent && npm run desktop",
+    "dev": "npm run ci:runtime --silent && vite",
+    "desktop": "npm run ci:runtime --silent && npm run build -- --mode desktop-proof && npm run build:electron && electron .",
+    "build": "npm run ci:runtime --silent && tsc -b && vite build",
+    "build:electron": "npm run ci:runtime --silent && tsc -p tsconfig.electron.json --noEmit && vite build --config vite.electron.config.ts --mode main && vite build --config vite.electron.config.ts --mode profile-utility && vite build --config vite.electron.config.ts --mode preload && vite build --config vite.electron.config.ts --mode eido-cli-sea && node scripts/electron/profile-live-gateway-helper.mjs",
+    "desktop:package:dir": "npm run ci:runtime --silent && vite build --mode desktop-proof && npm run build:electron && electron-builder --dir --publish never",
+    "desktop:smoke": "npm run ci:runtime --silent && npm run desktop:package:dir && node scripts/electron/packaged-smoke.mjs",
+    "release:package": "npm run ci:runtime --silent && npm run build -- --mode desktop-proof && npm run build:electron && node scripts/certification/package-certification.mjs",
+    "release:certify": "npm run ci:runtime --silent && node scripts/certification/certify-packaged.mjs",
+    "preview": "npm run ci:runtime --silent && vite preview",
+    "migrate:images": "npm run ci:runtime --silent && node scripts/maintenance/migrate-save-images.mjs",
+    "typecheck": "npm run ci:runtime --silent && tsc --noEmit && tsc -p tsconfig.electron.json --noEmit && tsc -p tsconfig.tools.json --noEmit",
+    "typecheck:outside-build": "npm run ci:runtime --silent && tsc -p tsconfig.electron.json --noEmit && tsc -p tsconfig.tools.json --noEmit",
+    "check": "npm run ci:runtime --silent && npm run ci:toolchain && npm run typecheck && npm run test",
+    "hooks:install": "npm run ci:runtime --silent && git config core.hooksPath .githooks",
+    "ci:toolchain": "node scripts/ci/toolchain-policy.mjs --runtime --repository",
+    "ci:required": "npm run ci:toolchain && node scripts/ci/required.mjs",
+    "ci:design-system": "npm run ci:runtime --silent && node scripts/ci/design-system-drift.mjs && node scripts/design/sync-design-reference.mjs --check",
+    "design:sync": "npm run ci:runtime --silent && node scripts/design/sync-design-reference.mjs",
+    "ci:workflow-policy": "npm run ci:runtime --silent && node scripts/ci/workflow-policy.mjs",
+    "test:ci-tools": "npm run ci:runtime --silent && node --test scripts/ci/*.test.mjs",
+    "test": "npm run ci:runtime --silent && vitest run --exclude 'scripts/ci/*.test.mjs' --exclude 'src/**/*.bench.test.ts' --exclude 'src/**/*.perf.test.ts' --exclude 'electron/**/*.perf.test.ts' --exclude 'src/**/*.browser.test.ts'",
+    "test:browser": "npm run ci:runtime --silent && playwright test --config playwright.interaction.config.ts",
+    "test:browser:health": "npm run ci:runtime --silent && playwright test --config playwright.interaction.config.ts src/canvas/browserHealth.browser.test.ts",
+    "test:browser:smoke": "npm run ci:runtime --silent && playwright test --config playwright.interaction.config.ts src/canvas/connectionPopover.browser.test.ts src/canvas/contextPeek.browser.test.ts src/canvas/resultFollowUp.browser.test.ts",
+    "test:browser:production": "npm run ci:runtime --silent && npm run build && playwright test --config playwright.production.config.ts",
+    "check:bundle": "npm run ci:runtime --silent && node scripts/ci/bundle-budget.mjs",
+    "perf:timeline": "npm run ci:runtime --silent && vitest run src/graph/timeline.bench.test.ts --reporter=verbose",
+    "perf:save": "npm run ci:runtime --silent && vitest run electron/profileSaveCost.perf.test.ts --reporter=verbose",
+    "perf:store": "npm run ci:runtime --silent && vitest run src/performance/storeReport.perf.test.ts --reporter=verbose",
+    "perf:browser": "npm run ci:runtime --silent && playwright test --config playwright.performance.config.ts",
+    "perf:rich-card:probe": "npm run ci:runtime --silent && EIDO_RICH_CARD_MODE=probe playwright test --config playwright.performance.config.ts src/performance/richCardBaseline.perf.ts",
+    "perf:rich-card:correctness": "npm run ci:runtime --silent && EIDO_RICH_CARD_MODE=correctness playwright test --config playwright.performance.config.ts src/performance/richCardBaseline.perf.ts",
+    "perf:rich-card:capture": "npm run ci:runtime --silent && playwright test --config playwright.performance.config.ts src/performance/richCardBaseline.perf.ts",
+    "perf:browser:current": "npm run ci:runtime --silent && EIDO_CURRENT_BOARD_DATA_FILE=${EIDO_CURRENT_BOARD_DATA_FILE:-$HOME/.eido/eido-v3-ideas.json} playwright test --config playwright.performance.config.ts -g \"current saved Board\"",
+    "perf:report": "npm run ci:runtime --silent && vitest run src/performance/performanceReport.perf.test.ts src/performance/storeReport.perf.test.ts src/performance/graphIndexReport.perf.test.ts src/performance/persistenceReport.perf.test.ts src/performance/richCardReport.perf.test.ts --reporter=verbose"
+  },
+  "dependencies": {
+    "@mdxeditor/editor": "^4.0.4",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@xyflow/react": "^12.3.5",
+    "@zip.js/zip.js": "2.8.34",
+    "immer": "^11.1.15",
+    "lucide-react": "^0.468.0",
+    "nanoid": "^5.1.16",
+    "prismjs": "^1.30.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tldts": "7.4.9",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@electron/fuses": "2.1.3",
+    "@playwright/test": "^1.62.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^24.19.2",
+    "@types/prismjs": "^1.26.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^6.0.2",
+    "electron": "43.8.3",
+    "electron-builder": "26.18.0",
+    "jsdom": "^29.1.1",
+    "postject": "1.0.0-alpha.6",
+    "typescript": "^5.6.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.12"
+  }
+}

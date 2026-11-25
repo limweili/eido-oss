@@ -1,0 +1,45 @@
+name: Weekly maintenance
+
+on:
+  schedule:
+    - cron: '43 16 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    name: Dependency vulnerability audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the exact commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node for CI
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      - name: Fail on high or critical dependency vulnerabilities
+        run: npm audit --audit-level=high
+
+  release-maintenance-checks:
+    name: Release updater and artifact integrity
+    # Mature release automation is backlog #740. Keep this check available for
+    # deliberate investigation without making it a scheduled Friends Alpha gate.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the exact commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node for CI
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+
+      - name: Fail closed on unhealthy release evidence
+        run: node scripts/release/maintenance-checks.mjs run --repository limweili/eido-releases --json

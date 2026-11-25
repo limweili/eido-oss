@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "types": ["node", "vite/client", "vitest/globals"]
+  },
+  "include": [
+    "electron/**/*.ts",
+    "electron/**/*.tsx",
+    "scripts/vite/linkPreviewPlugin.ts",
+    "scripts/vite/linkPreviewPlugin.test.ts",
+    "src/electron-api.d.ts",
+    "vite.electron.config.ts"
+  ]
+}

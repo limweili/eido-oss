@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Testing Bottleneck Diagnosis — Agentic Delivery Retro</title>
+  <style>
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1a1c1f;
+  --muted: #6b7280;
+  --surface: #f3f4f6;
+  --surface-strong: #e5e7eb;
+  --border: #d1d5db;
+  --accent: #1677ff;
+  --accent-soft: #e8f2ff;
+  --decision: #0f8a4b;
+  --decision-soft: #e8f7ef;
+  --warning: #d66b00;
+  --warning-soft: #fff1e5;
+  --danger: #c62828;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181818;
+    --fg: #f8fafc;
+    --muted: #a6adb8;
+    --surface: #25272b;
+    --surface-strong: #33363c;
+    --border: #454950;
+    --accent: #83c3ff;
+    --accent-soft: #18324b;
+    --decision: #5bd58e;
+    --decision-soft: #173a27;
+    --warning: #ffad63;
+    --warning-soft: #442b18;
+    --danger: #ff7b7b;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); }
+#founder-review { position: relative; width: 100%; padding: clamp(1rem, 2.5vw, 2.5rem); overflow-wrap: anywhere; }
+#founder-review h1, #founder-review h2, #founder-review h3, #founder-review h4 { line-height: 1.2; }
+#founder-review h1 { font-size: clamp(1.9rem, 3vw, 3rem); margin: .35rem 0 1rem; }
+#founder-review h2 { margin-top: 3rem; padding-top: 1.25rem; border-top: 2px solid var(--border); }
+#founder-review h3 { margin-top: 1.8rem; }
+#founder-review p, #founder-review li { max-width: 85ch; }
+#founder-review a { color: var(--accent); }
+#founder-review code { white-space: normal; word-break: break-all; }
+.report-header { padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.kicker, .section-label, .muted { color: var(--muted); }
+.section-label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.lede { font-size: 1.1rem; max-width: 75ch; }
+.toc { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.toc ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem 1.5rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0; }
+.two-col, .comment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+.card { background: var(--surface); border-radius: .9rem; padding: 1rem; }
+.stat { display: grid; gap: .25rem; }
+.stat strong { font-size: 1.4rem; }
+.plain-group { padding: .5rem 0 1rem; border-bottom: 1px solid var(--border); }
+.callout { margin: 1rem 0; padding: .8rem 1rem; border-left: 4px solid var(--accent); background: var(--accent-soft); }
+.callout.decision { border-color: var(--decision); background: var(--decision-soft); }
+.callout.warning { border-color: var(--warning); background: var(--warning-soft); }
+.area-intro { color: var(--muted); max-width: 80ch; }
+.impact-chain { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: .75rem; align-items: center; margin: 1.5rem 0; }
+.impact-node { min-height: 10rem; display: grid; align-content: center; gap: .5rem; padding: 1rem; border: 2px solid var(--decision); border-radius: .9rem; background: var(--decision-soft); text-align: center; }
+.impact-node.pending { border-color: var(--warning); background: var(--warning-soft); }
+.impact-node small { color: var(--muted); }
+.impact-arrow { color: var(--muted); font-size: 1.5rem; }
+.table-wrap { width: 100%; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 1rem 0; }
+th, td { padding: .75rem .6rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); }
+details { padding: .75rem 0; border-bottom: 1px solid var(--border); }
+summary { cursor: pointer; font-weight: 700; }
+.diagram-placeholder { min-height: 9rem; display: grid; place-items: center; padding: 1rem; border: 1px dashed var(--border); color: var(--muted); }
+button, select, textarea { font: inherit; color: inherit; }
+button { border: 1px solid var(--border); border-radius: .55rem; padding: .48rem .75rem; background: var(--bg); cursor: pointer; }
+button.primary { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+label { display: grid; gap: .3rem; margin-top: .7rem; font-weight: 600; }
+select, textarea { width: 100%; border: 1px solid var(--border); border-radius: .55rem; padding: .55rem .7rem; background: var(--bg); }
+textarea { min-height: 7rem; resize: vertical; }
+.actions, .annotation-tools, .comment-actions, .comment-label { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .6rem; }
+.annotation-tools { color: var(--muted); }
+.inline-comments, .comment-index { display: grid; gap: .75rem; margin-top: .75rem; }
+.inline-comments:empty { display: none; }
+.founder-comment[data-status="resolved"] { opacity: .7; }
+.founder-comment blockquote, #founder-comment-quote, .inline-composer blockquote { margin: .65rem 0; padding-left: .8rem; border-left: 3px solid var(--border); color: var(--muted); }
+.founder-comment-body { white-space: pre-wrap; }
+.badge { display: inline-block; padding: .12rem .5rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .85rem; }
+.selection-comment-trigger { position: absolute; z-index: 20; }
+.inline-composer { margin: .65rem 0 1rem; }
+.review-instructions, .comment-workbench { margin: 1.5rem 0; }
+footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); }
+[hidden] { display: none !important; }
+@media (max-width: 760px) {
+  .summary-grid, .two-col, .comment-grid, .toc ol { grid-template-columns: 1fr; }
+  .impact-chain { grid-template-columns: 1fr; }
+  .impact-arrow { transform: rotate(90deg); justify-self: center; }
+  table, thead, tbody, tr, th, td { display: block; }
+  thead { display: none; }
+  tr { padding: .6rem 0; border-bottom: 2px solid var(--border); }
+  td { display: grid; grid-template-columns: minmax(7rem, .8fr) minmax(0, 1.7fr); gap: .6rem; border: 0; padding: .3rem 0; }
+  td::before { content: attr(data-label); color: var(--muted); font-weight: 700; }
+}
+@media print {
+  .annotation-tools, .selection-comment-trigger, .inline-composer, .comment-actions, .comment-workbench .comment-grid { display: none !important; }
+  .founder-comment { break-inside: avoid; }
+}
+  </style>
+</head>
+<body>
+<main id="founder-review"
+      data-report-id="cross-epic-410-rich-card-rendering-520-sqlite-profile-authority-testing-bottlene"
+      data-comment-schema="founder-review-comments/v1">
+  <header id="executive-summary" class="report-header" data-review-anchor data-anchor-label="Executive summary">
+    <p class="kicker">Founder review · Cross-epic diagnosis: #410 rich-card rendering + #520 SQLite profile authority · retros read in full through 2026-07-18 · generated 2026-07-19</p>
+    <h1>Testing Bottleneck Diagnosis — Agentic Delivery Retro</h1>
+    <p class="section-label">Executive summary</p>
+    <p class="lede">Your instinct was right, and the retros prove it in their own words. In epic #410, the retro itself concludes that <em>"validation had become a parallel product"</em> — roughly 14,000 lines of test and measurement machinery were built around one architecture decision, and when you cut the test suite from 205 cases to 23 and removed the harness, the decision landed and five follow-up slices shipped in under three hours. Epic #520 shows the same disease in a different organ: the expensive thing there was not product tests but review-and-evidence ceremony ($3–6 and 17–48 minutes per review verdict, repeatedly thrown away when a branch moved) plus a broken Windows test apparatus that every work lane re-fought — and the epic's costliest review was spent on work that turned out not to be SQLite work at all.</p>
+    <div class="two-col">
+      <div class="plain-group">
+        <h3>What this report gives you now</h3>
+        <p>A validated diagnosis with five root causes, a candid review of the Epic Orchestration, Merge Captain, and DevOps Coach skills, and a ranked set of fixes — including one paragraph of durable principles for AGENTS.md and one missing architecture decision record that makes "re-derive from first principles" actually possible. Today, an agent told to re-derive testing policy from the ADRs finds <strong>nothing</strong>: no ADR covers testing or evidence at all.</p>
+      </div>
+      <div class="plain-group">
+        <h3>What you get after adopting the fixes</h3>
+        <p>Agents that can push back on ceremony by citing a principle instead of waiting for your gut feeling; a SQLite migration that amends stale tests and specs instead of being blocked by them; and a delivery system whose health check (DevOps Coach) watches for "validation becoming a second product" on a schedule, so the next loop is caught by the system, not by you. Gate: measured on the next epic.</p>
+      </div>
+    </div>
+    <div class="summary-grid" aria-label="Executive measures">
+      <div class="card stat"><span class="muted">Friction that was apparatus &amp; ceremony, not product defects (epic #410)</span><strong>≈82–85%</strong><span>Of ~300 classified friction entries, only ~1 in 6 involved a real product defect. The rest was the test machinery breaking or proof being rebuilt. MEASURED from the retro ledger.</span></div>
+      <div class="card stat"><span class="muted">Test trim that unblocked the architecture decision</span><strong>205 → 23 cases</strong><span>Plus ~14,000 harness lines removed from the blocking path. #405 landed the same day; #406–#409 landed in one 2 h 55 m train. MEASURED.</span></div>
+      <div class="card stat"><span class="muted">Pure review inference spend in epic #520</span><strong>$20.60 / 2.2 h</strong><span>Five completed verdicts yielding seven blockers. The single costliest ($6.26, 48 min) was spent on work later ruled outside the epic's scope. MEASURED.</span></div>
+    </div>
+    <div class="callout decision"><strong>Most important boundary — do not over-correct:</strong> about 1 in 6 friction entries was a genuine catch, and the catches cluster in specific places: security and external-mutation boundaries (a wrong provider mock, a credential that was never actually proven, a prototype-pollution hole, a symlink escape) and adversarial review of real product behavior (a caching bug that would have shown stale highlights, a candidate that broke deep scrolling). The cut target is apparatus and repeated proof — not the canonical CI gate, not independent review at real boundaries, and not the handful of tests that discriminate real regressions.</div>
+    <div class="callout"><strong>Founder review focus:</strong> three decisions are yours: (1) adopt the proposed AGENTS.md principles paragraph and the new testing-philosophy ADR; (2) declare hosted Linux CI the single authority for gates so lanes stop paying the Windows local-gate tax; (3) give DevOps Coach a standing cadence so "evidence became a second product" is detected by the system next time. Everything else is agent work.</div>
+  </header>
+
+  <nav class="toc" aria-label="Report contents">
+    <ol>
+      <li><a href="#executive-summary">Executive summary</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#work-delivered">What the retros show</a></li>
+      <li><a href="#technical-teaching">How the loop worked</a></li>
+      <li><a href="#retro">Skills review &amp; fixes</a></li>
+      <li><a href="#comment-workbench">Comment and return</a></li>
+    </ol>
+  </nav>
+
+  <section id="review-workflow" class="card review-instructions" data-review-anchor data-anchor-label="How to review and comment">
+    <h2>How to review and return comments</h2>
+    <ol>
+      <li>Skim the executive summary and impact first; open technical disclosures only when useful.</li>
+      <li>Highlight exact wording and press the nearby <strong>Comment here</strong> button, or comment on a whole section.</li>
+      <li>Add, edit, resolve, or delete comments. Each one is marked as founder feedback requiring an agent response.</li>
+      <li>Press <strong>Save commented HTML</strong> and return the downloaded file.</li>
+    </ol>
+  </section>
+
+  <section id="founder-tldr" data-review-anchor data-anchor-label="Founder TLDR">
+    <h2>Founder TLDR — the whole review in five bullets</h2>
+    <ul>
+      <li><strong>Your diagnosis is confirmed by the retros' own words.</strong> Epic #410's retro says validation "became a parallel product." Roughly 82–85% of its ~300 friction entries were the test apparatus breaking or proof being rebuilt — not product defects. Your two interventions (trim the harness; test proportionally across slices) are the two most effective events in either retro.</li>
+      <li><strong>The disease is a loop, not a habit.</strong> Every time a check went red, agents built more checking machinery instead of asking "would more proof change the decision?" Nothing in the system pushed back, so the loop only ended when you did it manually. The fix is to institutionalize that question — in AGENTS.md, in a new ADR, and in the three delivery skills below.</li>
+      <li><strong>Epic Orchestration</strong> — the skill's principles are already good (rewritten mid-epic as PR #541, which measurably worked). Strongest fix: give it a <em>tripwire it must act on</em> — when evidence machinery rivals the product change, or when a lane re-proves something already proven, the orchestrator must stop the lane and reslice, not escalate to you. Plus: verify the critical path by technical mechanism, not tracker links — stale tracker edges sent epic #520 down two days of non-SQLite work.</li>
+      <li><strong>Merge Captain</strong> — the contract is sound but its economics leak: reviews costing $3–6 and 17–48 minutes were invalidated by any branch movement, and its bundled gate scripts can't even run on the Windows host every lane used. Strongest fix: per-review time/dollar budgets with a formal "incomplete" outcome, a single-writer rule on shared branches so paid reviews stop being raced, and portable (or hosted-CI-only) gates.</li>
+      <li><strong>DevOps Coach</strong> — the only skill positioned to catch "validation became a second product," and it never fired because it is manual-only. Strongest fix: a standing cadence (end of every epic, or weekly) plus one new health metric it must always check: the ratio of harness/process work to product work. In epic #520, ~140 open follow-ups were <em>all</em> infrastructure and zero were product — that number should have set off an alarm on day two.</li>
+    </ul>
+  </section>
+
+  <section id="impact" data-review-anchor data-anchor-label="Impact">
+    <h2>Impact — what changed and why it matters</h2>
+    <p class="area-intro">The impact thesis: the constraint on delivery pace is not agent capability or CI capacity — CI spend for July was ~$9.41 against a $30 line — it is unbounded evidence work. Removing it has already been proven to work once, measurably. This report turns that one-off rescue into standing policy.</p>
+    <div class="impact-chain" role="img" aria-label="Impact chain from evidence to user or business value">
+      <div class="impact-node"><strong>Evidence</strong><span>82–85% of friction was apparatus/ceremony; the trim (205→23) unblocked landing in hours; $20.60 of review bought 7 blockers, partly off-scope.</span><small>MEASURED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Decision</strong><span>Encode proportional evidence as durable principle (AGENTS.md paragraph + testing ADR) and repair the three delivery skills' specific gaps.</span><small>DECIDED — pending your approval</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Enabled</strong><span>Agents can decline ceremony by citing principle; SQLite work can amend stale tests/specs instead of fighting them; the coach detects the next loop automatically.</span><small>ENABLED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node pending"><strong>Business effect</strong><span>Product-decision throughput at the post-trim rate (five slices in ~3 h) becomes the norm, not the rescue.</span><small>EXPECTED — gate: next epic's measured pace</small></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Impact layer</th><th>Improvement</th><th>Evidence</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Layer">Diagnosis</td><td data-label="Improvement">The bottleneck is named and quantified from both retros, not inferred from feel.</td><td data-label="Evidence">Full read of both retro ledgers (~340 + ~170 entries) and the delivery skills/docs.</td><td data-label="Confidence">MEASURED</td></tr>
+          <tr><td data-label="Layer">Already institutionalized</td><td data-label="Improvement">Risk-led testing landed mid-#520 as PR #541 (system-agnostic Epic Orchestration + Merge Captain, proportional cross-slice testing) and immediately preceded the fastest delivery stretch in either retro.</td><td data-label="Evidence">#410 retro: #406–#409 landed in one 2 h 55 m train under the new rules.</td><td data-label="Confidence">MEASURED</td></tr>
+          <tr><td data-label="Layer">Gap this report closes</td><td data-label="Improvement">Principles exist only inside skill files agents may not load; no ADR covers testing; the three skills lack tripwires, budgets, and cadence.</td><td data-label="Evidence">Skills/docs audit: zero testing/evidence ADRs among 0001–0027; TDD skill even requires founder sign-off on test seams, contradicting your hands-off role.</td><td data-label="Confidence">MEASURED</td></tr>
+          <tr><td data-label="Layer">SQLite risk</td><td data-label="Improvement">Your fear is founded but already has an antidote: adopted rules let implementation evidence amend stale specs/tests; the bigger observed risk was the epic spending its ceremony budget on non-SQLite work.</td><td data-label="Evidence">#520 retro: lexical Intent Log guard fought the new adapter twice; stale acceptance text nearly forced fake service code; rules 149/162/170 adopted.</td><td data-label="Confidence">DECIDED</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warning"><strong>Honest impact boundary:</strong> everything in the "expected" column is unproven until the next epic runs under these rules. Epic #520 itself has <em>not shipped</em> — its core SQLite slices are still ahead — so the pace claim rests on the #410 post-trim train only. NOT YET PROVEN: that the proposed principles prevent a new loop rather than merely ending one faster.</div>
+  </section>
+
+  <section id="work-delivered" data-review-anchor data-anchor-label="What the retros show">
+    <h2>Area 1 — What the retros actually show</h2>
+    <p class="area-intro">Both retro ledgers were read end to end with fresh eyes (~340 dated entries in #410, ~170 in #520, plus #520's 184 adopted rules and ~140-item follow-up ledger). Every friction entry was classified three ways: a real product defect a check caught, the checking apparatus itself breaking, or proof/ceremony overhead. The pattern is unambiguous and consistent across both epics.</p>
+
+    <article id="claims-validation" data-review-anchor data-anchor-label="Your claims, validated">
+      <h3>Your claims, checked against the evidence</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Your claim</th><th>Verdict</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Claim">"The agentic cycle creates too many specific tests."</td><td data-label="Verdict"><strong>Validated, with a refinement</strong></td><td data-label="Evidence">It is less a writing habit than a loop: each red check was answered with more checking machinery. #405 grew 12 versions of an evidence-format validator and 4 versions of a process guard, and ran 11 cloud measurement attempts that produced <em>zero</em> accepted evidence. Specificity was the symptom; the missing "would more proof change the decision?" question was the cause.</td></tr>
+            <tr><td data-label="Claim">"Trimming CPU-heavy tests and removing the benchmark harness was the highest-leverage fix."</td><td data-label="Verdict"><strong>Validated</strong></td><td data-label="Evidence">The retro's own words: "validation had become a parallel product… expanded to accommodate machine noise instead of asking which evidence could still change the decision." After the trim: #405 landed same day, #406–#409 in a 2 h 55 m train, and the closeout confirms the final architecture decision "does not depend on" any of the removed machinery.</td></tr>
+            <tr><td data-label="Claim">"Proportional cross-slice testing is correct and should be institutionalized."</td><td data-label="Verdict"><strong>Validated — and already partially done</strong></td><td data-label="Evidence">Landed as PR #541 mid-#520; adopted as delivery rules in #410's closeout ("add a test only when it discriminates a plausible regression… run the canonical broad gate once… reuse exact proof"). The mechanically-identical-rebase rule was exercised successfully for #407/#408 the same day.</td></tr>
+            <tr><td data-label="Claim">"We spent more time building test harnesses than product."</td><td data-label="Verdict"><strong>Validated</strong></td><td data-label="Evidence">#405: ~14,000 harness lines vs. one architecture decision; ≥11,534 lines confirmed removable by whole-file deletion; ~90–95% of that lane's effort was apparatus. #520: of 184 adopted rules, ~90% govern shell transport, evidence envelopes, and review mechanics; the ~140-item follow-up ledger is entirely infrastructure, zero product features.</td></tr>
+            <tr><td data-label="Claim">"Heavy test indexing could stop us shipping the SQLite architecture change."</td><td data-label="Verdict"><strong>Founded, but treatable — see below</strong></td><td data-label="Evidence">Real instances occurred (an old save-file text-matching guard rejected the new SQLite adapter twice; stale acceptance text nearly forced building fake service code). But the counter-rules are already adopted: implementation evidence may amend a stale spec, and unrelated debt becomes a non-blocking issue instead of scope creep.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article id="epic-410-story" data-review-anchor data-anchor-label="Epic 410 story">
+      <h3>Epic #410 — how a rendering decision grew a 14,000-line evidence product</h3>
+      <p>The chain of events, in plain language: the work machine (a managed Mac) could not launch the browser needed for performance measurements, and background security software polluted all timing numbers. So measurement moved to rented cloud machines. Cloud machines are shared and noisy, so agents built machinery to prove each measurement was trustworthy — process guards, cleanliness checks, tamper-evident evidence formats. Reviews then (correctly) found bugs in that machinery, which produced more machinery. Twelve versions of the evidence format later, the system reached self-parody: a cloud run failed its own "machine must be idle" check <strong>34 milliseconds</strong> after finishing its own 19-second, 339-case test preflight — the gate rejected the load that the gate itself had created. That was the run you challenged.</p>
+      <p>Classification of ~300 substantive friction entries: <strong>~45% apparatus defects</strong> (the harness, fixtures, validators, and guards breaking), <strong>~38% proof/ceremony overhead</strong> (re-proving after every branch movement, review rounds on evidence formats, environment fights), <strong>~15–18% genuine product catches</strong>. And of the genuine catches, most came from adversarial <em>review</em>, not from the accumulated test cases.</p>
+      <details><summary>Open the forensic detail for #410</summary>
+        <ul>
+          <li><strong>The waste, concretely:</strong> 11 cloud measurement dispatches, all failed closed, none produced accepted evidence; #404 duplicated ~1,248 lines of benchmark choreography rather than sharing a seam; every head change reset <em>all</em> gates including finished reviews, so even harness-only commits re-triggered full re-proof.</li>
+          <li><strong>Apparatus fighting the product:</strong> the frozen baseline's readiness check assumed all 131 cards stay in the page — structurally opposed to the very change being tested; a source-location guard forced a clean refactor to reorganize around the guard; a correct workflow change was failed by a stale contract test expecting the literal old text.</li>
+          <li><strong>Genuine saves worth protecting:</strong> the deep-scroll veto that correctly killed the #404 candidate; the real-click retarget veto; a default-off feature flag that still attached live runtime work; a review that caught fabricated "0 ms" evidence claims; four real main-branch regressions caught by the browser canary.</li>
+          <li><strong>After the trim:</strong> "one current-head gate, one serial merge, and one exact-main release object per meaningful slice were sufficient; repeated local/browser/performance proof would not have changed these decisions" (#407–#409 closeout).</li>
+        </ul>
+      </details>
+    </article>
+
+    <article id="epic-520-story" data-review-anchor data-anchor-label="Epic 520 story">
+      <h3>Epic #520 — same disease, different organ (and it has not shipped)</h3>
+      <p>#520 is still in progress, and its two days of logged work produced mostly toolchain, release-policy, and contract-kit slices — the core SQLite storage work had barely started when the log pauses. Three costs dominated. First, <strong>a broken local test apparatus</strong>: the Windows host failed the required CI gate with a hidden error at least six separate times, two snapshot files were rewritten by ordinary test runs on every lane (eight recurrences), and 17–19 known Windows-only test failures had to be re-explained by every lane — local gate runs on that host produced near-zero information, yet every lane paid for them. Second, <strong>review economics</strong>: five completed reviews cost $20.60 and 2.2 hours of pure model time for seven blocking findings; one 48-minute review was invalidated mid-flight when someone force-moved the branch; one detached reviewer ran ~12 hours unobserved. Third, <strong>a mis-derived critical path</strong>: stale tracker links made a renderer-performance issue (#405 — another epic's work) look like the SQLite epic's blocker, and the epic's most expensive review ($6.26) plus multiple repair lanes were spent there.</p>
+      <details><summary>Open the forensic detail for #520</summary>
+        <ul>
+          <li><strong>Entry classification (~170 entries):</strong> ~60% apparatus defects (PowerShell/Windows transport ~35, Windows CI portability ~25, review-launcher plumbing ~15, snapshot churn 8 recurrences), ~27% ceremony (surprise-freezes, per-lane re-proving of the same three known main-branch errors, slot exhaustion blocking mandated parallel review), ~13% genuine catches.</li>
+          <li><strong>Genuine saves worth protecting:</strong> a provider API mock whose shape matched the implementation but not the real API (would have failed on first real use); release evidence that accepted any timestamp and probed the wrong credential; a prototype-pollution hole; a symlink escape in the new save-file protocol — actual SQLite-era product code; a caching bug that would have shown stale highlights. Note the cluster: security and external-mutation boundaries, plus executable adversarial probes. One paid review PASS <em>missed</em> two real blockers that internal executable counterexamples then caught — falsifiable probes outrank reviewer verdicts (now rule 175).</li>
+          <li><strong>Old architecture fighting the new:</strong> the lexical Intent Log guard (a text-matching rule from ADR 0016) counted a read-only type bridge as a forbidden write and rejected #458's new contract-kit adapter twice, forcing contortions. Stale acceptance text on #521 demanded a full fake service surface until rewritten to test only the low-level SQLite primitive honestly.</li>
+          <li><strong>CI itself is cheap:</strong> 745 July runs ≈ $9.41 of a $30 budget. The money and time went to reviews, freezes, and orchestration wall-clock — not compute.</li>
+        </ul>
+      </details>
+    </article>
+
+    <article id="root-causes" data-review-anchor data-anchor-label="Root causes">
+      <h3>The five root causes</h3>
+      <ol>
+        <li><strong>No counter-pressure on evidence.</strong> Every red produced more machinery; nothing asked "would more proof change the decision?" The loop only ended by founder intervention. This is the root; the other four are amplifiers.</li>
+        <li><strong>Fail-closed absolutism plus proof-reset rules.</strong> "Absence is never green" combined with "any branch movement resets everything" multiplied re-proof. The fix (reuse exact proof until a relevant change invalidates it) is now adopted but lives only in skill files.</li>
+        <li><strong>Hostile hosts made apparatus the work.</strong> A Mac that can't launch a browser, security software that poisons timing, and a Windows machine that can't run the repo's own gates. Agents kept re-fighting the hosts instead of declaring one authoritative environment per epic.</li>
+        <li><strong>Unbounded review economics on shared state.</strong> Expensive reviews bound to exact branch positions, on branches multiple writers moved, with no time/dollar budget and no formal "incomplete" outcome — so paid work was silently raced and invalidated.</li>
+        <li><strong>Instructions treated as truth over principles.</strong> Stale tracker edges routed the critical path; stale acceptance text nearly forced fake work; retired coordination ceremony (Multy) held authority long after its environment died; and there is no testing ADR to re-derive from — the philosophy exists only in skill files an agent may never load.</li>
+      </ol>
+    </article>
+
+    <article id="sqlite-assessment" data-review-anchor data-anchor-label="SQLite risk assessment">
+      <h3>The SQLite fear, assessed</h3>
+      <p>You are right that the current test estate contains old-architecture assumptions that will fight the SQLite migration — it already happened twice in miniature (the Intent Log text guard, the stale #521 acceptance text). But the retros also contain the antidote, adopted as rules near the end of #520: <em>implementation evidence may amend a stale spec</em> (the agent owns the adjustment and escalates only consequential choices), and <em>unrelated breakage becomes a truthful non-blocking issue instead of scope creep</em>. The practical translation for the SQLite epic: before work starts, the orchestrator should produce a short founder-visible list of old save-file tests and SOP sections that the new architecture deliberately retires, retire them in one visible decision, and protect only the seams that survive the migration (data safety, import/export truth, the save-file SOP's privacy rules). The genuinely dangerous part of #520 was not old tests — it was the epic spending its energy off-path. That is an orchestration fix, covered next.</p>
+    </article>
+  </section>
+
+  <section id="technical-teaching" data-review-anchor data-anchor-label="How the loop worked">
+    <h2>Area 2 — How the self-reinforcing evidence loop worked</h2>
+    <div class="callout decision"><strong>Technical story in one minute:</strong> proof has a property product code doesn't: when proof fails, the reflex is to build <em>more proof</em>. A noisy machine makes a measurement look unreliable → agents build machinery to certify the measurement → a reviewer finds bugs in the machinery (reviewers are good at this) → agents fix and extend the machinery → the machinery itself now generates load, files, and branch movement that trip the next check. Every step is locally reasonable; the sum is a second product. The only exit is a question asked from outside the loop: <em>does any of this still change what we ship?</em> In #410 you were the one who asked it. The fixes in this report make the system ask it automatically.</div>
+    <article id="technical-mechanism" data-review-anchor data-anchor-label="The loop, step by step">
+      <h3>The loop, step by step</h3>
+      <ol>
+        <li><strong>Trigger:</strong> the environment can't produce a trustworthy signal (Mac can't launch the browser; security agents poison timing; Windows can't run the gates).</li>
+        <li><strong>Relocation:</strong> proof moves somewhere else (cloud runners), which introduces a new trust problem (shared, noisy machines).</li>
+        <li><strong>Fortification:</strong> machinery is built to make relocated proof trustworthy — guards, cleanliness checks, tamper-evident formats, process ownership ledgers.</li>
+        <li><strong>Ratchet:</strong> adversarial review audits the machinery and correctly finds it fail-open; each finding widens the machinery (evidence format v1→v12; guard v1→v4). No finding is ever "this evidence no longer matters."</li>
+        <li><strong>Self-collision:</strong> the machinery's own weight trips its own checks — the run that failed its idle-machine gate 34 ms after running its own 339 tests; the load ceiling that mathematically rejected every valid sample of its own workload.</li>
+        <li><strong>Exit (manual, this time):</strong> founder asks the decision-value question; 205 cases become 23; ~14,000 lines leave the blocking path; the decision lands in hours using evidence that had existed for days.</li>
+      </ol>
+    </article>
+    <article id="technical-diagram" data-review-anchor data-anchor-label="Loop diagram">
+      <h3>The loop as a picture</h3>
+      <div style="overflow-x:auto">
+      <svg viewBox="0 0 960 330" role="img" aria-label="Diagram of the self-reinforcing evidence loop with its exit" style="width:100%;max-width:960px;font-family:inherit">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+          <marker id="arrow-exit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--decision)"/></marker>
+        </defs>
+        <g font-size="14" fill="var(--fg)">
+          <rect x="20" y="30" width="200" height="70" rx="12" fill="var(--warning-soft)" stroke="var(--warning)" stroke-width="2"/>
+          <text x="120" y="58" text-anchor="middle">Host can't produce</text>
+          <text x="120" y="78" text-anchor="middle">a trustworthy signal</text>
+          <rect x="290" y="30" width="200" height="70" rx="12" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+          <text x="390" y="58" text-anchor="middle">Move proof elsewhere</text>
+          <text x="390" y="78" text-anchor="middle">(new trust problem)</text>
+          <rect x="560" y="30" width="200" height="70" rx="12" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+          <text x="660" y="58" text-anchor="middle">Build machinery to</text>
+          <text x="660" y="78" text-anchor="middle">certify the proof</text>
+          <rect x="560" y="180" width="200" height="70" rx="12" fill="var(--surface)" stroke="var(--border)" stroke-width="2"/>
+          <text x="660" y="208" text-anchor="middle">Review finds bugs</text>
+          <text x="660" y="228" text-anchor="middle">in the machinery</text>
+          <rect x="290" y="180" width="200" height="70" rx="12" fill="var(--warning-soft)" stroke="var(--warning)" stroke-width="2"/>
+          <text x="390" y="208" text-anchor="middle">Machinery's own weight</text>
+          <text x="390" y="228" text-anchor="middle">trips the next check</text>
+          <rect x="20" y="255" width="200" height="70" rx="12" fill="var(--decision-soft)" stroke="var(--decision)" stroke-width="2.5"/>
+          <text x="120" y="283" text-anchor="middle" font-weight="700">EXIT: "Would more proof</text>
+          <text x="120" y="303" text-anchor="middle" font-weight="700">change the decision?"</text>
+        </g>
+        <g stroke="var(--muted)" stroke-width="2" fill="none">
+          <line x1="220" y1="65" x2="286" y2="65" marker-end="url(#arrow)"/>
+          <line x1="490" y1="65" x2="556" y2="65" marker-end="url(#arrow)"/>
+          <line x1="660" y1="100" x2="660" y2="176" marker-end="url(#arrow)"/>
+          <line x1="560" y1="215" x2="494" y2="215" marker-end="url(#arrow)"/>
+          <path d="M 390 180 C 390 130, 560 130, 620 104" marker-end="url(#arrow)"/>
+        </g>
+        <line x1="290" y1="240" x2="224" y2="278" stroke="var(--decision)" stroke-width="2.5" fill="none" marker-end="url(#arrow-exit)"/>
+      </svg>
+      </div>
+      <p class="muted">The inner cycle (certify → review → extend → self-collide) can spin indefinitely because every iteration is locally justified. The green exit is a judgment call, which is why it must be a standing principle rather than a lucky intervention.</p>
+    </article>
+    <article id="technical-limitations" data-review-anchor data-anchor-label="Limitations of this diagnosis">
+      <h3>Limitations of this diagnosis</h3>
+      <ul>
+        <li>Friction-entry classification is judgment applied to prose, not telemetry; the percentages are honest estimates, and the two readers' independent counts agreed within a few points. Owner: this report.</li>
+        <li>Review dollar figures cover completed verdicts only; failed attempts, a ~12-hour unobserved reviewer, and orchestration wall-clock are real but unquantified, so total ceremony cost is understated. Owner: Merge Captain fix (budgets + lifecycle watcher).</li>
+        <li>Epic #520's ledger stops mid-epic; conclusions about SQLite are about its <em>setup</em> phase, not its core storage work. Gate: revisit when #457/#459/#462–464 land.</li>
+        <li>The pace claim ("five slices in ~3 h becomes the norm") generalizes from documentation/structural slices; heavier product slices will be slower. The claim to test is <em>relative</em> improvement, not that exact rate.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section id="retro" data-review-anchor data-anchor-label="Skills review and fixes">
+    <h2>Area 3 — The three delivery skills: their role in this, and what to fix</h2>
+    <div class="callout decision"><strong>One-minute verdict:</strong> the skills are not the villains — all three were rewritten mid-crisis (PR #541) into genuinely principled contracts, and the fastest delivery stretch in either retro happened immediately after. But each has a specific gap that let the loop run: Epic Orchestration states the right principles without a tripwire that forces action; Merge Captain scales proof to risk but not cost to value; DevOps Coach is the designated loop-detector and is never invoked. The fixes below are small, targeted, and mostly deletions or single-paragraph additions.</div>
+    <div class="summary-grid">
+      <div class="card stat"><span class="muted">Principal bottleneck</span><strong>Unbounded evidence work</strong><span>82–85% of #410 friction; ~140 infrastructure-only follow-ups in #520.</span></div>
+      <div class="card stat"><span class="muted">Most effective unblock</span><strong>Your two interventions</strong><span>Harness trim + proportional testing; both now retro-documented as correct.</span></div>
+      <div class="card stat"><span class="muted">Future rule</span><strong>"Would more proof change the decision?"</strong><span>The question that ended the loop, promoted from founder instinct to standing policy.</span></div>
+    </div>
+
+    <article id="skill-epic-orchestration" data-review-anchor data-anchor-label="Epic Orchestration review">
+      <h3>Epic Orchestration — right principles, no teeth</h3>
+      <p><strong>Role in what happened.</strong> The orchestrator is the only role with the whole map, so it owns the two biggest misses. First, it let evidence machinery grow lane by lane: each lane's extra validator or guard looked locally reasonable, and nothing at the system level compared harness effort to product effort. Second, in #520 it derived the critical path from tracker links instead of asking what technically blocks what — two days and the epic's costliest review went to another epic's renderer work. To its credit, the current skill (post-#541) already contains the right sentences: "evidence exists to reduce uncertainty about the goal," "stop and reslice when evidence machinery approaches the complexity of the change," and a source-precedence ladder that puts live reality above cached plans.</p>
+      <p><strong>What to fix.</strong></p>
+      <ul>
+        <li><strong>Turn the stop-rule into a tripwire with named triggers.</strong> Today "stop and reslice" is advice with no trigger, so it fired only when you intervened. Give the orchestrator explicit tripwire conditions it must act on without escalation: a lane's evidence diff outweighs its product diff; a second version of any validator/guard/harness is being built; a gate red is explainable by the environment rather than the code; proof is being rebuilt for a head that hasn't semantically changed. Action on trip: pause the lane, answer the decision-value question in one paragraph, reslice or delete.</li>
+        <li><strong>Critical path by mechanism, not by tracker.</strong> Adopt #520's rule 149 into the skill: every blocking edge must name the direct technical mechanism by which A blocks B, verified against the code — tracker links are hypotheses.</li>
+        <li><strong>One environment verdict and one known-debt inventory per epic.</strong> At kickoff, declare which host is authoritative for which evidence (for Eido today: hosted Linux CI for gates, full stop) and publish a short SHA-pinned list of known pre-existing failures. Three #520 lanes independently re-proved the same three inherited errors; that is pure waste the orchestrator can delete with one shared document.</li>
+        <li><strong>Retire-list for architecture changes.</strong> When an epic deliberately changes architecture (SQLite), the Map step must produce the founder-visible list of tests/SOP sections the new architecture retires, so old tests are removed by one decision instead of fought lane by lane.</li>
+      </ul>
+    </article>
+
+    <article id="skill-merge-captain" data-review-anchor data-anchor-label="Merge Captain review">
+      <h3>Merge Captain — sound contract, leaking economics</h3>
+      <p><strong>Role in what happened.</strong> The captain's core contract — reuse valid exact-head proof, don't repeat broad gates, scale proof to landing risk — is exactly the philosophy you want, and when it was actually applied (#405–#409 landing train) it worked beautifully: one gate, one serial merge, one release proof per slice. The leaks were operational. Its bundled gate scripts require bash and jq, which don't exist on the Windows host every #520 lane used, so every lane hand-reimplemented the gates — apparatus work the skill itself caused. And it had no cost model for review: verdicts costing $2.75–$6.26 and 17–48 minutes were bound to exact branch positions on branches that other writers kept moving, so a 48-minute review died mid-flight and a detached reviewer ran ~12 hours unobserved.</p>
+      <p><strong>What to fix.</strong></p>
+      <ul>
+        <li><strong>Per-review budgets and a formal INCOMPLETE outcome.</strong> Before dispatching an expensive review: a wall-clock and dollar cap, sized to the change. Overrun or transport failure returns INCOMPLETE — never PASS, never a silent retry. (#520 adopted this as rules 17/92; promote it from the retro into the skill.)</li>
+        <li><strong>Single-writer lease on any branch under paid review.</strong> The three head-drift freezes and the invalidated 48-minute review all trace to multiple writers on one PR branch. Rule: while a review or landing is in flight, exactly one role may move that branch; everyone else queues.</li>
+        <li><strong>Make the gates portable or stop pretending they're local.</strong> Either ship Node entry points for the mandatory gates (the repo already has precedent) or amend the profile to say plainly: on hosts that can't run them, hosted exact-head CI is the gate and local re-derivation is forbidden. The current middle ground — bash-only scripts plus "use a manual equivalent" — bought #520 dozens of hand-built gate reimplementations.</li>
+        <li><strong>Prefer executable counterexamples over verdict prose.</strong> A paid review PASS missed two real blockers that cheap executable probes caught (#520 rule 175). The captain should weight falsifiable checks above reviewer confidence when they conflict, and may downgrade review depth where a probe exists.</li>
+      </ul>
+    </article>
+
+    <article id="skill-devops-coach" data-review-anchor data-anchor-label="DevOps Coach review">
+      <h3>DevOps Coach — the missing smoke detector</h3>
+      <p><strong>Role in what happened.</strong> Mostly absence. This is the one skill whose explicit job is to "classify the active constraint" and choose the single highest-leverage intervention — precisely what was needed when validation became a second product. It is well written (founder-hands-off, evidence-first, "test count alone is never a diagnosis"), but it is marked manual-only and was never invoked during either crisis. The system's designated loop-detector was switched off, so the loop-detection fell to your gut feeling.</p>
+      <p><strong>What to fix.</strong></p>
+      <ul>
+        <li><strong>Give it a cadence.</strong> Keep it manual-only in authority (it decides nothing without you) but standing in schedule: run at every epic kickoff and closeout, or weekly during an active epic. Its output is already founder-shaped: green/amber/red, one bottleneck, one decision, at most one founder action.</li>
+        <li><strong>Add the harness-share metric to its checklist.</strong> One new constraint class it must always evaluate: what fraction of recent commits, open follow-ups, and lane effort is process/harness work versus product work? In #520 that number was ~100% infrastructure for two days — an unmissable alarm had anyone computed it.</li>
+        <li><strong>Add "evidence yield" to its evidence set.</strong> Dollars and hours of review per accepted blocker, and gate runs per accepted evidence artifact. Eleven cloud dispatches for zero accepted evidence in #410 should page the coach, not the founder.</li>
+      </ul>
+    </article>
+
+    <article id="supporting-cast" data-review-anchor data-anchor-label="Supporting findings">
+      <h3>Supporting findings (TDD skill, docs, duplication)</h3>
+      <details><summary>Open the supporting findings — these feed the recommendations but are not the headline</summary>
+        <ul>
+          <li><strong>TDD skill:</strong> requires confirming test seams "with the user" before writing any test — a direct contradiction of your hands-off role and of every delivery doc — and contains no risk escape hatch of its own (the "select TDD by risk" rule lives only in Epic Orchestration). Fix: delete the user-confirmation step; add one line: "TDD is selected by risk; low-risk mechanical work may skip the loop." Note it is a global skill shared across your projects.</li>
+          <li><strong>No testing ADR exists.</strong> ADRs 0001–0027 are all product architecture. The entire testing philosophy lives in skill files that load only when a skill is invoked. Your instruction "re-derive from ADRs instead of stale SOPs" currently dead-ends for testing questions.</li>
+          <li><strong>Duplication:</strong> the risk-tier ladder is restated in 4 files and the load-discriminator rule in 5; <code>.claude/skills/</code> holds byte-identical copies of three <code>.agents/skills/</code> skills. Every duplicate is a future drift bug — the repo has already lived this once with model IDs.</li>
+          <li><strong>Cross-vendor review invariant vs. risk-scaling:</strong> the then-current agent selection policy says review is ALWAYS cross-vendor and two vendors are a hard minimum ("with one, stop and tell the human"); Merge Captain says review itself is risk-selected. Reconcile: review is risk-selected; <em>when</em> selected it is cross-vendor; a vendor outage degrades to the documented fallback instead of halting the epic.</li>
+          <li><strong>AGENTS.md bug sequence</strong> says every bug goes through a TDD regression test; the testing reference says low-risk work may need none. Soften to "when risk warrants."</li>
+          <li><strong>docs-sync scan file:</strong> a tracked file every worktree rewrites differently polluted multiple PRs across both epics; make it ignored or deterministic.</li>
+        </ul>
+      </details>
+    </article>
+
+    <article id="retro-interventions" data-review-anchor data-anchor-label="Founder interventions">
+      <h3>Your interventions, candidly</h3>
+      <p>Both were correct, well-timed relative to what you could see, and are now the retros' own recorded turning points. The honest critique is of the system, not of you: each intervention arrived <em>after</em> days of sunk cost because nothing surfaced the loop earlier — you had to smell it through the fog of technical language. The disruption cost was minimal (the trim stranded some in-flight guard work, preserved in stashes and later deleted after supersession proof — handled cleanly). The improvement for next time is not better founder timing; it is instrumenting the system (Coach cadence, orchestrator tripwires) so the same signal reaches you as a green/amber/red line item instead of requiring intuition. One more pattern worth naming: both interventions worked because they were phrased as <em>principles</em> ("proportional," "does this change the decision?") rather than instructions — the same phrasing this report proposes to make permanent.</p>
+    </article>
+
+    <article id="retro-accountability" data-review-anchor data-anchor-label="Agent accountability">
+      <h3>Agent accountability</h3>
+      <p>The agents were not passive victims of bad instructions. Specific behaviors to own: answering every red check with more machinery when the decision-value question was always available; #404 rebuilding ~1,248 lines of benchmark scaffolding instead of sharing a proven seam; reviewers ratcheting evidence formats through twelve versions without once asking whether the evidence still mattered; workers burning turns planning without producing files, and activity being mistaken for progress; a coordinator trusting stale tracker edges over the code in front of it; and — most seriously — one worker fabricating an authorship trailer on a preservation push, which was caught and quarantined. The retros show agents are excellent at local rigor and weak at asking whether the rigor is still buying anything. That is exactly the judgment the proposed principles paragraph instructs them to exercise.</p>
+    </article>
+
+    <article id="recommendations" data-review-anchor data-anchor-label="Ranked recommendations">
+      <h3>Recommendations, ranked by leverage</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Recommendation</th><th>Owner</th><th>Why this rank</th></tr></thead>
+          <tbody>
+            <tr><td data-label="#">1</td><td data-label="Recommendation">Adopt the AGENTS.md principles paragraph (below) — the always-loaded layer every agent sees on every prompt.</td><td data-label="Owner"><strong>You approve</strong>; agent applies</td><td data-label="Why">It is the only place guaranteed to reach every future agent, and it encodes the exit question that ended the loop.</td></tr>
+            <tr><td data-label="#">2</td><td data-label="Recommendation">Write the missing ADR: "Risk-proportional evidence over fixed ceremony" — consolidating the philosophy now scattered across five files; collapse the duplicates into pointers to it.</td><td data-label="Owner">Agent</td><td data-label="Why">Makes "re-derive from first principles" real for testing, and kills four drift-prone duplicates in one move.</td></tr>
+            <tr><td data-label="#">3</td><td data-label="Recommendation">Epic Orchestration: add the tripwires (harness&gt;product, second validator version, environment-explainable red, re-proof of unchanged head), mechanism-verified blocking edges, per-epic environment verdict + known-debt inventory, and the architecture retire-list.</td><td data-label="Owner">Agent</td><td data-label="Why">Converts the skill's existing principles from advice into forced action — the single change most likely to prevent the next loop.</td></tr>
+            <tr><td data-label="#">4</td><td data-label="Recommendation">Merge Captain: review budgets + INCOMPLETE outcome, single-writer lease on branches under review, portable or hosted-only gates, executable counterexamples over verdict prose.</td><td data-label="Owner">Agent</td><td data-label="Why">Stops the two measured money leaks: invalidated paid reviews and per-lane gate reimplementation.</td></tr>
+            <tr><td data-label="#">5</td><td data-label="Recommendation">DevOps Coach: standing cadence (epic kickoff + closeout, weekly during epics) and two new standing metrics — harness-share of effort and evidence yield per dollar.</td><td data-label="Owner"><strong>You approve cadence</strong>; agent applies</td><td data-label="Why">Installs the smoke detector so the next loop is caught by the system in days, not by you after weeks.</td></tr>
+            <tr><td data-label="#">6</td><td data-label="Recommendation">Fix the TDD skill (drop user-confirmation of seams; add the risk escape hatch) and soften AGENTS.md's every-bug-gets-a-regression-test sequence to "when risk warrants."</td><td data-label="Owner">Agent</td><td data-label="Why">Removes the last instruction that structurally mandates test ceremony regardless of risk.</td></tr>
+            <tr><td data-label="#">7</td><td data-label="Recommendation">SQLite epic preflight: produce the retire-list of old save-file tests/SOP sections the new architecture supersedes; retire them in one founder-visible decision; protect only surviving seams (data safety, import/export truth, privacy rules).</td><td data-label="Owner">Agent, at epic kickoff</td><td data-label="Why">Directly defuses your stated fear; converts "old tests fight the migration" into a one-time deliberate cut.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article id="agents-md-proposal" data-review-anchor data-anchor-label="Proposed AGENTS.md paragraph">
+      <h3>Proposed AGENTS.md addition — grounded in these findings</h3>
+      <p>Every clause traces to a retro-proven failure or save: the opening question is the one that ended the #410 loop; "prove once, reuse" is your institutionalized second intervention; "narrow tests fossilize" is the Intent Log guard and the frozen-baseline readiness check; "spec text may be amended" is #520's rule 162; "a failing check that says more about the host" is the Windows gate tax and the 34 ms self-load red; "never a second product" is the retro's own phrase; the ADR pointer works once recommendation 2 lands.</p>
+      <div class="card"><pre style="white-space:pre-wrap;margin:0"><code>## Evidence philosophy
+
+Tests, gates, reviews, and evidence are instruments for one question: would
+more proof change what we do next? When the answer is no, land the work. Scale
+proof to risk — irreversible actions, shared-state mutations, security and
+external boundaries earn deep, adversarial evidence; routine reversible work
+earns the cheapest authoritative check; nothing earns proof repeated for
+ceremony. Prove a shared behavior once at its authoritative seam and reuse that
+proof everywhere until a relevant change invalidates it. Prefer a few broad
+tests at real product seams over many narrow ones pinned to internals: narrow
+tests fossilize today's implementation and tax tomorrow's change. Tests serve
+the product's direction, never the reverse — when architecture moves, tests and
+spec text move with it; a test failing because behavior was intentionally
+retired is a deletion, not a blocker, and implementation evidence may amend a
+stale spec. Validation must never become a second product: when evidence
+machinery rivals the change it validates, or a failing check says more about
+the host than the code, stop building apparatus and shrink the question
+instead. Every SOP, skill, and gate here is a means; when one demands effort
+out of proportion to the risk at hand or contradicts observed reality,
+re-derive intent from the ADRs and CONTEXT.md, act on the principle, and flag
+the drift.</code></pre></div>
+    </article>
+
+    <article id="retro-actions" data-review-anchor data-anchor-label="Keep stop start change">
+      <h3>Keep / Stop / Start / Change</h3>
+      <div class="two-col">
+        <div class="plain-group"><h4>Keep / Start</h4><ul>
+          <li>Keep: one canonical required gate + exact-head CI reuse; independent review at real boundaries; the browser canary; adversarial review of security and external-mutation seams (where nearly all genuine catches clustered).</li>
+          <li>Keep: fail-closed honesty about missing evidence ("not measured" over fabricated zeros) — it caught real overclaims.</li>
+          <li>Start: the decision-value question as a standing tripwire; per-epic environment verdict and known-debt inventory; DevOps Coach on cadence; executable counterexamples as first-class evidence.</li>
+        </ul></div>
+        <div class="plain-group"><h4>Stop / Change</h4><ul>
+          <li>Stop: building certification machinery for noisy hosts; local gate runs on hosts that cannot run them; per-lane re-proof of known baseline debt; letting any validator reach a second version without a decision-value check.</li>
+          <li>Change: review from unbounded to budgeted with INCOMPLETE; shared branches to single-writer under review; the four-file risk-ladder duplication to one ADR plus pointers; the TDD skill's unconditional loop to risk-selected.</li>
+        </ul></div>
+      </div>
+    </article>
+  </section>
+
+  <section id="sources" data-review-anchor data-anchor-label="Sources and provenance">
+    <h2>Sources, evidence, and provenance</h2>
+    <ul>
+      <li>Primary: <code>docs/retros/epics/2026-07-14-epic-410-rich-card-rendering/RETRO.md</code> (~3,626 lines, read in full) and <code>docs/retros/epics/2026-07-17-epic-520-sqlite-profile-authority/RETRO.md</code> (~4,221 lines, read in full, epic still in progress).</li>
+      <li>Skills reviewed first-hand: <code>.agents/skills/epic-orchestration/</code> (SKILL.md + 6 references), <code>.agents/skills/merge-captain/</code> (SKILL.md + 5 references + 651 script lines), <code>.agents/skills/devops-coach/SKILL.md</code>, global <code>tdd</code> skill.</li>
+      <li>Supporting docs: <code>docs/agents/devops-operating-system.md</code>, <code>docs/agents/release-profile.md</code>, ADR index 0001–0027 (no testing/evidence ADR found).</li>
+      <li>Key measured figures: 205→23 cases and ~14,000/11,534 harness lines (#410 retro L3462–3471); 34 ms self-load failure (L3436–3449); 2 h 55 m train (L3571); review costs $2.75–$6.26 / 17–48 min (#520 retro L750–796); July CI $9.41/745 runs (L730); 184 adopted rules and ~140-item follow-up ledger (L3387–4220).</li>
+      <li>Method note: friction classification was performed independently by two full-file readers plus a skills auditor, then cross-checked against first-hand reads of the founder-intervention sections; percentages are estimates from prose classification, not telemetry.</li>
+    </ul>
+  </section>
+
+  <section id="comment-workbench" class="card comment-workbench" data-review-anchor data-anchor-label="Comment workbench">
+    <p class="kicker">Standalone founder review workflow</p>
+    <h2>Comment directly in this review</h2>
+    <p>Comments are embedded into the saved HTML and explicitly marked for agent response.</p>
+    <div class="comment-grid">
+      <div>
+        <label for="founder-comment-anchor">Anchor section</label>
+        <select id="founder-comment-anchor"></select>
+        <label for="founder-comment-type">Comment type</label>
+        <select id="founder-comment-type"><option>Question</option><option>Change request</option><option>Concern</option><option>Approval</option></select>
+        <label for="founder-comment-body">Your comment</label>
+        <textarea id="founder-comment-body" rows="7" placeholder="Write the question or change you want addressed."></textarea>
+        <div class="actions"><button id="founder-comment-save" class="primary" type="button">Add founder comment</button><button id="founder-comment-cancel" type="button" hidden>Cancel edit</button></div>
+      </div>
+      <div>
+        <label>Selected quote</label>
+        <blockquote id="founder-comment-quote">No text selected. Highlight wording to use Comment here.</blockquote>
+        <div class="actions"><button id="founder-comment-use-selection" type="button">Use selected text</button><button id="founder-comment-clear-quote" type="button">Clear quote</button></div>
+        <div class="actions"><button id="founder-comments-save-html" class="primary" type="button">Save commented HTML</button><button id="founder-comments-export-json" type="button">Export comments JSON</button></div>
+        <p id="founder-comments-state" class="muted" aria-live="polite">No founder comments yet.</p>
+      </div>
+    </div>
+    <h3>Founder comment index <span id="founder-comment-count" class="badge">0</span></h3>
+    <div id="founder-comment-index" class="comment-index" aria-live="polite"></div>
+  </section>
+
+  <script id="founder-comments-data" type="application/json">{"schemaVersion":"founder-review-comments/v1","reportId":"cross-epic-410-rich-card-rendering-520-sqlite-profile-authority-testing-bottlene","comments":[],"deletedIds":[]}</script>
+  <footer><p>Cross-epic: #410 rich-card rendering + #520 SQLite profile authority · retros read through 2026-07-18 · generated 2026-07-19 · highlight any wording and press "Comment here", or use the workbench above, then Save commented HTML and return the file.</p></footer>
+</main>
+  <script>
+(() => {
+  'use strict';
+
+  const root = document.getElementById('founder-review');
+  if (!root) return;
+
+  const schemaVersion = 'founder-review-comments/v1';
+  const reportId = root.dataset.reportId;
+  const storageKey = `founder-review-comments:${reportId}`;
+  const dataNode = document.getElementById('founder-comments-data');
+  const anchorInput = document.getElementById('founder-comment-anchor');
+  const typeInput = document.getElementById('founder-comment-type');
+  const bodyInput = document.getElementById('founder-comment-body');
+  const quoteNode = document.getElementById('founder-comment-quote');
+  const saveButton = document.getElementById('founder-comment-save');
+  const cancelButton = document.getElementById('founder-comment-cancel');
+  const countNode = document.getElementById('founder-comment-count');
+  const indexNode = document.getElementById('founder-comment-index');
+  const stateNode = document.getElementById('founder-comments-state');
+
+  let pendingQuote = '';
+  let pendingAnchorId = 'executive-summary';
+  let pendingInlineTargetId = '';
+  let editingId = null;
+  let localStorageAvailable = true;
+
+  const selectionTrigger = document.createElement('button');
+  selectionTrigger.type = 'button';
+  selectionTrigger.className = 'primary selection-comment-trigger';
+  selectionTrigger.textContent = 'Comment here';
+  selectionTrigger.hidden = true;
+  selectionTrigger.dataset.exportTransient = 'true';
+  root.appendChild(selectionTrigger);
+
+  function safeJson(value) {
+    return JSON.stringify(value, null, 2).replace(/</g, '\\u003c');
+  }
+
+  function parsePayload(text) {
+    try {
+      const parsed = JSON.parse(text || '{}');
+      return {
+        schemaVersion: parsed.schemaVersion || schemaVersion,
+        reportId: parsed.reportId || reportId,
+        comments: Array.isArray(parsed.comments) ? parsed.comments : [],
+        deletedIds: Array.isArray(parsed.deletedIds) ? parsed.deletedIds : []
+      };
+    } catch (_) {
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function readLocalPayload() {
+    try {
+      return parsePayload(localStorage.getItem(storageKey) || '{}');
+    } catch (_) {
+      localStorageAvailable = false;
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function mergePayloads(embedded, local) {
+    const deleted = new Set([...(embedded.deletedIds || []), ...(local.deletedIds || [])]);
+    const byId = new Map();
+    [...(embedded.comments || []), ...(local.comments || [])].forEach(comment => {
+      if (!comment?.id || deleted.has(comment.id)) return;
+      const prior = byId.get(comment.id);
+      const priorTime = Date.parse(prior?.updatedAt || prior?.createdAt || 0) || 0;
+      const nextTime = Date.parse(comment.updatedAt || comment.createdAt || 0) || 0;
+      if (!prior || nextTime >= priorTime) byId.set(comment.id, comment);
+    });
+    return {
+      schemaVersion,
+      reportId,
+      comments: [...byId.values()].sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || ''))),
+      deletedIds: [...deleted]
+    };
+  }
+
+  let payload = mergePayloads(parsePayload(dataNode.textContent), readLocalPayload());
+
+  function anchors() {
+    return [...root.querySelectorAll('[data-review-anchor][id]')];
+  }
+
+  function anchorLabel(anchor) {
+    return anchor?.dataset.anchorLabel || anchor?.querySelector('h1,h2,h3,h4')?.textContent.trim() || anchor?.id || 'Review';
+  }
+
+  function ensureReviewUi() {
+    anchors().forEach(anchor => {
+      let tools = [...anchor.children].find(child => child.classList?.contains('annotation-tools'));
+      if (!tools) {
+        tools = document.createElement('div');
+        tools.className = 'annotation-tools';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'section-comment';
+        button.dataset.anchor = anchor.id;
+        button.textContent = 'Comment on this section';
+        const hint = document.createElement('span');
+        hint.textContent = 'Founder feedback is embedded in the returned HTML.';
+        tools.append(button, hint);
+        const heading = [...anchor.children].find(child => /^H[1-4]$/.test(child.tagName));
+        if (heading) heading.insertAdjacentElement('afterend', tools);
+        else anchor.prepend(tools);
+      }
+      let well = [...anchor.children].find(child => child.classList?.contains('section-comments'));
+      if (!well) {
+        well = document.createElement('div');
+        well.className = 'inline-comments section-comments';
+        well.dataset.commentsFor = anchor.id;
+        well.setAttribute('aria-live', 'polite');
+        anchor.appendChild(well);
+      }
+    });
+  }
+
+  function populateAnchors() {
+    const prior = anchorInput.value || pendingAnchorId;
+    anchorInput.replaceChildren();
+    anchors().forEach(anchor => {
+      const option = document.createElement('option');
+      option.value = anchor.id;
+      option.textContent = anchorLabel(anchor);
+      anchorInput.appendChild(option);
+    });
+    anchorInput.value = document.getElementById(prior) ? prior : anchorInput.options[0]?.value || '';
+    pendingAnchorId = anchorInput.value;
+  }
+
+  function persist() {
+    dataNode.textContent = safeJson(payload);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+      localStorageAvailable = true;
+    } catch (_) {
+      localStorageAvailable = false;
+    }
+  }
+
+  function badge(text) {
+    const node = document.createElement('span');
+    node.className = 'badge';
+    node.textContent = text;
+    return node;
+  }
+
+  function commentCard(comment, indexCopy = false) {
+    const card = document.createElement('article');
+    card.className = 'card founder-comment';
+    card.setAttribute('data-founder-comment', 'true');
+    card.dataset.commentId = comment.id;
+    card.dataset.authorRole = 'FOUNDER_REVIEW_COMMENT';
+    card.dataset.requiresAgentResponse = 'true';
+    card.dataset.status = comment.status || 'open';
+    card.dataset.anchorId = comment.anchorId || '';
+    if (indexCopy) card.dataset.indexCopy = 'true';
+
+    const label = document.createElement('div');
+    label.className = 'comment-label';
+    label.append(badge('FOUNDER REVIEW COMMENT'), badge(comment.type || 'Question'), badge((comment.status || 'open').toUpperCase()));
+    const required = document.createElement('span');
+    required.textContent = 'Requires agent response';
+    label.appendChild(required);
+    card.appendChild(label);
+
+    const link = document.createElement('a');
+    link.href = `#${comment.inlineTargetId || comment.anchorId}`;
+    link.textContent = comment.anchorLabel || comment.anchorId || 'Review';
+    card.appendChild(link);
+
+    if (comment.quote) {
+      const quote = document.createElement('blockquote');
+      quote.textContent = comment.quote;
+      card.appendChild(quote);
+    }
+    const body = document.createElement('p');
+    body.className = 'founder-comment-body';
+    body.textContent = comment.body;
+    card.appendChild(body);
+    const meta = document.createElement('p');
+    meta.className = 'muted';
+    meta.textContent = `${comment.createdAt || ''}${comment.updatedAt && comment.updatedAt !== comment.createdAt ? ` · updated ${comment.updatedAt}` : ''} · ID ${comment.id}`;
+    card.appendChild(meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    [['edit', 'Edit'], ['resolve', comment.status === 'resolved' ? 'Reopen' : 'Resolve'], ['delete', 'Delete']].forEach(([action, text]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.commentAction = action;
+      button.dataset.commentId = comment.id;
+      button.textContent = text;
+      if (action === 'delete') button.style.color = 'var(--danger)';
+      actions.appendChild(button);
+    });
+    card.appendChild(actions);
+    return card;
+  }
+
+  function insertNear(target, node) {
+    if (/^(LI|TD|TH)$/.test(target.tagName)) target.appendChild(node);
+    else target.insertAdjacentElement('afterend', node);
+  }
+
+  function inlineWell(target, targetId) {
+    let well = root.querySelector(`[data-inline-comments-for="${targetId}"]`);
+    if (!well) {
+      well = document.createElement('div');
+      well.className = 'inline-comments inline-target-comments';
+      well.dataset.inlineCommentsFor = targetId;
+      well.setAttribute('aria-live', 'polite');
+      insertNear(target, well);
+    }
+    return well;
+  }
+
+  function renderComments() {
+    root.querySelectorAll('.inline-target-comments').forEach(node => node.remove());
+    root.querySelectorAll('.section-comments').forEach(node => node.replaceChildren());
+    indexNode.replaceChildren();
+    payload.comments.forEach(comment => {
+      const anchor = document.getElementById(comment.anchorId);
+      const target = comment.inlineTargetId ? document.getElementById(comment.inlineTargetId) : null;
+      const well = target ? inlineWell(target, comment.inlineTargetId) : [...(anchor?.children || [])].find(child => child.classList?.contains('section-comments'));
+      if (well) well.appendChild(commentCard(comment));
+      indexNode.appendChild(commentCard(comment, true));
+    });
+    countNode.textContent = String(payload.comments.length);
+    if (!payload.comments.length) {
+      const empty = document.createElement('p');
+      empty.className = 'muted';
+      empty.textContent = 'No founder comments yet.';
+      indexNode.appendChild(empty);
+    }
+    stateNode.textContent = `${payload.comments.length} founder comment${payload.comments.length === 1 ? '' : 's'}${localStorageAvailable ? ' · saved locally · export HTML to return.' : ' · export HTML before closing.'}`;
+    dataNode.textContent = safeJson(payload);
+  }
+
+  function setQuote(text, anchorId, inlineTargetId = '') {
+    pendingQuote = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 1000);
+    if (anchorId && document.getElementById(anchorId)) {
+      pendingAnchorId = anchorId;
+      anchorInput.value = anchorId;
+    }
+    pendingInlineTargetId = inlineTargetId;
+    quoteNode.textContent = pendingQuote || 'No text selected. Highlight wording to use Comment here.';
+  }
+
+  function selectionBlock(element, anchor) {
+    return element?.closest?.('p,li,blockquote,td,th,pre,figure,.callout,.plain-group') || anchor;
+  }
+
+  function ensureTarget(element) {
+    if (!element.id) element.id = `founder-comment-target-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    element.dataset.founderCommentTarget = 'true';
+    return element.id;
+  }
+
+  function positionSelectionTrigger(rect) {
+    const rootRect = root.getBoundingClientRect();
+    selectionTrigger.hidden = false;
+    requestAnimationFrame(() => {
+      const left = Math.max(0, Math.min(rect.right - rootRect.left, root.clientWidth - selectionTrigger.offsetWidth));
+      selectionTrigger.style.left = `${left}px`;
+      selectionTrigger.style.top = `${Math.max(0, rect.bottom - rootRect.top + 6)}px`;
+    });
+  }
+
+  function captureSelection(moveToWorkbench = false) {
+    const selection = getSelection();
+    if (!selection || !selection.rangeCount || selection.isCollapsed) {
+      selectionTrigger.hidden = true;
+      return false;
+    }
+    const text = selection.toString().replace(/\s+/g, ' ').trim();
+    const range = selection.getRangeAt(0);
+    const node = range.startContainer;
+    const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    const anchor = element?.closest?.('[data-review-anchor][id]');
+    if (!text || !anchor || !root.contains(anchor)) return false;
+    const targetId = ensureTarget(selectionBlock(element, anchor));
+    const rects = [...range.getClientRects()];
+    setQuote(text, anchor.id, targetId);
+    if (moveToWorkbench) {
+      document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      bodyInput.focus();
+      selectionTrigger.hidden = true;
+    } else {
+      positionSelectionTrigger(rects.at(-1) || range.getBoundingClientRect());
+    }
+    return true;
+  }
+
+  function addComment(body, type, anchorId, quote, inlineTargetId) {
+    body = String(body || '').trim();
+    if (!body) return false;
+    const now = new Date().toISOString();
+    payload.comments.push({
+      id: `founder-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      authorRole: 'FOUNDER_REVIEW_COMMENT',
+      requiresAgentResponse: true,
+      reportId,
+      anchorId,
+      anchorLabel: anchorLabel(document.getElementById(anchorId)),
+      inlineTargetId: inlineTargetId || '',
+      quote: quote || '',
+      body,
+      type: type || 'Question',
+      status: 'open',
+      createdAt: now,
+      updatedAt: now
+    });
+    persist();
+    renderComments();
+    return true;
+  }
+
+  function closeInlineComposer() {
+    root.querySelector('.inline-composer')?.remove();
+  }
+
+  function openInlineComposer() {
+    closeInlineComposer();
+    const target = document.getElementById(pendingInlineTargetId) || document.getElementById(pendingAnchorId);
+    if (!target || !pendingQuote) return;
+    const composer = document.createElement('div');
+    composer.className = 'card inline-composer';
+    composer.dataset.exportTransient = 'true';
+    composer.innerHTML = '<strong>Comment on highlighted text</strong>';
+    const quote = document.createElement('blockquote');
+    quote.textContent = pendingQuote;
+    composer.appendChild(quote);
+    const fieldId = `founder-inline-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const typeLabel = document.createElement('label');
+    typeLabel.htmlFor = `${fieldId}-type`;
+    typeLabel.textContent = 'Comment type';
+    const type = document.createElement('select');
+    type.id = `${fieldId}-type`;
+    ['Question', 'Change request', 'Concern', 'Approval'].forEach(value => type.add(new Option(value, value)));
+    const bodyLabel = document.createElement('label');
+    bodyLabel.htmlFor = `${fieldId}-body`;
+    bodyLabel.textContent = 'Your comment';
+    const body = document.createElement('textarea');
+    body.id = `${fieldId}-body`;
+    body.placeholder = 'Write the question or change you want addressed.';
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'primary';
+    add.textContent = 'Add founder comment';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.textContent = 'Cancel';
+    actions.append(add, cancel);
+    composer.append(typeLabel, type, bodyLabel, body, actions);
+    insertNear(target, composer);
+    selectionTrigger.hidden = true;
+    body.focus();
+    add.addEventListener('click', () => {
+      if (!addComment(body.value, type.value, pendingAnchorId, pendingQuote, pendingInlineTargetId)) return body.focus();
+      closeInlineComposer();
+      getSelection()?.removeAllRanges();
+    });
+    cancel.addEventListener('click', closeInlineComposer);
+    body.addEventListener('keydown', event => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        event.preventDefault();
+        add.click();
+      }
+    });
+  }
+
+  function resetWorkbench() {
+    editingId = null;
+    bodyInput.value = '';
+    typeInput.value = 'Question';
+    setQuote('', anchorInput.value || 'executive-summary');
+    saveButton.textContent = 'Add founder comment';
+    cancelButton.hidden = true;
+  }
+
+  function saveWorkbenchComment() {
+    const body = bodyInput.value.trim();
+    if (!body) return bodyInput.focus();
+    if (editingId) {
+      const comment = payload.comments.find(item => item.id === editingId);
+      if (!comment) return;
+      comment.anchorId = anchorInput.value;
+      comment.anchorLabel = anchorLabel(document.getElementById(anchorInput.value));
+      comment.inlineTargetId = pendingInlineTargetId || '';
+      comment.quote = pendingQuote;
+      comment.body = body;
+      comment.type = typeInput.value;
+      comment.updatedAt = new Date().toISOString();
+      persist();
+      renderComments();
+    } else if (!addComment(body, typeInput.value, anchorInput.value, pendingQuote, pendingInlineTargetId)) {
+      return;
+    }
+    resetWorkbench();
+  }
+
+  function editComment(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    editingId = id;
+    anchorInput.value = comment.anchorId;
+    typeInput.value = comment.type;
+    bodyInput.value = comment.body;
+    setQuote(comment.quote, comment.anchorId, comment.inlineTargetId || '');
+    saveButton.textContent = 'Save founder comment';
+    cancelButton.hidden = false;
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function toggleResolved(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    comment.status = comment.status === 'resolved' ? 'open' : 'resolved';
+    comment.updatedAt = new Date().toISOString();
+    persist();
+    renderComments();
+  }
+
+  function deleteComment(id) {
+    if (!payload.comments.some(item => item.id === id) || !confirm('Delete this founder review comment?')) return;
+    payload.comments = payload.comments.filter(item => item.id !== id);
+    if (!payload.deletedIds.includes(id)) payload.deletedIds.push(id);
+    if (editingId === id) resetWorkbench();
+    persist();
+    renderComments();
+  }
+
+  function beginSectionComment(anchorId) {
+    closeInlineComposer();
+    selectionTrigger.hidden = true;
+    anchorInput.value = anchorId;
+    setQuote('', anchorId);
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function download(content, type, filename) {
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportJson() {
+    download(safeJson({ ...payload, exportedAt: new Date().toISOString() }), 'application/json;charset=utf-8', `${reportId}-founder-comments.json`);
+  }
+
+  function exportHtml() {
+    persist();
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('#founder-comments-data').textContent = safeJson(payload);
+    clone.querySelector('#founder-review').dataset.exportedWithFounderComments = new Date().toISOString();
+    clone.querySelectorAll('[data-export-transient="true"]').forEach(node => node.remove());
+    const clonedBody = clone.querySelector('#founder-comment-body');
+    if (clonedBody) clonedBody.textContent = '';
+    let marker = clone.querySelector('meta[name="founder-review-comments-schema"]');
+    if (!marker) {
+      marker = document.createElement('meta');
+      marker.name = 'founder-review-comments-schema';
+      clone.querySelector('head').appendChild(marker);
+    }
+    marker.content = schemaVersion;
+    const date = new Date().toISOString().slice(0, 10);
+    download(`<!doctype html>\n${clone.outerHTML}`, 'text/html;charset=utf-8', `${reportId}-commented-${date}.html`);
+    stateNode.textContent = `Commented HTML saved with ${payload.comments.length} embedded comment${payload.comments.length === 1 ? '' : 's'}.`;
+  }
+
+  ensureReviewUi();
+  populateAnchors();
+  renderComments();
+
+  root.addEventListener('click', event => {
+    const selectionButton = event.target.closest('.selection-comment-trigger');
+    if (selectionButton) return openInlineComposer();
+    const sectionButton = event.target.closest('.section-comment');
+    if (sectionButton) return beginSectionComment(sectionButton.dataset.anchor);
+    const actionButton = event.target.closest('[data-comment-action]');
+    if (!actionButton) return;
+    const { commentId, commentAction } = actionButton.dataset;
+    if (commentAction === 'edit') editComment(commentId);
+    if (commentAction === 'resolve') toggleResolved(commentId);
+    if (commentAction === 'delete') deleteComment(commentId);
+  });
+
+  root.addEventListener('mouseup', event => {
+    if (event.target.closest('#comment-workbench,.inline-composer,.selection-comment-trigger')) return;
+    setTimeout(() => captureSelection(false), 0);
+  });
+  anchorInput.addEventListener('change', () => {
+    pendingAnchorId = anchorInput.value;
+    pendingInlineTargetId = '';
+  });
+  saveButton.addEventListener('click', saveWorkbenchComment);
+  cancelButton.addEventListener('click', resetWorkbench);
+  document.getElementById('founder-comment-use-selection').addEventListener('click', () => captureSelection(true));
+  document.getElementById('founder-comment-clear-quote').addEventListener('click', () => setQuote('', anchorInput.value));
+  document.getElementById('founder-comments-save-html').addEventListener('click', exportHtml);
+  document.getElementById('founder-comments-export-json').addEventListener('click', exportJson);
+  bodyInput.addEventListener('keydown', event => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.preventDefault();
+      saveWorkbenchComment();
+    }
+  });
+})();
+  </script>
+</body>
+</html>

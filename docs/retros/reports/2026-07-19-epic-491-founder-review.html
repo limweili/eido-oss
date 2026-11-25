@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Epic #491 Design System — Delivery &amp; Process Review</title>
+  <style>
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1a1c1f;
+  --muted: #6b7280;
+  --surface: #f3f4f6;
+  --surface-strong: #e5e7eb;
+  --border: #d1d5db;
+  --accent: #1677ff;
+  --accent-soft: #e8f2ff;
+  --decision: #0f8a4b;
+  --decision-soft: #e8f7ef;
+  --warning: #d66b00;
+  --warning-soft: #fff1e5;
+  --danger: #c62828;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181818;
+    --fg: #f8fafc;
+    --muted: #a6adb8;
+    --surface: #25272b;
+    --surface-strong: #33363c;
+    --border: #454950;
+    --accent: #83c3ff;
+    --accent-soft: #18324b;
+    --decision: #5bd58e;
+    --decision-soft: #173a27;
+    --warning: #ffad63;
+    --warning-soft: #442b18;
+    --danger: #ff7b7b;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); }
+#founder-review { position: relative; width: 100%; padding: clamp(1rem, 2.5vw, 2.5rem); overflow-wrap: anywhere; }
+#founder-review h1, #founder-review h2, #founder-review h3, #founder-review h4 { line-height: 1.2; }
+#founder-review h1 { font-size: clamp(1.9rem, 3vw, 3rem); margin: .35rem 0 1rem; }
+#founder-review h2 { margin-top: 3rem; padding-top: 1.25rem; border-top: 2px solid var(--border); }
+#founder-review h3 { margin-top: 1.8rem; }
+#founder-review p, #founder-review li { max-width: 85ch; }
+#founder-review a { color: var(--accent); }
+#founder-review code { white-space: normal; word-break: break-all; }
+.report-header { padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.kicker, .section-label, .muted { color: var(--muted); }
+.section-label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.lede { font-size: 1.1rem; max-width: 75ch; }
+.toc { padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.toc ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem 1.5rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0; }
+.two-col, .comment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
+.card { background: var(--surface); border-radius: .9rem; padding: 1rem; }
+.stat { display: grid; gap: .25rem; }
+.stat strong { font-size: 1.4rem; }
+.plain-group { padding: .5rem 0 1rem; border-bottom: 1px solid var(--border); }
+.callout { margin: 1rem 0; padding: .8rem 1rem; border-left: 4px solid var(--accent); background: var(--accent-soft); }
+.callout.decision { border-color: var(--decision); background: var(--decision-soft); }
+.callout.warning { border-color: var(--warning); background: var(--warning-soft); }
+.area-intro { color: var(--muted); max-width: 80ch; }
+.impact-chain { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: .75rem; align-items: center; margin: 1.5rem 0; }
+.impact-node { min-height: 10rem; display: grid; align-content: center; gap: .5rem; padding: 1rem; border: 2px solid var(--decision); border-radius: .9rem; background: var(--decision-soft); text-align: center; }
+.impact-node.pending { border-color: var(--warning); background: var(--warning-soft); }
+.impact-node small { color: var(--muted); }
+.impact-arrow { color: var(--muted); font-size: 1.5rem; }
+.table-wrap { width: 100%; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 1rem 0; }
+th, td { padding: .75rem .6rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); }
+details { padding: .75rem 0; border-bottom: 1px solid var(--border); }
+summary { cursor: pointer; font-weight: 700; }
+.diagram-placeholder { min-height: 9rem; display: grid; place-items: center; padding: 1rem; border: 1px dashed var(--border); color: var(--muted); }
+button, select, textarea { font: inherit; color: inherit; }
+button { border: 1px solid var(--border); border-radius: .55rem; padding: .48rem .75rem; background: var(--bg); cursor: pointer; }
+button.primary { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+button:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+label { display: grid; gap: .3rem; margin-top: .7rem; font-weight: 600; }
+select, textarea { width: 100%; border: 1px solid var(--border); border-radius: .55rem; padding: .55rem .7rem; background: var(--bg); }
+textarea { min-height: 7rem; resize: vertical; }
+.actions, .annotation-tools, .comment-actions, .comment-label { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .6rem; }
+.annotation-tools { color: var(--muted); }
+.inline-comments, .comment-index { display: grid; gap: .75rem; margin-top: .75rem; }
+.inline-comments:empty { display: none; }
+.founder-comment[data-status="resolved"] { opacity: .7; }
+.founder-comment blockquote, #founder-comment-quote, .inline-composer blockquote { margin: .65rem 0; padding-left: .8rem; border-left: 3px solid var(--border); color: var(--muted); }
+.founder-comment-body { white-space: pre-wrap; }
+.badge { display: inline-block; padding: .12rem .5rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .85rem; }
+.selection-comment-trigger { position: absolute; z-index: 20; }
+.inline-composer { margin: .65rem 0 1rem; }
+.review-instructions, .comment-workbench { margin: 1.5rem 0; }
+footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); }
+[hidden] { display: none !important; }
+@media (max-width: 760px) {
+  .summary-grid, .two-col, .comment-grid, .toc ol { grid-template-columns: 1fr; }
+  .impact-chain { grid-template-columns: 1fr; }
+  .impact-arrow { transform: rotate(90deg); justify-self: center; }
+  table, thead, tbody, tr, th, td { display: block; }
+  thead { display: none; }
+  tr { padding: .6rem 0; border-bottom: 2px solid var(--border); }
+  td { display: grid; grid-template-columns: minmax(7rem, .8fr) minmax(0, 1.7fr); gap: .6rem; border: 0; padding: .3rem 0; }
+  td::before { content: attr(data-label); color: var(--muted); font-weight: 700; }
+}
+@media print {
+  .annotation-tools, .selection-comment-trigger, .inline-composer, .comment-actions, .comment-workbench .comment-grid { display: none !important; }
+  .founder-comment { break-inside: avoid; }
+}
+  </style>
+</head>
+<body>
+<main id="founder-review"
+      data-report-id="eido-491-design-system-review"
+      data-comment-schema="founder-review-comments/v1">
+  <header id="executive-summary" class="report-header" data-review-anchor data-anchor-label="Executive summary">
+    <p class="kicker">Founder review · Eido #491 · main b02e1ec3 · 2026-07-19 AEST · generated 2026-07-19</p>
+    <h1>Epic #491 Design System — Delivery &amp; Process Review</h1>
+    <p class="section-label">Executive summary</p>
+    <p class="lede">Epic #491 is complete on <code>main</code>. Eido now uses the approved design language from PR #445 as architecture rather than decoration: one token authority, one primitive and overlay vocabulary, shared typography and interaction roles, coherent canvas and DOM rendering, and drift checks at the owning seams. The source/design outcome is shipped; user adoption, packaged-runtime certification, and business impact remain separate future evidence.</p>
+    <div class="two-col">
+      <div class="plain-group">
+        <h3>What changed now</h3>
+        <p><span class="badge">DECIDED</span> Eighteen design slices, the production renderer/storage line, Board Search, and terminal integration were composed into one certified tree and promoted through PR #592. Focus, accessibility, responsive composition, save semantics, and graph behavior were preserved while visual authority moved into shared roles.</p>
+      </div>
+      <div class="plain-group">
+        <h3>What users or the business receive later</h3>
+        <p><span class="badge">NOT YET PROVEN</span> Faster future UI delivery, lower design drift, stronger perceived coherence, and improved user confidence are plausible effects, not measured outcomes. #471 still owns packaged-runtime certification; future product telemetry or research must establish user and business effect.</p>
+      </div>
+    </div>
+    <div class="summary-grid" aria-label="Executive measures">
+      <div class="card stat"><span class="muted">Integrated scope</span><strong>18 / 18 slices</strong><span>All #491 design lanes reached the certified integration tree.</span></div>
+      <div class="card stat"><span class="muted">Final release evidence</span><strong>4 exact signals</strong><span>Required, macOS, Windows, and release artifact on final main.</span></div>
+      <div class="card stat"><span class="muted">Observed contrast repair</span><strong>1.89 → 9.08</strong><span>Dark editor body text corrected at the shared prose seam.</span></div>
+    </div>
+    <div class="callout decision"><strong>Most important boundary:</strong> #491 delivered and certified the source/design system. It did not migrate legacy Card colours, alter storage versions, prove real-user impact, or complete #471's packaged-runtime certification.</div>
+    <div class="callout"><strong>Founder review focus:</strong> decide which acceptance clauses to retire, where Standards and visual review belong, whether draft-to-ready CI duplication should be removed, and which #491 lessons should become system-agnostic process.</div>
+  </header>
+
+  <nav class="toc" aria-label="Report contents">
+    <ol>
+      <li><a href="#executive-summary">Executive summary</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#work-delivered">Work delivered</a></li>
+      <li><a href="#technical-teaching">Technical teaching</a></li>
+      <li><a href="#retro">Retro and collaboration</a></li>
+      <li><a href="#founder-decisions">Decisions to make</a></li>
+      <li><a href="#sources">Sources</a></li>
+      <li><a href="#comment-workbench">Comment and return</a></li>
+    </ol>
+  </nav>
+
+  <section id="review-workflow" class="card review-instructions" data-review-anchor data-anchor-label="How to review and comment">
+    <h2>How to review and return comments</h2>
+    <ol>
+      <li>Skim the executive summary and impact first; open technical and forensic disclosures only when useful.</li>
+      <li>Highlight exact wording and press the nearby <strong>Comment here</strong> button, or comment on a whole section.</li>
+      <li>Add, edit, resolve, or delete comments. Each one is marked as founder feedback requiring an agent response.</li>
+      <li>Press <strong>Save commented HTML</strong> and return the saved file.</li>
+    </ol>
+  </section>
+
+  <section id="impact" data-review-anchor data-anchor-label="Impact">
+    <h2>Impact — what changed and why it matters</h2>
+    <p class="area-intro">The immediate impact is architectural and operational: Eido's interface now has a single language and an exact certified source tree. Product sentiment, adoption, and financial impact are deliberately not inferred from engineering completion.</p>
+    <div class="impact-chain" role="img" aria-label="Measured mixed visual authority led to one shared design architecture, enabling coherent future UI delivery; user and business effect remains unproven">
+      <div class="impact-node"><strong>Evidence</strong><span>Raw values, duplicate recipes, inconsistent controls, and real cross-slice defects were observed.</span><small>MEASURED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Delivery change</strong><span>Tokens, roles, primitives, overlays, painter, and proof moved to shared owners.</span><small>DECIDED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Capability</strong><span>New UI can compose one system instead of restyling every consumer independently.</span><small>ENABLED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node pending"><strong>User or business effect</strong><span>Greater coherence and faster iteration require rollout, product use, and future measurement.</span><small>EXPECTED / NOT YET PROVEN</small></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Impact layer</th><th>Improvement</th><th>Evidence</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Layer">Design authority</td><td data-label="Improvement">One token, typography, primitive, overlay, and painter vocabulary now governs the app.</td><td data-label="Evidence">18/18 slices integrated; PRs #575, #591, and #592; design authority gate.</td><td data-label="Confidence"><span class="badge">MEASURED</span></td></tr>
+          <tr><td data-label="Layer">Interaction and accessibility posture</td><td data-label="Improvement">Focus return, keyboard ownership, overlay Escape behavior, hit areas, long-Card selection, and Search activation were repaired or preserved.</td><td data-label="Evidence">Independent Standards/Spec reviews and focused causal journeys across #502–#509 and #557–#559.</td><td data-label="Confidence"><span class="badge">DECIDED</span></td></tr>
+          <tr><td data-label="Layer">Release readiness</td><td data-label="Improvement">The exact final tree is on main with Required, native-host, bundle, and artifact proof.</td><td data-label="Evidence">Required run 29660641783; native run 29660641846; artifact 8434236120.</td><td data-label="Confidence"><span class="badge">MEASURED</span></td></tr>
+          <tr><td data-label="Layer">Delivery throughput</td><td data-label="Improvement">Evidence moved from broad repeated matrices toward owning seams, causal journeys, tree identity, and stop rules.</td><td data-label="Evidence">481 browser-matrix lines removed; stale assertions deleted; duplicate ready-state runs classified; ADR 0028 adopted.</td><td data-label="Confidence"><span class="badge">DECIDED</span></td></tr>
+          <tr><td data-label="Layer">Packaged product</td><td data-label="Improvement">The identical source SHA is ready for the separately owned packaged-runtime certification path.</td><td data-label="Evidence">#471 boundary and final exact source/native proof.</td><td data-label="Confidence"><span class="badge">ENABLED</span></td></tr>
+          <tr><td data-label="Layer">User and business outcome</td><td data-label="Improvement">Expected coherence, confidence, and future UI velocity have not been measured in real use.</td><td data-label="Evidence">No product telemetry, research, adoption, retention, or financial measure was in scope.</td><td data-label="Confidence"><span class="badge">NOT YET PROVEN</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warning"><strong>Honest impact boundary:</strong> a green release candidate proves source integrity and delivery readiness, not user delight, packaged behavior, adoption, or commercial return.</div>
+  </section>
+
+  <section id="work-delivered" data-review-anchor data-anchor-label="Work delivered">
+    <h2>Area 1 — Work delivered</h2>
+    <p class="area-intro">The epic moved from an approved visual proposal to an app-wide authority, then composed that authority with the production renderer and storage line before one identity-preserving promotion to main.</p>
+    <article id="completion-boundary" data-review-anchor data-anchor-label="Completion boundary">
+      <h3>Delivered versus intentionally excluded</h3>
+      <div class="two-col">
+        <div class="plain-group">
+          <h4>Delivered</h4>
+          <ul>
+            <li>Light, Dark, and Match-system authority; semantic tokens; typography; local fonts; reduced motion.</li>
+            <li>Shared controls, fields, buttons, badges, dialogs, tooltips, overlays, focus ownership, and responsive chrome.</li>
+            <li>Card identity, canvas painter/cache parity, connections, Mods, Highlights, playback, AI/version surfaces, and context rows.</li>
+            <li>Production P/S/L rich-Card rendering, long Cards, image renditions/lifecycle, Board Search, accessibility continuity, and save/export compatibility.</li>
+            <li>Static design drift authority, exact Required, macOS/Windows native proof, bundle budget, and main release artifact.</li>
+          </ul>
+        </div>
+        <div class="plain-group">
+          <h4>Not delivered</h4>
+          <ul>
+            <li>Migration or visual preservation of Card colours in old save files; identity is forward-only.</li>
+            <li>Storage-version changes, private-save validation, or any <code>.multy</code> state.</li>
+            <li>#471 packaged-runtime certification, which remains independently owned.</li>
+            <li>Real-user adoption, usability research, sentiment, retention, or business metrics.</li>
+            <li>A promise that every future screen is automatically coherent; the authority and drift checks make that enforceable, not inevitable.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+    <article id="selected-decision" data-review-anchor data-anchor-label="Selected decision or architecture">
+      <h3>Selected decision or architecture</h3>
+      <p><span class="badge">DECIDED</span> The design system is a set of named semantic authorities, not a palette copied into consumers. Components ask for roles such as ink, line, field, badge, overlay, or Card identity; shared modules decide the concrete appearance and interaction contract. The terminal integration merged current main into the design line once, preserved the reviewed tree, and promoted that ancestry intact.</p>
+      <p>Rejected approaches were replaying or rebasing 59 design commits one by one; preserving raw old-main CSS beside the new system; creating a second Search surface; migrating legacy save colours; and rebuilding proof for unchanged seams after every lineage change. The trade-off is stronger central ownership and less local styling freedom in exchange for coherence, drift resistance, and cheaper future change.</p>
+    </article>
+    <article id="delivery-ledger" data-review-anchor data-anchor-label="Delivery ledger">
+      <h3>Detailed delivery ledger</h3>
+      <details>
+        <summary>Open issue, PR, CI, release, and artifact detail</summary>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Boundary</th><th>Outcome</th><th>Exact evidence</th></tr></thead>
+            <tbody>
+              <tr><td data-label="Boundary">PR #445</td><td data-label="Outcome">Approved design-system rule book and living reference.</td><td data-label="Evidence"><a href="https://github.com/limweili/eido/pull/445">Design source</a></td></tr>
+              <tr><td data-label="Boundary">#492–#501</td><td data-label="Outcome">Ownership, tokens, painter, primitives, overlays, theme, Card identity, and chrome foundations.</td><td data-label="Evidence">Shared authorities landed before downstream consumers.</td></tr>
+              <tr><td data-label="Boundary">#502–#509</td><td data-label="Outcome">Connections, Mods, prose, AI/version, overlays, context rows, and playback migrated.</td><td data-label="Evidence">Independent Standards and Spec review at stable boundaries.</td></tr>
+              <tr><td data-label="Boundary">#507 / PR #575</td><td data-label="Outcome">App-wide convergence reached 17/18 slices at <code>97fa4424</code>.</td><td data-label="Evidence"><a href="https://github.com/limweili/eido/actions/runs/29649899040">Required 29649899040</a>: 168 files, 2,155 tests, 419.9/450 KiB.</td></tr>
+              <tr><td data-label="Boundary">#553–#561</td><td data-label="Outcome">Renderer, renditions, residency, Search, focus, lifecycle, and save/export train landed on current main.</td><td data-label="Evidence">Serial PR and exact-main proof per renderer slice.</td></tr>
+              <tr><td data-label="Boundary">PR #591 / #510</td><td data-label="Outcome">Current main and design integration composed; Search adapted; terminal source integration certified.</td><td data-label="Evidence"><a href="https://github.com/limweili/eido/actions/runs/29660062153">Required 29660062153</a>; <a href="https://github.com/limweili/eido/actions/runs/29660062151">native 29660062151</a>; tree <code>27341527</code>.</td></tr>
+              <tr><td data-label="Boundary">PR #592 / #491</td><td data-label="Outcome">Identity-preserving promotion to main <code>b02e1ec3</code>; epic closed.</td><td data-label="Evidence"><a href="https://github.com/limweili/eido/actions/runs/29660641783">Required 29660641783</a>; <a href="https://github.com/limweili/eido/actions/runs/29660641846">native 29660641846</a>; artifact <code>8434236120</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </article>
+    <article id="next-sequence" data-review-anchor data-anchor-label="Next sequence">
+      <h3>What happens next</h3>
+      <p>#471 owns actual packaged-runtime certification and must use the identical source/artifact boundary; a rebuild invalidates that proof. Separately, the next product cycle should choose a small real-user validation signal for coherence and usability. Rollback remains source-level rather than data-migration recovery because #491 changed neither storage versions nor private save data.</p>
+    </article>
+  </section>
+
+  <section id="technical-teaching" data-review-anchor data-anchor-label="Technical teaching">
+    <h2>Area 2 — Technical teaching</h2>
+    <div class="callout decision"><strong>Technical story in one minute:</strong> before #491, many screens each carried a small private design system. Now a component names the role it needs, a shared authority supplies appearance and interaction, the canvas painter uses the same theme inputs, and focused tests protect the owner rather than copying assertions into every consumer.</div>
+    <article id="technical-mechanism" data-review-anchor data-anchor-label="How it works">
+      <h3>How it works</h3>
+      <p><strong>Mechanism:</strong> semantic tokens and typography roles flow into shared primitives, overlays, Card identities, and painter rules; consumer components compose them. <strong>Trade-off:</strong> local components have less freedom to invent raw values. <strong>Product meaning:</strong> Light/Dark behavior, focus, hierarchy, and canvas/DOM identity can change coherently. <strong>Validation gate:</strong> static drift checks and focused owner tests run inside exact Required, with causal browser or perceptual review only where a shared seam cannot answer the question.</p>
+    </article>
+    <article id="technical-diagram" data-review-anchor data-anchor-label="Technical diagram">
+      <h3>Authority and proof flow</h3>
+      <div class="impact-chain" role="img" aria-label="The design rule book feeds shared primitives, which feed app and canvas consumers, which are protected by owner tests and exact release proof">
+        <div class="impact-node"><strong>Rule book</strong><span>Semantic tokens, typography, identity, motion</span><small>ONE AUTHORITY</small></div>
+        <span class="impact-arrow" aria-hidden="true">→</span>
+        <div class="impact-node"><strong>Shared kit</strong><span>Primitives, overlays, focus, responsive roles</span><small>OWNING SEAMS</small></div>
+        <span class="impact-arrow" aria-hidden="true">→</span>
+        <div class="impact-node"><strong>Consumers</strong><span>Chrome, Cards, canvas, Search, Mods, playback</span><small>COMPOSITION</small></div>
+        <span class="impact-arrow" aria-hidden="true">→</span>
+        <div class="impact-node"><strong>Release proof</strong><span>Drift gate, Required, native hosts, artifact</span><small>EXACT IDENTITY</small></div>
+      </div>
+    </article>
+    <article id="technical-limitations" data-review-anchor data-anchor-label="Technical limitations">
+      <h3>Limitations and open gates</h3>
+      <ul>
+        <li><span class="badge">NOT YET PROVEN</span> Packaged macOS/Windows behavior remains #471's responsibility even though native source-boundary proof is green.</li>
+        <li><span class="badge">NOT YET PROVEN</span> The design system's effect on comprehension, perceived quality, adoption, retention, or support burden has not been measured.</li>
+        <li><span class="badge">DECIDED</span> Legacy Card colours are not a compatibility target; new choices use the new identity model without save migration.</li>
+        <li><span class="badge">ENABLED</span> Drift checks make future enforcement possible, but future contributors must still use the named authorities.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section id="retro" data-review-anchor data-anchor-label="Retro and collaboration">
+    <h2>Area 3 — Retro and how to work better together</h2>
+    <div class="callout decision"><strong>One-minute verdict:</strong> the strongest outcome was a coherent certified system with real architecture, accessibility, and host defects caught before promotion. The principal avoidable delay was proof volume: broad Computer Use, Playwright, per-consumer matrices, duplicated CI, coordination sediment, and an unbounded reviewer. The most effective correction was the founder's mid-epic insistence on risk-led evidence, made executable by PRs #541/#542 and ADR 0028.</div>
+    <div class="summary-grid">
+      <div class="card stat"><span class="muted">Principal bottleneck</span><strong>Proof volume</strong><span>The system spent capacity proving already-known seams instead of shipping the next boundary.</span></div>
+      <div class="card stat"><span class="muted">Most effective unblock</span><strong>Risk-led stop rules</strong><span>Ask whether more proof would change what ships; reuse identity-preserved evidence.</span></div>
+      <div class="card stat"><span class="muted">Concrete warning</span><strong>213,176 tokens</strong><span>One unbounded review consumed this without returning a verdict.</span></div>
+    </div>
+    <article id="retro-friction" data-review-anchor data-anchor-label="Friction and bottlenecks">
+      <h3>Friction, bottlenecks, and how they were unblocked</h3>
+      <p>The suspected risk was that a large visual migration needed broad proof everywhere. The actual constraint was review and validation volume. Computer Use became an acceptance oracle, Playwright coverage grew horizontally, issue clauses encouraged per-theme/per-viewport matrices, and replacement CI runs were watched even when commit and tree identity were unchanged. #503 later removed 481 lines from one browser matrix while retaining the two distinct causal journeys. Host-explainable path aliases and optional canaries were initially noisy but did not represent product defects.</p>
+      <p>The unblock was to concentrate proof: static review for semantic authority, owner tests for shared behavior, causal browser journeys only for timing/focus/geometry, one short perceptual review at meaningful composition, and exact Required at the landing boundary. When a checker wanted a v2 or evidence work outweighed product work, the team stopped and resliced.</p>
+    </article>
+    <article id="retro-interventions" data-review-anchor data-anchor-label="Founder interventions">
+      <h3>Founder interventions</h3>
+      <p>The founder correctly identified Computer Use, Playwright, and excessive test creation as the bottleneck, then clarified that even Playwright should not be treated as a universal oracle. That intervention immediately changed lane contracts, reduced evidence breadth, and made visual review perceptual rather than behavioral. The cost was a mid-epic process reset: active plans, skills, and assumptions had to be re-derived after PRs #541/#542 and ADR 0028. The reset was worth doing, but the same framing at epic kickoff would have avoided churn and contradictory issue contracts.</p>
+    </article>
+    <article id="retro-accountability" data-review-anchor data-anchor-label="Agent accountability">
+      <h3>Agent and team accountability</h3>
+      <p>The delivery team should have recognized earlier that proof volume, not defect escape rate, was dominating cycle time. It overbuilt matrices, allowed a coordination registry to accumulate sediment, let one reviewer run without a bounded verdict contract, and initially treated replacement runs as new evidence. Those were orchestration decisions, not unavoidable tool limitations. The team improved when it separated causal, perceptual, static, and provider-state questions and assigned each to one authoritative proof.</p>
+    </article>
+    <article id="retro-actions" data-review-anchor data-anchor-label="Future operating model">
+      <h3>Keep / Stop / Start / Change</h3>
+      <div class="two-col">
+        <div class="plain-group">
+          <h4>Keep / Start</h4>
+          <ul>
+            <li>Keep foundations before consumers, continuous serial landing, exact tree identity, and a retro separate from mutable coordination.</li>
+            <li>Keep Standards and Spec review independent at meaningful stable boundaries.</li>
+            <li>Start every epic with an evidence map: claim, owner, invalidation boundary, and stop rule.</li>
+            <li>Start issue-contract review before implementation when old clauses imply exhaustive matrices.</li>
+            <li>Start a small post-release product measure when user or business impact matters.</li>
+          </ul>
+        </div>
+        <div class="plain-group">
+          <h4>Stop / Change</h4>
+          <ul>
+            <li>Stop per-consumer proof for unchanged shared roles and stop using visual tools for timing or gesture truth.</li>
+            <li>Stop unbounded reviewers; no verdict means incomplete, not approval.</li>
+            <li>Stop repairing tests that require deliberately retired behavior.</li>
+            <li>Change draft-to-ready workflow triggers or merge policy so identical heads do not pay for duplicate Required/native runs.</li>
+            <li>Change recovery notes to point at live GitHub/Git/CI authority instead of duplicating task state.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+    <details>
+      <summary>Open forensic retro evidence</summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Observed friction</th><th>Evidence</th><th>Correction</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Friction">Broad browser proof exceeded product change.</td><td data-label="Evidence">#503 removed 481 lines from one matrix while preserving two causal journeys.</td><td data-label="Correction">Prove the shared seam and representative transition.</td></tr>
+            <tr><td data-label="Friction">Unbounded review failed to return a verdict.</td><td data-label="Evidence">213,176 tokens consumed by one Sol review without closure.</td><td data-label="Correction">Bound scope and compute; incomplete remains incomplete.</td></tr>
+            <tr><td data-label="Friction">Optional or host-explainable reds became noise.</td><td data-label="Evidence">Browser canaries and <code>/var</code> ↔ <code>/private/var</code> aliases were investigated without product causality.</td><td data-label="Correction">Classify once; do not rerun or build checker machinery.</td></tr>
+            <tr><td data-label="Friction">Draft → ready repeated unchanged proof.</td><td data-label="Evidence">#591 and #592 spawned replacement runs on identical heads and trees.</td><td data-label="Correction">Reuse exact evidence; wait only when provider branch protection mechanically requires it.</td></tr>
+            <tr><td data-label="Friction">Old tests pinned retired behavior.</td><td data-label="Evidence">A CardShell assertion still required <code>color: inherit</code> after the direct semantic-ink repair.</td><td data-label="Correction">Delete the stale assertion; retain the owning prose test.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section id="founder-decisions" data-review-anchor data-anchor-label="Founder decisions">
+    <h2>Decisions to make before the next epic</h2>
+    <ol>
+      <li><strong>Acceptance contracts:</strong> which per-card, per-theme, and per-viewport clauses should be removed from the default issue template?</li>
+      <li><strong>Review placement:</strong> should Standards review happen immediately after shared-seam shape stabilizes, before large consumer evidence?</li>
+      <li><strong>Visual review:</strong> which intermediate heads deserve perceptual review, and what belongs only at terminal integration?</li>
+      <li><strong>CI triggers:</strong> can draft-to-ready replacement runs be removed without weakening exact-head truth or branch protection?</li>
+      <li><strong>Recovery state:</strong> what is the smallest committed handoff after compaction when GitHub, Git, and CI are authoritative?</li>
+      <li><strong>Process ownership:</strong> which lessons belong in system-agnostic skills, Eido's release profile, or this one-off retro?</li>
+    </ol>
+    <div class="callout"><strong>Recommended decision order:</strong> settle acceptance contracts and CI duplication first; both directly reduce the next epic's proof volume. Then place Standards and visual review around the resulting smaller delivery slices.</div>
+  </section>
+
+  <section id="sources" data-review-anchor data-anchor-label="Sources and provenance">
+    <h2>Sources, evidence, and provenance</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Authority</th><th>Source</th><th>Use in this review</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Authority">Canonical epic</td><td data-label="Source"><a href="https://github.com/limweili/eido/issues/491">Issue #491</a></td><td data-label="Use">Outcome, scope, closure state, and child delivery boundary.</td></tr>
+          <tr><td data-label="Authority">Approved design</td><td data-label="Source"><a href="https://github.com/limweili/eido/pull/445">PR #445</a> and <a href="https://github.com/limweili/eido/blob/b02e1ec3ab476c20387b3c3d4d3eb884d8dae00a/docs/design/design-system/SYSTEM.md">SYSTEM.md</a></td><td data-label="Use">Visual and architectural rule authority.</td></tr>
+          <tr><td data-label="Authority">Evidence policy</td><td data-label="Source"><a href="https://github.com/limweili/eido/blob/b02e1ec3ab476c20387b3c3d4d3eb884d8dae00a/docs/adr/0028-risk-proportional-evidence-over-fixed-ceremony.md">ADR 0028</a>, <a href="https://github.com/limweili/eido/pull/541">PR #541</a>, <a href="https://github.com/limweili/eido/pull/542">PR #542</a></td><td data-label="Use">Risk-led testing, proof reuse, and stop rules.</td></tr>
+          <tr><td data-label="Authority">Integration</td><td data-label="Source"><a href="https://github.com/limweili/eido/pull/591">PR #591</a>, tree <code>27341527</code></td><td data-label="Use">Final source composition, review, visual, and native findings.</td></tr>
+          <tr><td data-label="Authority">Promotion</td><td data-label="Source"><a href="https://github.com/limweili/eido/pull/592">PR #592</a>, main <code>b02e1ec3</code></td><td data-label="Use">Exact promoted lineage and epic closure.</td></tr>
+          <tr><td data-label="Authority">CI and release</td><td data-label="Source"><a href="https://github.com/limweili/eido/actions/runs/29660641783">Required 29660641783</a>, <a href="https://github.com/limweili/eido/actions/runs/29660641846">native 29660641846</a>, artifact <code>8434236120</code></td><td data-label="Use">Exact-main integrity and release-candidate evidence.</td></tr>
+          <tr><td data-label="Authority">Retro</td><td data-label="Source"><code>docs/retros/epics/2026-07-18-epic-491-design-system/RETRO.md</code>, branch <code>codex/491-living-retro</code>, commit <code>0ca7de48</code></td><td data-label="Use">Observed friction, interventions, accountability, and future questions.</td></tr>
+          <tr><td data-label="Authority">Open boundary</td><td data-label="Source"><a href="https://github.com/limweili/eido/issues/471">Issue #471</a></td><td data-label="Use">Packaged-runtime certification intentionally excluded from #491.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">No private Eido save data, credentials, or <code>.multy</code> state was used to produce this report.</p>
+  </section>
+
+  <section id="comment-workbench" class="card comment-workbench" data-review-anchor data-anchor-label="Comment workbench">
+    <p class="kicker">Standalone founder review workflow</p>
+    <h2>Comment directly in this review</h2>
+    <p>Comments are embedded into the saved HTML and explicitly marked for agent response.</p>
+    <div class="comment-grid">
+      <div>
+        <label for="founder-comment-anchor">Anchor section</label>
+        <select id="founder-comment-anchor"></select>
+        <label for="founder-comment-type">Comment type</label>
+        <select id="founder-comment-type"><option>Question</option><option>Change request</option><option>Concern</option><option>Approval</option></select>
+        <label for="founder-comment-body">Your comment</label>
+        <textarea id="founder-comment-body" rows="7" placeholder="Write the question or change you want addressed."></textarea>
+        <div class="actions"><button id="founder-comment-save" class="primary" type="button">Add founder comment</button><button id="founder-comment-cancel" type="button" hidden>Cancel edit</button></div>
+      </div>
+      <div>
+        <label>Selected quote</label>
+        <blockquote id="founder-comment-quote">No text selected. Highlight wording to use Comment here.</blockquote>
+        <div class="actions"><button id="founder-comment-use-selection" type="button">Use selected text</button><button id="founder-comment-clear-quote" type="button">Clear quote</button></div>
+        <div class="actions"><button id="founder-comments-save-html" class="primary" type="button">Save commented HTML</button><button id="founder-comments-export-json" type="button">Export comments JSON</button></div>
+        <p id="founder-comments-state" class="muted" aria-live="polite">No founder comments yet.</p>
+      </div>
+    </div>
+    <h3>Founder comment index <span id="founder-comment-count" class="badge">0</span></h3>
+    <div id="founder-comment-index" class="comment-index" aria-live="polite"></div>
+  </section>
+
+  <script id="founder-comments-data" type="application/json">{"schemaVersion":"founder-review-comments/v1","reportId":"eido-491-design-system-review","comments":[],"deletedIds":[]}</script>
+  <footer><p>Eido #491 · main b02e1ec3 · 2026-07-19 AEST · generated 2026-07-19</p></footer>
+</main>
+  <script>
+(() => {
+  'use strict';
+
+  const root = document.getElementById('founder-review');
+  if (!root) return;
+
+  const schemaVersion = 'founder-review-comments/v1';
+  const reportId = root.dataset.reportId;
+  const storageKey = `founder-review-comments:${reportId}`;
+  const dataNode = document.getElementById('founder-comments-data');
+  const anchorInput = document.getElementById('founder-comment-anchor');
+  const typeInput = document.getElementById('founder-comment-type');
+  const bodyInput = document.getElementById('founder-comment-body');
+  const quoteNode = document.getElementById('founder-comment-quote');
+  const saveButton = document.getElementById('founder-comment-save');
+  const cancelButton = document.getElementById('founder-comment-cancel');
+  const countNode = document.getElementById('founder-comment-count');
+  const indexNode = document.getElementById('founder-comment-index');
+  const stateNode = document.getElementById('founder-comments-state');
+
+  let pendingQuote = '';
+  let pendingAnchorId = 'executive-summary';
+  let pendingInlineTargetId = '';
+  let editingId = null;
+  let localStorageAvailable = true;
+
+  const selectionTrigger = document.createElement('button');
+  selectionTrigger.type = 'button';
+  selectionTrigger.className = 'primary selection-comment-trigger';
+  selectionTrigger.textContent = 'Comment here';
+  selectionTrigger.hidden = true;
+  selectionTrigger.dataset.exportTransient = 'true';
+  root.appendChild(selectionTrigger);
+
+  function safeJson(value) {
+    return JSON.stringify(value, null, 2).replace(/</g, '\\u003c');
+  }
+
+  function parsePayload(text) {
+    try {
+      const parsed = JSON.parse(text || '{}');
+      return {
+        schemaVersion: parsed.schemaVersion || schemaVersion,
+        reportId: parsed.reportId || reportId,
+        comments: Array.isArray(parsed.comments) ? parsed.comments : [],
+        deletedIds: Array.isArray(parsed.deletedIds) ? parsed.deletedIds : []
+      };
+    } catch (_) {
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function readLocalPayload() {
+    try {
+      return parsePayload(localStorage.getItem(storageKey) || '{}');
+    } catch (_) {
+      localStorageAvailable = false;
+      return { schemaVersion, reportId, comments: [], deletedIds: [] };
+    }
+  }
+
+  function mergePayloads(embedded, local) {
+    const deleted = new Set([...(embedded.deletedIds || []), ...(local.deletedIds || [])]);
+    const byId = new Map();
+    [...(embedded.comments || []), ...(local.comments || [])].forEach(comment => {
+      if (!comment?.id || deleted.has(comment.id)) return;
+      const prior = byId.get(comment.id);
+      const priorTime = Date.parse(prior?.updatedAt || prior?.createdAt || 0) || 0;
+      const nextTime = Date.parse(comment.updatedAt || comment.createdAt || 0) || 0;
+      if (!prior || nextTime >= priorTime) byId.set(comment.id, comment);
+    });
+    return {
+      schemaVersion,
+      reportId,
+      comments: [...byId.values()].sort((a, b) => String(a.createdAt || '').localeCompare(String(b.createdAt || ''))),
+      deletedIds: [...deleted]
+    };
+  }
+
+  let payload = mergePayloads(parsePayload(dataNode.textContent), readLocalPayload());
+
+  function anchors() {
+    return [...root.querySelectorAll('[data-review-anchor][id]')];
+  }
+
+  function anchorLabel(anchor) {
+    return anchor?.dataset.anchorLabel || anchor?.querySelector('h1,h2,h3,h4')?.textContent.trim() || anchor?.id || 'Review';
+  }
+
+  function ensureReviewUi() {
+    anchors().forEach(anchor => {
+      let tools = [...anchor.children].find(child => child.classList?.contains('annotation-tools'));
+      if (!tools) {
+        tools = document.createElement('div');
+        tools.className = 'annotation-tools';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'section-comment';
+        button.dataset.anchor = anchor.id;
+        button.textContent = 'Comment on this section';
+        const hint = document.createElement('span');
+        hint.textContent = 'Founder feedback is embedded in the returned HTML.';
+        tools.append(button, hint);
+        const heading = [...anchor.children].find(child => /^H[1-4]$/.test(child.tagName));
+        if (heading) heading.insertAdjacentElement('afterend', tools);
+        else anchor.prepend(tools);
+      }
+      let well = [...anchor.children].find(child => child.classList?.contains('section-comments'));
+      if (!well) {
+        well = document.createElement('div');
+        well.className = 'inline-comments section-comments';
+        well.dataset.commentsFor = anchor.id;
+        well.setAttribute('aria-live', 'polite');
+        anchor.appendChild(well);
+      }
+    });
+  }
+
+  function populateAnchors() {
+    const prior = anchorInput.value || pendingAnchorId;
+    anchorInput.replaceChildren();
+    anchors().forEach(anchor => {
+      const option = document.createElement('option');
+      option.value = anchor.id;
+      option.textContent = anchorLabel(anchor);
+      anchorInput.appendChild(option);
+    });
+    anchorInput.value = document.getElementById(prior) ? prior : anchorInput.options[0]?.value || '';
+    pendingAnchorId = anchorInput.value;
+  }
+
+  function persist() {
+    dataNode.textContent = safeJson(payload);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(payload));
+      localStorageAvailable = true;
+    } catch (_) {
+      localStorageAvailable = false;
+    }
+  }
+
+  function badge(text) {
+    const node = document.createElement('span');
+    node.className = 'badge';
+    node.textContent = text;
+    return node;
+  }
+
+  function commentCard(comment, indexCopy = false) {
+    const card = document.createElement('article');
+    card.className = 'card founder-comment';
+    card.setAttribute('data-founder-comment', 'true');
+    card.dataset.commentId = comment.id;
+    card.dataset.authorRole = 'FOUNDER_REVIEW_COMMENT';
+    card.dataset.requiresAgentResponse = 'true';
+    card.dataset.status = comment.status || 'open';
+    card.dataset.anchorId = comment.anchorId || '';
+    if (indexCopy) card.dataset.indexCopy = 'true';
+
+    const label = document.createElement('div');
+    label.className = 'comment-label';
+    label.append(badge('FOUNDER REVIEW COMMENT'), badge(comment.type || 'Question'), badge((comment.status || 'open').toUpperCase()));
+    const required = document.createElement('span');
+    required.textContent = 'Requires agent response';
+    label.appendChild(required);
+    card.appendChild(label);
+
+    const link = document.createElement('a');
+    link.href = `#${comment.inlineTargetId || comment.anchorId}`;
+    link.textContent = comment.anchorLabel || comment.anchorId || 'Review';
+    card.appendChild(link);
+
+    if (comment.quote) {
+      const quote = document.createElement('blockquote');
+      quote.textContent = comment.quote;
+      card.appendChild(quote);
+    }
+    const body = document.createElement('p');
+    body.className = 'founder-comment-body';
+    body.textContent = comment.body;
+    card.appendChild(body);
+    const meta = document.createElement('p');
+    meta.className = 'muted';
+    meta.textContent = `${comment.createdAt || ''}${comment.updatedAt && comment.updatedAt !== comment.createdAt ? ` · updated ${comment.updatedAt}` : ''} · ID ${comment.id}`;
+    card.appendChild(meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'comment-actions';
+    [['edit', 'Edit'], ['resolve', comment.status === 'resolved' ? 'Reopen' : 'Resolve'], ['delete', 'Delete']].forEach(([action, text]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.commentAction = action;
+      button.dataset.commentId = comment.id;
+      button.textContent = text;
+      if (action === 'delete') button.style.color = 'var(--danger)';
+      actions.appendChild(button);
+    });
+    card.appendChild(actions);
+    return card;
+  }
+
+  function insertNear(target, node) {
+    if (/^(LI|TD|TH)$/.test(target.tagName)) target.appendChild(node);
+    else target.insertAdjacentElement('afterend', node);
+  }
+
+  function inlineWell(target, targetId) {
+    let well = root.querySelector(`[data-inline-comments-for="${targetId}"]`);
+    if (!well) {
+      well = document.createElement('div');
+      well.className = 'inline-comments inline-target-comments';
+      well.dataset.inlineCommentsFor = targetId;
+      well.setAttribute('aria-live', 'polite');
+      insertNear(target, well);
+    }
+    return well;
+  }
+
+  function renderComments() {
+    root.querySelectorAll('.inline-target-comments').forEach(node => node.remove());
+    root.querySelectorAll('.section-comments').forEach(node => node.replaceChildren());
+    indexNode.replaceChildren();
+    payload.comments.forEach(comment => {
+      const anchor = document.getElementById(comment.anchorId);
+      const target = comment.inlineTargetId ? document.getElementById(comment.inlineTargetId) : null;
+      const well = target ? inlineWell(target, comment.inlineTargetId) : [...(anchor?.children || [])].find(child => child.classList?.contains('section-comments'));
+      if (well) well.appendChild(commentCard(comment));
+      indexNode.appendChild(commentCard(comment, true));
+    });
+    countNode.textContent = String(payload.comments.length);
+    if (!payload.comments.length) {
+      const empty = document.createElement('p');
+      empty.className = 'muted';
+      empty.textContent = 'No founder comments yet.';
+      indexNode.appendChild(empty);
+    }
+    stateNode.textContent = `${payload.comments.length} founder comment${payload.comments.length === 1 ? '' : 's'}${localStorageAvailable ? ' · saved locally · export HTML to return.' : ' · export HTML before closing.'}`;
+    dataNode.textContent = safeJson(payload);
+  }
+
+  function setQuote(text, anchorId, inlineTargetId = '') {
+    pendingQuote = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 1000);
+    if (anchorId && document.getElementById(anchorId)) {
+      pendingAnchorId = anchorId;
+      anchorInput.value = anchorId;
+    }
+    pendingInlineTargetId = inlineTargetId;
+    quoteNode.textContent = pendingQuote || 'No text selected. Highlight wording to use Comment here.';
+  }
+
+  function selectionBlock(element, anchor) {
+    return element?.closest?.('p,li,blockquote,td,th,pre,figure,.callout,.plain-group') || anchor;
+  }
+
+  function ensureTarget(element) {
+    if (!element.id) element.id = `founder-comment-target-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    element.dataset.founderCommentTarget = 'true';
+    return element.id;
+  }
+
+  function positionSelectionTrigger(rect) {
+    const rootRect = root.getBoundingClientRect();
+    selectionTrigger.hidden = false;
+    requestAnimationFrame(() => {
+      const left = Math.max(0, Math.min(rect.right - rootRect.left, root.clientWidth - selectionTrigger.offsetWidth));
+      selectionTrigger.style.left = `${left}px`;
+      selectionTrigger.style.top = `${Math.max(0, rect.bottom - rootRect.top + 6)}px`;
+    });
+  }
+
+  function captureSelection(moveToWorkbench = false) {
+    const selection = getSelection();
+    if (!selection || !selection.rangeCount || selection.isCollapsed) {
+      selectionTrigger.hidden = true;
+      return false;
+    }
+    const text = selection.toString().replace(/\s+/g, ' ').trim();
+    const range = selection.getRangeAt(0);
+    const node = range.startContainer;
+    const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    const anchor = element?.closest?.('[data-review-anchor][id]');
+    if (!text || !anchor || !root.contains(anchor)) return false;
+    const targetId = ensureTarget(selectionBlock(element, anchor));
+    const rects = [...range.getClientRects()];
+    setQuote(text, anchor.id, targetId);
+    if (moveToWorkbench) {
+      document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      bodyInput.focus();
+      selectionTrigger.hidden = true;
+    } else {
+      positionSelectionTrigger(rects.at(-1) || range.getBoundingClientRect());
+    }
+    return true;
+  }
+
+  function addComment(body, type, anchorId, quote, inlineTargetId) {
+    body = String(body || '').trim();
+    if (!body) return false;
+    const now = new Date().toISOString();
+    payload.comments.push({
+      id: `founder-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      authorRole: 'FOUNDER_REVIEW_COMMENT',
+      requiresAgentResponse: true,
+      reportId,
+      anchorId,
+      anchorLabel: anchorLabel(document.getElementById(anchorId)),
+      inlineTargetId: inlineTargetId || '',
+      quote: quote || '',
+      body,
+      type: type || 'Question',
+      status: 'open',
+      createdAt: now,
+      updatedAt: now
+    });
+    persist();
+    renderComments();
+    return true;
+  }
+
+  function closeInlineComposer() {
+    root.querySelector('.inline-composer')?.remove();
+  }
+
+  function openInlineComposer() {
+    closeInlineComposer();
+    const target = document.getElementById(pendingInlineTargetId) || document.getElementById(pendingAnchorId);
+    if (!target || !pendingQuote) return;
+    const composer = document.createElement('div');
+    composer.className = 'card inline-composer';
+    composer.dataset.exportTransient = 'true';
+    composer.innerHTML = '<strong>Comment on highlighted text</strong>';
+    const quote = document.createElement('blockquote');
+    quote.textContent = pendingQuote;
+    composer.appendChild(quote);
+    const fieldId = `founder-inline-comment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const typeLabel = document.createElement('label');
+    typeLabel.htmlFor = `${fieldId}-type`;
+    typeLabel.textContent = 'Comment type';
+    const type = document.createElement('select');
+    type.id = `${fieldId}-type`;
+    ['Question', 'Change request', 'Concern', 'Approval'].forEach(value => type.add(new Option(value, value)));
+    const bodyLabel = document.createElement('label');
+    bodyLabel.htmlFor = `${fieldId}-body`;
+    bodyLabel.textContent = 'Your comment';
+    const body = document.createElement('textarea');
+    body.id = `${fieldId}-body`;
+    body.placeholder = 'Write the question or change you want addressed.';
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'primary';
+    add.textContent = 'Add founder comment';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.textContent = 'Cancel';
+    actions.append(add, cancel);
+    composer.append(typeLabel, type, bodyLabel, body, actions);
+    insertNear(target, composer);
+    selectionTrigger.hidden = true;
+    body.focus();
+    add.addEventListener('click', () => {
+      if (!addComment(body.value, type.value, pendingAnchorId, pendingQuote, pendingInlineTargetId)) return body.focus();
+      closeInlineComposer();
+      getSelection()?.removeAllRanges();
+    });
+    cancel.addEventListener('click', closeInlineComposer);
+    body.addEventListener('keydown', event => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+        event.preventDefault();
+        add.click();
+      }
+    });
+  }
+
+  function resetWorkbench() {
+    editingId = null;
+    bodyInput.value = '';
+    typeInput.value = 'Question';
+    setQuote('', anchorInput.value || 'executive-summary');
+    saveButton.textContent = 'Add founder comment';
+    cancelButton.hidden = true;
+  }
+
+  function saveWorkbenchComment() {
+    const body = bodyInput.value.trim();
+    if (!body) return bodyInput.focus();
+    if (editingId) {
+      const comment = payload.comments.find(item => item.id === editingId);
+      if (!comment) return;
+      comment.anchorId = anchorInput.value;
+      comment.anchorLabel = anchorLabel(document.getElementById(anchorInput.value));
+      comment.inlineTargetId = pendingInlineTargetId || '';
+      comment.quote = pendingQuote;
+      comment.body = body;
+      comment.type = typeInput.value;
+      comment.updatedAt = new Date().toISOString();
+      persist();
+      renderComments();
+    } else if (!addComment(body, typeInput.value, anchorInput.value, pendingQuote, pendingInlineTargetId)) {
+      return;
+    }
+    resetWorkbench();
+  }
+
+  function editComment(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    editingId = id;
+    anchorInput.value = comment.anchorId;
+    typeInput.value = comment.type;
+    bodyInput.value = comment.body;
+    setQuote(comment.quote, comment.anchorId, comment.inlineTargetId || '');
+    saveButton.textContent = 'Save founder comment';
+    cancelButton.hidden = false;
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function toggleResolved(id) {
+    const comment = payload.comments.find(item => item.id === id);
+    if (!comment) return;
+    comment.status = comment.status === 'resolved' ? 'open' : 'resolved';
+    comment.updatedAt = new Date().toISOString();
+    persist();
+    renderComments();
+  }
+
+  function deleteComment(id) {
+    if (!payload.comments.some(item => item.id === id) || !confirm('Delete this founder review comment?')) return;
+    payload.comments = payload.comments.filter(item => item.id !== id);
+    if (!payload.deletedIds.includes(id)) payload.deletedIds.push(id);
+    if (editingId === id) resetWorkbench();
+    persist();
+    renderComments();
+  }
+
+  function beginSectionComment(anchorId) {
+    closeInlineComposer();
+    selectionTrigger.hidden = true;
+    anchorInput.value = anchorId;
+    setQuote('', anchorId);
+    document.getElementById('comment-workbench').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    bodyInput.focus();
+  }
+
+  function download(content, type, filename) {
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportJson() {
+    download(safeJson({ ...payload, exportedAt: new Date().toISOString() }), 'application/json;charset=utf-8', `${reportId}-founder-comments.json`);
+  }
+
+  function exportHtml() {
+    persist();
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('#founder-comments-data').textContent = safeJson(payload);
+    clone.querySelector('#founder-review').dataset.exportedWithFounderComments = new Date().toISOString();
+    clone.querySelectorAll('[data-export-transient="true"]').forEach(node => node.remove());
+    const clonedBody = clone.querySelector('#founder-comment-body');
+    if (clonedBody) clonedBody.textContent = '';
+    let marker = clone.querySelector('meta[name="founder-review-comments-schema"]');
+    if (!marker) {
+      marker = document.createElement('meta');
+      marker.name = 'founder-review-comments-schema';
+      clone.querySelector('head').appendChild(marker);
+    }
+    marker.content = schemaVersion;
+    const date = new Date().toISOString().slice(0, 10);
+    download(`<!doctype html>\n${clone.outerHTML}`, 'text/html;charset=utf-8', `${reportId}-commented-${date}.html`);
+    stateNode.textContent = `Commented HTML saved with ${payload.comments.length} embedded comment${payload.comments.length === 1 ? '' : 's'}.`;
+  }
+
+  ensureReviewUi();
+  populateAnchors();
+  renderComments();
+
+  root.addEventListener('click', event => {
+    const selectionButton = event.target.closest('.selection-comment-trigger');
+    if (selectionButton) return openInlineComposer();
+    const sectionButton = event.target.closest('.section-comment');
+    if (sectionButton) return beginSectionComment(sectionButton.dataset.anchor);
+    const actionButton = event.target.closest('[data-comment-action]');
+    if (!actionButton) return;
+    const { commentId, commentAction } = actionButton.dataset;
+    if (commentAction === 'edit') editComment(commentId);
+    if (commentAction === 'resolve') toggleResolved(commentId);
+    if (commentAction === 'delete') deleteComment(commentId);
+  });
+
+  root.addEventListener('mouseup', event => {
+    if (event.target.closest('#comment-workbench,.inline-composer,.selection-comment-trigger')) return;
+    setTimeout(() => captureSelection(false), 0);
+  });
+  anchorInput.addEventListener('change', () => {
+    pendingAnchorId = anchorInput.value;
+    pendingInlineTargetId = '';
+  });
+  saveButton.addEventListener('click', saveWorkbenchComment);
+  cancelButton.addEventListener('click', resetWorkbench);
+  document.getElementById('founder-comment-use-selection').addEventListener('click', () => captureSelection(true));
+  document.getElementById('founder-comment-clear-quote').addEventListener('click', () => setQuote('', anchorInput.value));
+  document.getElementById('founder-comments-save-html').addEventListener('click', exportHtml);
+  document.getElementById('founder-comments-export-json').addEventListener('click', exportJson);
+  bodyInput.addEventListener('keydown', event => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.preventDefault();
+      saveWorkbenchComment();
+    }
+  });
+})();
+  </script>
+</body>
+</html>

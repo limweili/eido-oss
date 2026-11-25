@@ -1,0 +1,327 @@
+[
+  {
+    "version": 1,
+    "id": "v4-living-group",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "group",
+      "groupTitle": "LIVING TREES · STABLE SCAFFOLDS + ALTERNATIVE GALLUS ROOTS",
+      "compressionPrompt": "Preserve the crown-bird split, the complete five-family galliform ladder, both incompatible Gallus topologies, the stable grey-plus-Sri-Lankan sister pair, and every source qualifier. Do not synthesize a consensus Gallus root.",
+      "position": { "x": 5272, "y": -10000 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-title",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "title",
+      "body": "Living trees · crown birds to two unresolved Gallus roots",
+      "position": { "x": 5272, "y": -60 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-crown",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Crown birds**\n\nThe least inclusive clade containing all living birds. The topology below is stable even though crown age is model-sensitive and Aves/Neornithes usage differs among authors.",
+      "position": { "x": 5300, "y": 380 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-palaeognathae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Palaeognathae**\n\nOne living crown-bird branch. It is the sister branch to Neognathae, not a stage through which neognaths evolved.",
+      "position": { "x": 5740, "y": 120 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-neognathae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Neognathae**\n\nThe living branch that divides into Neoaves and Galloanserae. Chicken history continues through Galloanserae.",
+      "position": { "x": 5740, "y": 640 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-neoaves",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Neoaves**\n\nThe large living sister radiation to Galloanserae. Its near-K–Pg diversification is chronologically model-dependent and does not sit on the chicken path.",
+      "position": { "x": 6180, "y": 480 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-galloanserae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Crown Galloanserae**\n\nThe living landfowl–waterfowl split. Latest-Cretaceous Asteriornis and Vegavis constrain nearby total-group history, while exact clock ages remain model-sensitive. [Stiller et al. 2024](https://doi.org/10.1038/s41586-024-07323-1)",
+      "position": { "x": 6180, "y": 900 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-anseriformes",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Crown Anseriformes**\n\nThe living waterfowl sibling branch. Vegavis is kept on the fossil shelf as a total-group constraint with precise crown placement still under test.",
+      "position": { "x": 6620, "y": 740 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-galliformes",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Crown Galliformes**\n\nThe living landfowl branch containing megapodes, cracids, guineafowl, New World quail, phasianids, and chickens.",
+      "position": { "x": 6620, "y": 1160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-family-root",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Five-family galliform scaffold**\n\nUCE and multigene analyses independently recover the same ladder: Megapodiidae first, then Cracidae, then Numididae, then Odontophoridae + Phasianidae. Node ages are clock estimates, not fossil observations. [Chen et al. 2021](https://doi.org/10.1186/s12862-021-01935-1); [Wang et al. 2013](https://doi.org/10.1371/journal.pone.0064312)",
+      "position": { "x": 7060, "y": 1160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-megapodiidae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Megapodiidae**\n\nMound-builders. The first living family branch in the supported galliform scaffold.",
+      "position": { "x": 7500, "y": 900 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-remain-one",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Remaining crown Galliformes · step 1**\n\nThe sister branch left after Megapodiidae separates.",
+      "position": { "x": 7500, "y": 1420 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-cracidae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Cracidae**\n\nGuans, chachalacas, and curassows. The next living family branch.",
+      "position": { "x": 7940, "y": 1160 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-remain-two",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Remaining crown Galliformes · step 2**\n\nThe sister branch left after Cracidae separates.",
+      "position": { "x": 7940, "y": 1680 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-numididae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Numididae**\n\nGuineafowl. The next living family branch.",
+      "position": { "x": 8380, "y": 1420 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-final-pair",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Final living sister pair**\n\nOdontophoridae + Phasianidae. This relationship completes the family ladder without averaging clock dates across studies.",
+      "position": { "x": 8380, "y": 1940 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-odontophoridae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Odontophoridae**\n\nNew World quail. Sister family to Phasianidae in the recovered scaffold.",
+      "position": { "x": 8820, "y": 1680 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-phasianidae",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Phasianidae**\n\nPheasants, partridges, turkeys, chickens, and close relatives. The chicken route continues through tribe Gallini.",
+      "position": { "x": 8820, "y": 2200 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-gallini",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Tribe Gallini**\n\nThe focal split here is Bambusicola + Gallus. Genome-scale work uses Bambusicola to root living Gallus. [Tiley et al. 2020](https://doi.org/10.1186/s40657-020-00194-w)",
+      "position": { "x": 9260, "y": 2200 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-bambusicola",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Bambusicola**\n\nThe sister genus used as the outgroup for the competing living-Gallus roots. Calibrated analyses place the Gallus–Bambusicola split around 15–16 Ma, as a molecular-clock estimate. [Hosner et al. 2017](https://doi.org/10.1098/rspb.2017.0210); [Wang et al. 2017](https://doi.org/10.1111/jbi.12782)",
+      "position": { "x": 9700, "y": 1940 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-gallus",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Living Gallus · four-species inventory**\n\nRed G. gallus, green G. varius, grey G. sonneratii, and Sri Lankan G. lafayettii. The inventory is stable; the first living branch is not. Cross-species gene flow means a strictly bifurcating history is also an incomplete simplification.",
+      "position": { "x": 9700, "y": 2460 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-green-first",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Hypothesis G1 · green junglefowl first**\n\n(G. varius, (G. gallus, (G. sonneratii, G. lafayettii)))\n\nRecovered across multiple genomic partitions from about 32 million aligned bases and 3,406 gene trees. One captive individual represented each non-red species, and ancient gene flow was detected. [Tiley et al. 2020](https://doi.org/10.1186/s40657-020-00194-w)",
+      "position": { "x": 10140, "y": 2200 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-red-first",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Hypothesis G2 · red junglefowl first**\n\n(G. gallus, (G. varius, (G. sonneratii, G. lafayettii)))\n\nFavored with 149 samples, more than 35 million SNPs, captive-hybrid screening, and two wild Indian grey junglefowl. Captive admixture and gene flow may distort an apparent root. [Mariadassou et al. 2021](https://doi.org/10.1016/j.ympev.2020.107044)",
+      "position": { "x": 10140, "y": 2720 }
+    }
+  },
+  { "version": 1, "id": "v4-living-id-group", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-group" }, "identity": { "preset": "green", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-living-id-crown", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-crown" }, "identity": { "preset": "blue", "fill": "body" } } },
+  { "version": 1, "id": "v4-living-id-neognathae", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-neognathae" }, "identity": { "preset": "blue", "fill": "soft" } } },
+  { "version": 1, "id": "v4-living-id-galloanserae", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-galloanserae" }, "identity": { "preset": "mint", "fill": "body" } } },
+  { "version": 1, "id": "v4-living-id-galliformes", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-galliformes" }, "identity": { "preset": "green", "fill": "body" } } },
+  { "version": 1, "id": "v4-living-id-family-root", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-family-root" }, "identity": { "preset": "green", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-living-id-phasianidae", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-phasianidae" }, "identity": { "preset": "amber", "fill": "soft" } } },
+  { "version": 1, "id": "v4-living-id-gallini", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-gallini" }, "identity": { "preset": "amber", "fill": "soft" } } },
+  { "version": 1, "id": "v4-living-id-gallus", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-gallus" }, "identity": { "preset": "orange", "fill": "body" } } },
+  { "version": 1, "id": "v4-living-id-green-first", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-green-first" }, "identity": { "preset": "purple", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-living-id-red-first", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-red-first" }, "identity": { "preset": "orchid", "fill": "pattern" } } },
+  {
+    "version": 1,
+    "id": "v4-living-member-family-root",
+    "name": "group.membership.set",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-living-family-root" }, "group": { "createdByCommandId": "v4-living-group" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-living-arrange",
+    "name": "cards.arrange",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "frames": [
+        { "card": { "createdByCommandId": "v4-living-group" }, "position": { "x": 5272, "y": 74 }, "size": { "width": 5276, "height": 2916 } },
+        { "card": { "createdByCommandId": "v4-living-title" }, "position": { "x": 5272, "y": -60 }, "size": { "width": 980, "height": 82 } },
+        { "card": { "createdByCommandId": "v4-living-crown" }, "position": { "x": 5300, "y": 380 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-palaeognathae" }, "position": { "x": 5740, "y": 120 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-neognathae" }, "position": { "x": 5740, "y": 640 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-neoaves" }, "position": { "x": 6180, "y": 480 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-galloanserae" }, "position": { "x": 6180, "y": 900 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-anseriformes" }, "position": { "x": 6620, "y": 740 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-galliformes" }, "position": { "x": 6620, "y": 1160 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-family-root" }, "position": { "x": 7060, "y": 1160 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-living-megapodiidae" }, "position": { "x": 7500, "y": 900 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-remain-one" }, "position": { "x": 7500, "y": 1420 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-cracidae" }, "position": { "x": 7940, "y": 1160 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-remain-two" }, "position": { "x": 7940, "y": 1680 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-numididae" }, "position": { "x": 8380, "y": 1420 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-final-pair" }, "position": { "x": 8380, "y": 1940 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-odontophoridae" }, "position": { "x": 8820, "y": 1680 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-phasianidae" }, "position": { "x": 8820, "y": 2200 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-gallini" }, "position": { "x": 9260, "y": 2200 }, "size": { "width": 360, "height": 220 } },
+        { "card": { "createdByCommandId": "v4-living-bambusicola" }, "position": { "x": 9700, "y": 1940 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-living-gallus" }, "position": { "x": 9700, "y": 2460 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-living-green-first" }, "position": { "x": 10140, "y": 2200 }, "size": { "width": 380, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-living-red-first" }, "position": { "x": 10140, "y": 2720 }, "size": { "width": 380, "height": 240 } }
+      ]
+    }
+  },
+  { "version": 1, "id": "v4-living-edge-crown-pala", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-crown" }, "to": { "createdByCommandId": "v4-living-palaeognathae" }, "strength": "strong", "polarity": "helps", "reason": "one living crown-bird sibling branch" } },
+  { "version": 1, "id": "v4-living-edge-crown-neo", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-crown" }, "to": { "createdByCommandId": "v4-living-neognathae" }, "strength": "strong", "polarity": "helps", "reason": "the living crown-bird branch containing chickens" } },
+  { "version": 1, "id": "v4-living-edge-neo-neoaves", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-neognathae" }, "to": { "createdByCommandId": "v4-living-neoaves" }, "strength": "strong", "polarity": "helps", "reason": "one living neognath sibling radiation" } },
+  { "version": 1, "id": "v4-living-edge-neo-gallo", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-neognathae" }, "to": { "createdByCommandId": "v4-living-galloanserae" }, "strength": "strong", "polarity": "helps", "reason": "the neognath sibling branch containing chickens" } },
+  { "version": 1, "id": "v4-living-edge-gallo-anser", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-galloanserae" }, "to": { "createdByCommandId": "v4-living-anseriformes" }, "strength": "strong", "polarity": "helps", "reason": "living waterfowl branch" } },
+  { "version": 1, "id": "v4-living-edge-gallo-galliform", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-galloanserae" }, "to": { "createdByCommandId": "v4-living-galliformes" }, "strength": "strong", "polarity": "helps", "reason": "living landfowl branch containing chickens" } },
+  { "version": 1, "id": "v4-living-edge-galliform-root", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-galliformes" }, "to": { "createdByCommandId": "v4-living-family-root" }, "strength": "strong", "polarity": "helps", "reason": "expands the independently recovered five-family scaffold" } },
+  { "version": 1, "id": "v4-living-edge-root-mega", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-family-root" }, "to": { "createdByCommandId": "v4-living-megapodiidae" }, "strength": "strong", "polarity": "helps", "reason": "first family branch" } },
+  { "version": 1, "id": "v4-living-edge-root-remain1", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-family-root" }, "to": { "createdByCommandId": "v4-living-remain-one" }, "strength": "strong", "polarity": "helps", "reason": "remaining galliform branch" } },
+  { "version": 1, "id": "v4-living-edge-remain1-crac", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-remain-one" }, "to": { "createdByCommandId": "v4-living-cracidae" }, "strength": "strong", "polarity": "helps", "reason": "next family branch" } },
+  { "version": 1, "id": "v4-living-edge-remain1-remain2", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-remain-one" }, "to": { "createdByCommandId": "v4-living-remain-two" }, "strength": "strong", "polarity": "helps", "reason": "remaining galliform branch" } },
+  { "version": 1, "id": "v4-living-edge-remain2-numid", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-remain-two" }, "to": { "createdByCommandId": "v4-living-numididae" }, "strength": "strong", "polarity": "helps", "reason": "next family branch" } },
+  { "version": 1, "id": "v4-living-edge-remain2-final", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-remain-two" }, "to": { "createdByCommandId": "v4-living-final-pair" }, "strength": "strong", "polarity": "helps", "reason": "remaining Odontophoridae-plus-Phasianidae sister pair" } },
+  { "version": 1, "id": "v4-living-edge-final-odonto", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-final-pair" }, "to": { "createdByCommandId": "v4-living-odontophoridae" }, "strength": "strong", "polarity": "helps", "reason": "one family in the final sister pair" } },
+  { "version": 1, "id": "v4-living-edge-final-phas", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-final-pair" }, "to": { "createdByCommandId": "v4-living-phasianidae" }, "strength": "strong", "polarity": "helps", "reason": "the family branch containing chickens" } },
+  { "version": 1, "id": "v4-living-edge-phas-gallini", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-phasianidae" }, "to": { "createdByCommandId": "v4-living-gallini" }, "strength": "strong", "polarity": "helps", "reason": "focuses the phasianid tree on tribe Gallini" } },
+  { "version": 1, "id": "v4-living-edge-gallini-bambu", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-gallini" }, "to": { "createdByCommandId": "v4-living-bambusicola" }, "strength": "strong", "polarity": "helps", "reason": "sister genus and rooting outgroup" } },
+  { "version": 1, "id": "v4-living-edge-gallini-gallus", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-gallini" }, "to": { "createdByCommandId": "v4-living-gallus" }, "strength": "strong", "polarity": "helps", "reason": "genus containing the domestic lineage" } },
+  { "version": 1, "id": "v4-living-edge-gallus-green", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-gallus" }, "to": { "createdByCommandId": "v4-living-green-first" }, "strength": "weak", "polarity": "helps", "reason": "one complete supported genome-scale root hypothesis" } },
+  { "version": 1, "id": "v4-living-edge-gallus-red", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-gallus" }, "to": { "createdByCommandId": "v4-living-red-first" }, "strength": "weak", "polarity": "helps", "reason": "the incompatible complete genome-scale root hypothesis" } },
+  { "version": 1, "id": "v4-living-edge-alternative-roots", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-living-green-first" }, "to": { "createdByCommandId": "v4-living-red-first" }, "strength": "weak", "polarity": "pushesAgainst", "reason": "alternative basal placements cannot be merged; both retain grey plus Sri Lankan as sisters" } }
+]

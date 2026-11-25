@@ -1,0 +1,421 @@
+/* What is left of reach as a visual surface. The panel that used to own this
+   module is gone (ADR 0033): reach now happens inside a run, not in a drawer.
+   What survives is provenance, which belongs to the Card that carries it. */
+
+/* A Note read from the web wears its origin quietly: the source belongs to the
+   card, not to the reading of it. */
+.web-source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--e-ink-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The CLI terminal is a statement, not a switch. It stands in the Card foot
+   among the run keys now (#960), so it uses the same compact square geometry
+   and selected go treatment as the neighboring reach key. The accessible name
+   and tooltip carry the statement for anyone who needs it. */
+.agent-chip {
+  width: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: var(--e-r-chip);
+  border: 1px solid var(--e-go);
+  justify-content: center;
+  padding-inline: 0;
+}
+
+/* The working globe. Pressed is reach promised, not reach running, so it takes
+   the still go tint an on-chip wears rather than any motion: the state must be
+   legible without a hover, and colour is the quietest thing that is. */
+.reach-toggle[data-pressed='true'],
+.web-reach-toggle[data-pressed='true'] {
+  border-color: var(--e-go);
+  background: color-mix(in srgb, var(--e-go) 12%, var(--e-wash-base));
+  color: var(--e-go-ink);
+}
+.reach-toggle[data-pressed='true']:hover:not(:disabled),
+.web-reach-toggle[data-pressed='true']:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--e-go) 20%, var(--e-wash-base));
+}
+/* Pressed already wears the go border the focus grammar relies on, so focus
+   gets the borderless-focus ring instead of vanishing into it. */
+.reach-toggle[data-pressed='true']:focus-visible,
+.web-reach-toggle[data-pressed='true']:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 2px;
+}
+/* The working globe is a positive latched key, so its Web state uses the
+   shared go-selected icon treatment from primitives. Research overrides that
+   treatment below because it arms a longer, consequential job. */
+
+/* Research armed. The same globe steps out of the go family into attention,
+   the hue reserved for "needs your eye": Off and Web are one weight of
+   decision and share the toggle grammar above, while Research arms a job
+   that runs for minutes and cannot be called back. Colour is not the only
+   carrier: the accessible name says which state is on, and the callout below
+   the Card body carries the words for what the hue means. 18% is attention's
+   own wash depth, the deepest its ink twin still reads on; hover deepens the
+   mix the way the go tint's hover does, verified at 4.85:1 by day and 4.68:1
+   at night so the glyph never dips under the floor mid-hover. */
+.reach-toggle,
+.web-reach-toggle {
+  position: relative;
+}
+.reach-toggle.reach-toggle--research,
+.web-reach-toggle.web-reach-toggle--research {
+  border-color: var(--e-attention);
+  background: color-mix(in srgb, var(--e-attention) 18%, var(--e-wash-base));
+  color: var(--e-attention-ink);
+}
+.reach-toggle.reach-toggle--research:hover:not(:disabled),
+.web-reach-toggle.web-reach-toggle--research:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--e-attention) 24%, var(--e-wash-base));
+}
+/* Attention already owns the border, so focus takes the borderless-focus go
+   ring, exactly as the pressed go state above does. */
+.reach-toggle.reach-toggle--research:focus-visible,
+.web-reach-toggle.web-reach-toggle--research:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 2px;
+}
+/* The research note arrives the way every newcomer in this module does: a
+   short rise and fade on the enter beat. Layout underneath moves instantly,
+   per the charter; only the newcomer travels. Under reduced motion the
+   duration token collapses and it simply appears. */
+.reach-note {
+  animation: reach-note-enter var(--e-t-fast) var(--e-ease-out);
+}
+@keyframes reach-note-enter {
+  from {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+}
+
+/* The depth choice inside the research question (#971): one segmented control
+   under the sentence, cheapest first, with the price of the chosen size
+   standing beside it.
+
+   Segmented, because this is one question with four answers and the control
+   already means that. Its selected cell is a solid ink pill, which is the
+   state grammar's own selected treatment (SYSTEM.md §7) and what Settings
+   uses for reasoning. The four keys wore an attention tint before and it was
+   not loud enough: the callout under them is already an attention wash, so a
+   tint on a tint read as "one of these is slightly warmer" rather than "this
+   one" (founder report 2026-08-18).
+
+   The price is standing text, not a tooltip. A tooltip is drawn on the
+   document rather than in the Card, so on a coloured Card it arrived as a
+   black pill from another world, and it covered the sentence it was there to
+   explain. */
+/* The keys and the price share a line while there is room for one, and the
+   price takes its own line when there is not. A Card is resizable down to a
+   width narrower than the two of them together, so the narrow case is the
+   ordinary case, not a corner of it. */
+.reach-depths {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-top: var(--e-sp-2);
+  min-width: 0;
+}
+/* One width for all four cells. They are a scale, and a scale whose keys are
+   different widths stops reading as one: XL is two characters and sat wider
+   than the three beside it. One width, not one fixed width: the cells shrink
+   together on a narrow Card, so they stay a scale at every size instead of
+   holding 34px and pushing the control out of the callout. */
+.reach-depth-pick {
+  inline-size: 136px;
+  max-inline-size: 100%;
+}
+/* The cells divide the control rather than each holding a length, so they are
+   equal at every width. A length here does not survive: a flex container sizes
+   itself from what its items could shrink to, so four cells asking for 34px
+   each collapsed the control to the width of four letters. */
+.reach-depth-pick .e-segmented__option {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  padding-inline: 0;
+  text-align: center;
+}
+.reach-depth-cost {
+  min-width: 0;
+  color: var(--identity-body-attention-ink, var(--e-attention-ink));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* The sentence wraps to whatever the Card is; a run of characters with no
+   break in it breaks rather than reaching past the well it is written in. */
+.reach-note-words {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* The trail of what a run looked up. Quiet by construction: it sits above an
+   answer nobody is reading it instead of, so it takes soft ink, no fill, and no
+   border of its own. The one line it does draw is the rule between it and the
+   answer below, which is the only thing the reader needs it to say when the
+   answer is there. */
+.tool-trail {
+  margin: 0 0 var(--e-sp-2);
+  font-size: var(--e-fs-micro);
+  color: var(--e-ink-soft);
+  /* Lets the open height animate to `auto` instead of jumping to it. Inherited,
+     so it is declared once here for everything the disclosure moves. */
+  interpolate-size: allow-keywords;
+}
+
+/* The browser's own disclosure triangle is the one shape on this Card nobody
+   chose, and the engine draws it three different ways. All three are turned off
+   here: `display` on the summary drops the list-item box that carries `::marker`,
+   `list-style` covers the engines that keep it anyway, and the -webkit- rule
+   covers the older form still shipped in embedded Chromium. */
+.tool-trail__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+  padding-block: var(--e-sp-1);
+  cursor: pointer;
+  color: var(--e-ink-faint);
+  list-style: none;
+  transition: color var(--e-t-fast) var(--e-ease-out);
+}
+.tool-trail__summary::marker,
+.tool-trail__summary::-webkit-details-marker {
+  content: '';
+  display: none;
+}
+.tool-trail__summary:hover,
+.tool-trail__summary:focus-visible {
+  color: var(--e-ink-soft);
+}
+/* The chevron turns rather than swapping shape, so the control shows which way
+   the trail is about to move. */
+.tool-trail__chevron {
+  flex: none;
+  transition: transform var(--e-t-move) var(--e-ease-out);
+}
+.tool-trail[open] .tool-trail__chevron {
+  transform: rotate(180deg);
+}
+/* The trail opens as a movement, not a jump: height eases open while the rows
+   fade in just behind it, so the answer below is pushed down rather than
+   displaced. `content-visibility` rides the same transition so the closing
+   half does not vanish on frame one.
+   Under reduced motion every duration token collapses to a millisecond, which
+   turns this back into the instant open it replaced. */
+.tool-trail::details-content {
+  block-size: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    block-size var(--e-t-move) var(--e-ease-out),
+    opacity var(--e-t-move) var(--e-ease-out),
+    content-visibility var(--e-t-move) allow-discrete;
+}
+.tool-trail[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+/* No rail runs down these steps. One was drawn and then removed: the only line
+   weight the system permits for structure is invisible at the size a Card is
+   actually read at, and the weight above it is reserved for interactive
+   boundaries, which a decorative stroke is not. The icons already stand in a
+   column, and the column is the grouping. The opened drawer's aside rule
+   further down is a different thing: an inset a reader asked for by pressing,
+   not a standing decoration. */
+.tool-trail__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  margin: 0;
+  list-style: none;
+}
+/* A row is two things now (#966): the line, and a drawer beneath it. The line
+   keeps the old row grammar; the item just stacks them. */
+.tool-trail__step {
+  display: block;
+  min-width: 0;
+}
+.tool-trail__step-line {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  min-width: 0;
+}
+/* The chevron that offers the rest of a row (#966). Every row carries the same
+   affordance, but it shows itself only under the pointer, the focus, or an
+   open drawer: a column of standing chevrons would out-shout the steps they
+   serve. It turns rather than swapping shape, the same move the trail's own
+   summary makes, so one grammar says "this opens" everywhere in the trail. */
+.tool-trail__reveal {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  margin-inline-start: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--e-ink-faint);
+  opacity: 0;
+  transition:
+    opacity var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out);
+}
+/* The line is the control now, so the chevron is a sign rather than a target:
+   it brightens with the row it belongs to and never answers a press of its
+   own. A row that can open takes the whole width so the press lands anywhere
+   along it, and keeps the line's own type and colour: it reads as a line of
+   the trail, not as a button parked in one. */
+.tool-trail__step-line--pressable {
+  appearance: none;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.tool-trail__step-line--pressable:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 2px;
+  border-radius: var(--e-r-sm);
+}
+.tool-trail__step-line--pressable:hover .tool-trail__reveal,
+.tool-trail__step-line--pressable:focus-visible .tool-trail__reveal,
+.tool-trail__step-line--pressable[aria-expanded='true'] .tool-trail__reveal {
+  opacity: 1;
+}
+.tool-trail__step-line--pressable:hover .tool-trail__what {
+  color: var(--e-ink-soft);
+}
+.tool-trail__reveal svg {
+  transition: transform var(--e-t-move) var(--e-ease-out);
+}
+.tool-trail__step-line--pressable[aria-expanded='true'] .tool-trail__reveal svg {
+  transform: rotate(180deg);
+}
+/* The drawer opens as a movement: grid rows from nothing to content size,
+   which animates to an unmeasured height the way the trail's own disclosure
+   does, with the passage fading in just behind the move. Under reduced motion
+   every duration token collapses to a millisecond, which makes this the
+   instant open it would otherwise have to be. */
+.tool-trail__step-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--e-t-move) var(--e-ease-out),
+    opacity var(--e-t-move) var(--e-ease-out);
+}
+.tool-trail__step-drawer[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.tool-trail__step-body {
+  min-height: 0;
+  overflow: hidden;
+}
+/* The opened passage stands behind a hairline rule, indented to the labels so
+   it reads as the line's own aside. The rule stands under the icon column,
+   one spacing step in, which puts it within a pixel of the icon's centre and
+   keeps the margin on the ladder; the padding beside it carries the text back
+   to where it was. --e-line is the structural hairline, which an aside's edge
+   is. The ladder has no size below micro, so
+   the quieter voice comes from fainter ink instead of a smaller face. The
+   passage is the model's question, address, or words, never page text, and it
+   keeps its own line breaks because a thinking passage is prose. */
+.tool-trail__step-passage {
+  margin: var(--e-sp-1) 0;
+  margin-inline-start: var(--e-sp-1);
+  padding-inline-start: calc(var(--e-sp-2) + 7px);
+  border-inline-start: 1px solid var(--e-line);
+  color: var(--e-ink-faint);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* The count the trail is not drawing yet. It carries no icon, because nothing
+   happened at this line: it is the trail admitting its own edge, and offering
+   to stop being at it. Indented to the step labels, not the icons, because it
+   belongs to the list rather than standing in it. */
+.tool-trail__step--rest {
+  padding-inline-start: calc(var(--e-sp-4) + var(--e-sp-1));
+}
+.tool-trail__more {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--e-ink-faint);
+  cursor: pointer;
+  transition: color var(--e-t-fast) var(--e-ease-out);
+}
+.tool-trail__more:hover,
+.tool-trail__more:focus-visible {
+  color: var(--e-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* The kind icon only: the reveal chevron colours with its button, so it stays
+   out of this rule by the child combinator. */
+.tool-trail__step-line > svg {
+  flex: none;
+  color: var(--e-ink-faint);
+}
+/* A step reads at the same weight as the trail's own summary above it: the
+   trail is provenance the reader consults, not a column of announcements
+   competing with the answer beside it. The row darkens under the pointer, the
+   same move the summary makes, so what is about to open says so. */
+.tool-trail__what {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--e-ink-faint);
+  transition: color var(--e-t-fast) var(--e-ease-out);
+}
+/* A page the model read is a place the reader can go, but the trail is
+   provenance rather than an invitation: the link stays the colour of its
+   neighbours until a pointer asks. */
+.tool-trail__link {
+  color: inherit;
+  text-decoration: none;
+}
+.tool-trail__link:hover,
+.tool-trail__link:focus-visible {
+  color: var(--e-go-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* The drawer's address is the one passage that is also a link. It stays the
+   aside it sits in: a block, so the rule beside it runs the height of the
+   address, and the same quiet ink as any other passage until a pointer asks.
+   Element-qualified so it outranks the link colour above it. */
+a.tool-trail__step-passage {
+  display: block;
+  color: var(--e-ink-faint);
+}
+a.tool-trail__step-passage:hover,
+a.tool-trail__step-passage:focus-visible {
+  color: var(--e-go-ink);
+}
+/* Indented one step, so the icon column starts where the summary's own words do
+   and the steps read as that line's children. Set on the steps rather than on
+   the open state, so neither the indent nor the gap snaps away on the first
+   frame of closing.
+   No scrolling window and no height cap, in either phase. A reader who opens a
+   trail while the run is still working has asked to watch it work, and a clipped
+   list is the opposite of that. */
+.tool-trail__steps {
+  padding-inline-start: var(--e-sp-4);
+  padding-block-end: var(--e-sp-1);
+}

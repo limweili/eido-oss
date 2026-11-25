@@ -1,0 +1,85 @@
+# ci-class: experimental
+name: Image rendition candidate evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-rendition-candidate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    name: Image rendition candidate evidence (experimental)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the exact branch head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify resolver, React boundary, compatibility, and evidence contract
+        run: >-
+          npx vitest run
+          src/shared/imageRenditions.test.ts
+          src/shared/imageCompression.test.ts
+          src/canvas/cards/CardAssets.test.tsx
+          src/graph/cardAssetCompat.test.ts
+          src/performance/imageRenditionCandidate.test.ts
+          --reporter=verbose
+
+      - name: Probe one bounded traversal (non-evidence)
+        env:
+          VITE_EIDO_IMAGE_RENDITION_CANDIDATE: '1'
+          EIDO_IMAGE_RENDITION_MODE: probe
+        run: >-
+          npx playwright test
+          --config playwright.performance.config.ts
+          src/performance/imageRenditionCandidate.perf.ts
+
+      - name: Capture repeated candidate evidence
+        env:
+          VITE_EIDO_IMAGE_RENDITION_CANDIDATE: '1'
+          EIDO_IMAGE_RENDITION_MODE: capture
+          EIDO_IMAGE_RENDITION_ARTIFACT: artifacts/imageRenditionCandidate.raw.json
+        run: >-
+          npx playwright test
+          --config playwright.performance.config.ts
+          src/performance/imageRenditionCandidate.perf.ts
+
+      - name: Regenerate and verify the candidate report
+        env:
+          EIDO_IMAGE_RENDITION_REPORT_ARTIFACT: artifacts/imageRenditionCandidate.raw.json
+          EIDO_IMAGE_RENDITION_REPORT_PATH: artifacts/image-rendition-candidate.md
+        run: >-
+          npx vitest run
+          src/performance/imageRenditionCandidateReport.perf.test.ts
+          --reporter=verbose
+
+      - name: Preserve current-head raw evidence and report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: image-rendition-candidate-${{ github.sha }}
+          path: |
+            artifacts/imageRenditionCandidate.raw.json
+            artifacts/image-rendition-candidate.md
+            playwright-report/
+            test-results/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,273 @@
+{
+  "slider": {
+    "version": 1,
+    "kind": "slider",
+    "title": "EVIDENCE THRESHOLD",
+    "identity": "amber",
+    "treatment": "Treat this evidence threshold as a hard calibration for every claim.",
+    "state": {
+      "steps": 4,
+      "stops": ["exploratory", "plausible", "supported", "strong", "decisive"],
+      "items": [
+        {
+          "label": "Minimum support",
+          "v": 75,
+          "frame": "Prefer claims supported by multiple primary lines; label anything weaker explicitly."
+        }
+      ]
+    }
+  },
+  "dial": {
+    "version": 1,
+    "kind": "dial",
+    "title": "ANCESTOR LANGUAGE",
+    "identity": "orange",
+    "treatment": "Calibrate how literally the answer may describe fossils as ancestors.",
+    "state": {
+      "steps": 4,
+      "stops": ["ladder", "loose", "careful", "strict", "cladistic"],
+      "items": [
+        {
+          "label": "Direct-ancestor caution",
+          "v": 100,
+          "frame": "Treat named fossils as side relatives unless direct ancestry is specifically demonstrated."
+        }
+      ]
+    }
+  },
+  "count": {
+    "version": 1,
+    "kind": "count",
+    "title": "PRIMARY SOURCES",
+    "identity": "blue",
+    "treatment": "Meet the requested source count without inventing citations.",
+    "state": {
+      "mode": "number",
+      "steps": 5,
+      "items": [
+        {
+          "label": "Minimum primary DOI links",
+          "n": 4,
+          "frame": "Name at least this many relevant primary papers already present in the connected evidence."
+        }
+      ]
+    }
+  },
+  "switch": {
+    "version": 1,
+    "kind": "switch",
+    "title": "SHOW LIVE ALTERNATIVES",
+    "identity": "purple",
+    "treatment": "Keep unresolved branches visible instead of averaging them away.",
+    "state": {
+      "items": [
+        {
+          "label": "State incompatible hypotheses",
+          "on": true,
+          "frame": "Show each supported alternative completely and say what evidence would discriminate between them."
+        },
+        {
+          "label": "Preserve invariant conclusions",
+          "on": true,
+          "frame": "Separate conclusions that survive every live alternative from those that change."
+        }
+      ]
+    }
+  },
+  "pad": {
+    "version": 1,
+    "kind": "pad",
+    "title": "SCOPE × CAUTION",
+    "identity": "sky",
+    "treatment": "Balance breadth against evidential caution using both axes together.",
+    "state": {
+      "steps": 4,
+      "axes": {
+        "x": {
+          "label": "Scope",
+          "lo": "single claim",
+          "hi": "whole system",
+          "frame": "Move from a local datum toward its consequences for the whole chicken-history model."
+        },
+        "y": {
+          "label": "Caution",
+          "lo": "hypothesis-generating",
+          "hi": "decision-grade",
+          "frame": "Raise the burden of identity, date type, sampling, and directionality before asserting a conclusion."
+        }
+      },
+      "v": {
+        "x": 80,
+        "y": 90
+      }
+    }
+  },
+  "select": {
+    "version": 1,
+    "kind": "select",
+    "title": "ANSWER SHAPE",
+    "identity": "mint",
+    "treatment": "Use the selected structure for the final synthesis.",
+    "state": {
+      "picked": 1,
+      "options": [
+        {
+          "label": "Narrative",
+          "frame": "Write a chronological narrative with explicit caveats."
+        },
+        {
+          "label": "Claim–evidence–caveat–test",
+          "frame": "For each conclusion give the claim, best evidence, strongest caveat, and deciding next test."
+        },
+        {
+          "label": "Decision table",
+          "frame": "Compare alternatives in a compact decision table."
+        }
+      ]
+    }
+  },
+  "order": {
+    "version": 1,
+    "kind": "order",
+    "title": "SYNTHESIS PRIORITY",
+    "identity": "green",
+    "treatment": "Respect this ordering when allocating attention and words.",
+    "state": {
+      "items": [
+        {
+          "label": "Stable topology",
+          "frame": "Begin with the nesting that is robust across analyses."
+        },
+        {
+          "label": "Network and domestication",
+          "frame": "Then explain gene flow and the difference between source ancestry and a human event."
+        },
+        {
+          "label": "Uncertainty and next tests",
+          "frame": "Finish with live alternatives and the cheapest decisive observations."
+        }
+      ],
+      "perm": [0, 1, 2],
+      "frame": "Do not let a disputed oldest-known claim displace the stable evolutionary scaffold."
+    }
+  },
+  "filter": {
+    "version": 1,
+    "kind": "filter",
+    "title": "CLAIM ADMISSION",
+    "identity": "red",
+    "treatment": "Filter claims by identity, dating, and directionality before they enter the synthesis.",
+    "state": {
+      "steps": 4,
+      "stops": ["none", "weak", "mixed", "strong", "direct"],
+      "lanes": [
+        {
+          "label": "Taxon or specimen identity",
+          "mode": "at-least",
+          "lo": 75,
+          "hi": 100,
+          "frame": "Require comparative morphology, CT, ZooMS, DNA, or a clearly stated combined method."
+        },
+        {
+          "label": "Chronology",
+          "mode": "at-least",
+          "lo": 50,
+          "hi": 100,
+          "frame": "Name whether the date is a fossil occurrence, clock, demographic split, associated phase, or direct AMS."
+        },
+        {
+          "label": "Arrow direction",
+          "mode": "between",
+          "lo": 50,
+          "hi": 100,
+          "frame": "Draw a directional introgression arrow only when donor and recipient direction are supported."
+        }
+      ]
+    }
+  },
+  "mixer": {
+    "version": 1,
+    "kind": "mixer",
+    "title": "EVIDENCE MIX",
+    "identity": "coral",
+    "treatment": "Blend disciplines in these proportions without treating unlike date types as interchangeable.",
+    "state": {
+      "frame": "Triangulate rather than averaging incompatible measurements.",
+      "items": [
+        {
+          "label": "Phylogenomics and fossils",
+          "v": 40,
+          "frame": "Use topology, character combinations, stratigraphy, and clock sensitivity."
+        },
+        {
+          "label": "Population genomics",
+          "v": 30,
+          "frame": "Use sampling, demographic models, local ancestry, and direction caveats."
+        },
+        {
+          "label": "Archaeology and biomolecules",
+          "v": 30,
+          "frame": "Use context, direct dates, ZooMS, isotopes, age profiles, and depositional evidence."
+        }
+      ]
+    }
+  },
+  "radar": {
+    "version": 1,
+    "kind": "radar",
+    "title": "AUDIT COVERAGE",
+    "identity": "orchid",
+    "treatment": "Make weak audit dimensions visible rather than hiding them in fluent prose.",
+    "state": {
+      "steps": 4,
+      "axes": [
+        {
+          "label": "Primary-source traceability",
+          "v": 100,
+          "frame": "Tie every material claim to a connected primary source."
+        },
+        {
+          "label": "Alternative hypotheses",
+          "v": 75,
+          "frame": "Represent each live topology or interpretation completely."
+        },
+        {
+          "label": "Sampling limitations",
+          "v": 75,
+          "frame": "Name geography, sample type, captive status, preservation, and missing reference panels."
+        },
+        {
+          "label": "Decisive tests",
+          "v": 100,
+          "frame": "End each uncertainty with the observation most likely to change the conclusion."
+        }
+      ]
+    }
+  },
+  "matrix": {
+    "version": 1,
+    "kind": "matrix",
+    "title": "CLAIM × EVIDENCE STATUS",
+    "identity": "charcoal",
+    "treatment": "Use the matrix to distinguish what is observed, modeled, and unresolved.",
+    "state": {
+      "steps": 3,
+      "stepNames": ["absent", "indirect", "direct"],
+      "rows": [
+        {"label": "Deep and living topology"},
+        {"label": "Domestication and dispersal"},
+        {"label": "Oldest-known claims"}
+      ],
+      "cols": [
+        {"label": "Identity"},
+        {"label": "Chronology"},
+        {"label": "Direction or causality"}
+      ],
+      "cells": [
+        [2, 1, 1],
+        [2, 1, 1],
+        [1, 1, 0]
+      ]
+    }
+  }
+}

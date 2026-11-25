@@ -1,0 +1,211 @@
+[
+  {
+    "version": 1,
+    "id": "v4-fossil-group",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "group",
+      "groupTitle": "FOSSIL SIDE SHELF · MOSAICS, NOT ANCESTORS",
+      "compressionPrompt": "Keep every fossil as a side relative or chronological constraint. Preserve anatomical uncertainty, fossil-versus-clock distinctions, current placement qualifiers, and all DOI links.",
+      "position": { "x": 52, "y": -10000 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-title",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "title",
+      "body": "Fossil side shelf · character combinations, not a ladder",
+      "position": { "x": 52, "y": 800 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-rule",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Shelf rule**\n\nEvery named taxon here is a side relative, branch sample, or minimum-age constraint. None is asserted to be a direct chicken ancestor. Compare character combinations and placement confidence; do not connect these cards into a smooth ancestor chain.",
+      "position": { "x": 80, "y": 1100 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-teleocrater",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Teleocrater rhadinus · Middle Triassic**\n\nAn aphanosaur near the base of Avemetatarsalia and outside Ornithodira. Its crocodile-like ankle and body proportions show that early bird-line archosaurs did not already resemble small cursorial dinosaurs. [Nesbitt et al. 2017](https://doi.org/10.1038/nature22037)",
+      "position": { "x": 520, "y": 1100 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-flight-experiments",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Microraptor + Anchiornis · paravian flight experiments**\n\nMicroraptor preserves four long-feathered limb surfaces outside Avialae. Anchiornis preserves extensive pennaceous feathers, while its exact paravian placement varies. Neither fossil alone identifies one origin of flight. [Xu et al. 2003](https://doi.org/10.1038/nature01342); [Hu et al. 2009](https://doi.org/10.1038/nature08322)",
+      "position": { "x": 960, "y": 1100 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-archaeopteryx",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Archaeopteryx · a mosaic, not ‘the first bird’**\n\nBone geometry supports active flapping unlike the living-bird stroke. The Chicago specimen adds palate, soft-tissue, and tertiary-feather detail; feeding-apparatus work adds a functional hypothesis, not observed behavior. [Voeten et al. 2018](https://doi.org/10.1038/s41467-018-03296-8); [O’Connor et al. 2025](https://doi.org/10.1038/s41586-025-08912-4); [O’Connor et al. 2026](https://doi.org/10.1016/j.xinn.2025.101086)",
+      "position": { "x": 1400, "y": 1100 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-tail-test",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**Late Jurassic tail test**\n\nCurrent best sequence: caudal count and proportional tail length declined before terminal vertebrae fused. Zhengheornis securely demonstrates the shortened, unfused stage. Whether a true pygostyle was already present depends on the disputed Baminornis element.",
+      "position": { "x": 1840, "y": 1100 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-zhengheornis",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Zhengheornis buyu · secure side branch**\n\nLate Jurassic avialan with 15 shortened caudal vertebrae and no pygostyle, estimated at roughly 74–163 g. This directly supports tail reduction before terminal fusion; it is not a chicken ancestor. [Wang et al. 2026](https://doi.org/10.1126/sciadv.aeb5202)",
+      "position": { "x": 2280, "y": 980 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-baminornis",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Baminornis zhenghensis? · contested side branch**\n\nThe 2025 description interpreted a fused terminal structure as the oldest avialan pygostyle. Comparative work raised a live alternative: the element may be synsacrum rather than fused tail vertebrae. Keep ‘oldest pygostyle’ conditional pending CT and independent coding. [Chen et al. 2025](https://doi.org/10.1038/s41586-024-08410-z); [Huang et al. 2026](https://doi.org/10.1016/j.cretres.2025.106244)",
+      "position": { "x": 2280, "y": 1340 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-navaornis",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Navaornis hestiae · enantiornithine experiment**\n\nIts three-dimensional braincase combines ancestral and derived features. Enantiornithines were a successful Cretaceous radiation outside the living-bird line, showing that modern-looking traits were recombined on extinct branches. [Chiappe et al. 2024](https://doi.org/10.1038/s41586-024-08114-4)",
+      "position": { "x": 2720, "y": 1100 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-kpg-filter",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "**K–Pg ecological filter · model**\n\nGlobal forest collapse may have favored ground-associated crown-bird survivors, followed by repeated arboreal re-evolution. Body size, development, diet, geography, and sampling remain possible co-causes. [Field et al. 2018](https://doi.org/10.1016/j.cub.2018.04.062)",
+      "position": { "x": 3160, "y": 1100 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-asteriornis",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Asteriornis maastrichtensis · 66.8–66.7 Ma**\n\nA latest-Cretaceous bird with galliform-like and anseriform-like cranial traits, recovered close to the galloanseran split. It constrains near-crown presence before K–Pg; it is neither the first galloanseran nor a direct chicken ancestor. [Field et al. 2020](https://doi.org/10.1038/s41586-020-2096-0)",
+      "position": { "x": 3600, "y": 980 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-vegavis",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Vegavis iaai · placement with versioned status**\n\nA Late Cretaceous waterfowl-total-group bird. Crown-waterfowl placement was proposed in 2005, questioned in 2018, and strengthened by a nearly complete skull in 2025; precise position relative to crown Anseriformes remains worth testing. [Clarke et al. 2005](https://doi.org/10.1038/nature03150); [Mayr et al. 2018](https://doi.org/10.1016/j.cretres.2018.02.013); [Torres et al. 2025](https://doi.org/10.1038/s41586-024-08390-0)",
+      "position": { "x": 3600, "y": 1340 }
+    }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-gallinuloides",
+    "name": "card.create",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "kind": "note",
+      "body": "† **Gallinuloides wyomingensis · early Eocene**\n\nA stem galliform that helps polarize characters near the crown. It is not a crown phasianid and not an ancestral chicken. [Ksepka 2009](https://doi.org/10.1111/j.1096-0031.2009.00250.x)",
+      "position": { "x": 4040, "y": 1100 }
+    }
+  },
+  { "version": 1, "id": "v4-fossil-id-group", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-group" }, "identity": { "preset": "amber", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-fossil-id-rule", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-rule" }, "identity": { "preset": "charcoal", "fill": "soft" } } },
+  { "version": 1, "id": "v4-fossil-id-teleocrater", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-teleocrater" }, "identity": { "preset": "slate", "fill": "soft" } } },
+  { "version": 1, "id": "v4-fossil-id-flight", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-flight-experiments" }, "identity": { "preset": "blue", "fill": "soft" } } },
+  { "version": 1, "id": "v4-fossil-id-archaeopteryx", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-archaeopteryx" }, "identity": { "preset": "sky", "fill": "soft" } } },
+  { "version": 1, "id": "v4-fossil-id-tail-test", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-tail-test" }, "identity": { "preset": "amber", "fill": "body" } } },
+  { "version": 1, "id": "v4-fossil-id-zhengheornis", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-zhengheornis" }, "identity": { "preset": "mint", "fill": "body" } } },
+  { "version": 1, "id": "v4-fossil-id-baminornis", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-baminornis" }, "identity": { "preset": "coral", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-fossil-id-navaornis", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-navaornis" }, "identity": { "preset": "purple", "fill": "soft" } } },
+  { "version": 1, "id": "v4-fossil-id-kpg", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-kpg-filter" }, "identity": { "preset": "charcoal", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-fossil-id-asteriornis", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-asteriornis" }, "identity": { "preset": "green", "fill": "soft" } } },
+  { "version": 1, "id": "v4-fossil-id-vegavis", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-vegavis" }, "identity": { "preset": "green", "fill": "pattern" } } },
+  { "version": 1, "id": "v4-fossil-id-gallinuloides", "name": "card.set-identity", "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-gallinuloides" }, "identity": { "preset": "mint", "fill": "soft" } } },
+  {
+    "version": 1,
+    "id": "v4-fossil-member-rule",
+    "name": "group.membership.set",
+    "payload": { "ideaId": "IDEA_ID", "card": { "createdByCommandId": "v4-fossil-rule" }, "group": { "createdByCommandId": "v4-fossil-group" } }
+  },
+  {
+    "version": 1,
+    "id": "v4-fossil-arrange",
+    "name": "cards.arrange",
+    "payload": {
+      "ideaId": "IDEA_ID",
+      "frames": [
+        { "card": { "createdByCommandId": "v4-fossil-group" }, "position": { "x": 52, "y": 934 }, "size": { "width": 4376, "height": 676 } },
+        { "card": { "createdByCommandId": "v4-fossil-title" }, "position": { "x": 52, "y": 800 }, "size": { "width": 820, "height": 82 } },
+        { "card": { "createdByCommandId": "v4-fossil-rule" }, "position": { "x": 80, "y": 1100 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-teleocrater" }, "position": { "x": 520, "y": 1100 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-flight-experiments" }, "position": { "x": 960, "y": 1100 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-archaeopteryx" }, "position": { "x": 1400, "y": 1100 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-tail-test" }, "position": { "x": 1840, "y": 1100 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-zhengheornis" }, "position": { "x": 2280, "y": 980 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-baminornis" }, "position": { "x": 2280, "y": 1340 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-navaornis" }, "position": { "x": 2720, "y": 1100 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-kpg-filter" }, "position": { "x": 3160, "y": 1100 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-asteriornis" }, "position": { "x": 3600, "y": 980 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-vegavis" }, "position": { "x": 3600, "y": 1340 }, "size": { "width": 360, "height": 240 } },
+        { "card": { "createdByCommandId": "v4-fossil-gallinuloides" }, "position": { "x": 4040, "y": 1100 }, "size": { "width": 360, "height": 240 } }
+      ]
+    }
+  },
+  { "version": 1, "id": "v4-fossil-edge-rule-teleocrater", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-rule" }, "to": { "createdByCommandId": "v4-fossil-teleocrater" }, "strength": "weak", "polarity": "helps", "reason": "early bird-line character sample; not direct ancestry" } },
+  { "version": 1, "id": "v4-fossil-edge-rule-flight", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-rule" }, "to": { "createdByCommandId": "v4-fossil-flight-experiments" }, "strength": "weak", "polarity": "helps", "reason": "neighboring paravian experiments broaden the character comparison" } },
+  { "version": 1, "id": "v4-fossil-edge-flight-archaeopteryx", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-flight-experiments" }, "to": { "createdByCommandId": "v4-fossil-archaeopteryx" }, "strength": "weak", "polarity": "helps", "reason": "comparative aerodynamic mosaics across neighboring branches; no ancestor chain implied" } },
+  { "version": 1, "id": "v4-fossil-edge-rule-tail", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-rule" }, "to": { "createdByCommandId": "v4-fossil-tail-test" }, "strength": "weak", "polarity": "helps", "reason": "opens a side-branch character test rather than a lineage rung" } },
+  { "version": 1, "id": "v4-fossil-edge-zheng-tail", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-zhengheornis" }, "to": { "createdByCommandId": "v4-fossil-tail-test" }, "strength": "strong", "polarity": "helps", "reason": "secure shortened unfused tail supports reduction before fusion" } },
+  { "version": 1, "id": "v4-fossil-edge-bamin-tail", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-baminornis" }, "to": { "createdByCommandId": "v4-fossil-tail-test" }, "strength": "weak", "polarity": "pushesAgainst", "reason": "uncertain bone identity blocks an unconditional Jurassic-pygostyle conclusion" } },
+  { "version": 1, "id": "v4-fossil-edge-rule-navaornis", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-rule" }, "to": { "createdByCommandId": "v4-fossil-navaornis" }, "strength": "weak", "polarity": "helps", "reason": "extinct Cretaceous radiation samples another trait mosaic outside the crown line" } },
+  { "version": 1, "id": "v4-fossil-edge-rule-kpg", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-rule" }, "to": { "createdByCommandId": "v4-fossil-kpg-filter" }, "strength": "weak", "polarity": "helps", "reason": "separates ecological-survival inference from anatomical placement" } },
+  { "version": 1, "id": "v4-fossil-edge-kpg-asteriornis", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-kpg-filter" }, "to": { "createdByCommandId": "v4-fossil-asteriornis" }, "strength": "weak", "polarity": "helps", "reason": "latest-Cretaceous fossil minimum near the galloanseran crown; not an ecological proof" } },
+  { "version": 1, "id": "v4-fossil-edge-kpg-vegavis", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-kpg-filter" }, "to": { "createdByCommandId": "v4-fossil-vegavis" }, "strength": "weak", "polarity": "helps", "reason": "independent latest-Cretaceous waterfowl-line constraint with placement caution" } },
+  { "version": 1, "id": "v4-fossil-edge-rule-gallinuloides", "name": "connection.create", "payload": { "ideaId": "IDEA_ID", "from": { "createdByCommandId": "v4-fossil-rule" }, "to": { "createdByCommandId": "v4-fossil-gallinuloides" }, "strength": "weak", "polarity": "helps", "reason": "Paleogene stem-galliform comparison outside the living crown" } }
+]

@@ -1,0 +1,40 @@
+appId: dev.eido.shell-proof
+productName: Eido Shell Proof
+asar: true
+npmRebuild: false
+cscLink: ''
+forceCodeSigning: false
+afterPack: scripts/electron/profile-mcp-sea-after-pack.mjs
+mac:
+  identity: null
+  binaries:
+    - Contents/Resources/bin/eido
+    - Contents/Resources/bin/eido-profile-live-gateway-helper
+  icon: release/packaged/icons/icon.icns
+win:
+  signExecutable: false
+  signExts:
+    - .exe
+  icon: release/packaged/icons/icon.ico
+directories:
+  output: .local/electron-shell
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - package.json
+  - '!**/*.map'
+extraResources:
+  - from: LICENSE
+    to: LICENSE
+  - from: electron/shell-manifest.json
+    to: shell-manifest.json
+electronFuses:
+  resetAdHocDarwinSignature: true
+  runAsNode: false
+  enableCookieEncryption: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  loadBrowserProcessSpecificV8Snapshot: false
+  grantFileProtocolExtraPrivileges: false

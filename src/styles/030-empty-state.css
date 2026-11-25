@@ -1,0 +1,72 @@
+
+/* ---------- Empty state ---------- */
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--e-sp-5);
+  box-sizing: border-box;
+  text-align: center;
+  pointer-events: none;
+  color: var(--e-ink-soft);
+}
+
+.empty-ghost {
+  display: block;
+  width: 236px;
+  height: 96px;
+  max-width: 100%;
+  margin: 0 auto var(--e-sp-5);
+  overflow: visible;
+  pointer-events: none;
+  user-select: none;
+}
+
+.empty-ghost__card {
+  stroke-width: 1.5;
+  stroke-dasharray: 6 5;
+}
+
+.empty-ghost__card--first {
+  fill: color-mix(in srgb, var(--e-surface-card) 45%, transparent);
+  stroke: var(--e-line-strong);
+}
+
+.empty-ghost__card--second {
+  fill: color-mix(in srgb, var(--e-surface-card) 30%, transparent);
+  stroke: var(--e-line);
+}
+
+.empty-ghost__wire {
+  fill: none;
+  stroke: var(--e-go);
+  stroke-width: 1.5;
+  stroke-dasharray: 0.1 7;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.empty-ghost__asterisk {
+  fill: none;
+  stroke: var(--e-ink-faint);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  opacity: 0.62;
+}
+
+.empty h2 {
+  color: var(--e-ink);
+  margin: 0 0 var(--e-sp-2);
+}
+
+.empty p {
+  max-width: 34ch;
+  margin: 0 0 var(--e-sp-4);
+}
+
+.empty__action {
+  pointer-events: auto;
+}

@@ -1,0 +1,1155 @@
+
+.budget-marker {
+  font-size: 12px;
+  color: var(--e-ink);
+  background: color-mix(in srgb, var(--e-attention) 18%, var(--e-wash-base));
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin: var(--e-sp-2) 0;
+}
+.budget-marker summary {
+  cursor: pointer;
+}
+.budget-marker ul {
+  margin: var(--e-sp-2) 0 0;
+  padding-left: var(--e-sp-5);
+  color: var(--e-ink-soft);
+}
+.settings-save-error {
+  margin-right: auto;
+  max-width: 46ch;
+  text-align: left;
+  color: var(--e-ink-soft);
+}
+
+/* Sits directly under the control it refuses, in the system's negative ink so
+   it reads as a refusal rather than as more help. */
+.settings-field-error {
+  margin: var(--e-sp-2) 0 0;
+  max-width: 46ch;
+  color: var(--e-avoid-ink);
+}
+
+.settings-modal {
+  /* A settled height (750px) so the modal does not resize as categories change,
+     and a shrink rule so a short window never pushes the footer off screen. The
+     panel keeps scrolling inside either way. */
+  height: min(46.875rem, calc(100dvh - var(--e-sp-5) * 2));
+  max-height: calc(100dvh - var(--e-sp-5) * 2);
+  width: min(940px, 100%);
+  max-width: 940px;
+}
+.settings-modal > .e-modal-shell__body {
+  display: flex;
+  overflow: hidden;
+  padding: 0;
+}
+.settings-shell {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+/* The title, the close control, and Done all sit the same distance in from the
+   modal edge: the inset the shared modal footer already spells as sp-4 plus
+   sp-1. It is written out at each rule that needs it. A local custom property
+   would read as a shorthand for it, but only --e-* names may be declared and
+   that prefix belongs to the generated token authority alone, so the calc is
+   repeated rather than named. */
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  padding: calc(var(--e-sp-4) + var(--e-sp-1)) var(--e-sp-3) var(--e-sp-3);
+  overflow: auto;
+  border-right: 1px solid var(--e-line);
+  background: var(--e-surface-recessed);
+}
+.settings-nav__title {
+  margin: 0;
+  /* Both columns start at the shared frame inset, which the nav's own padding
+     already spends. On top of that the title clears what the panel puts above
+     its first category heading: the close control row and the panel's top
+     padding. That lands the title on the heading's line. */
+  padding: calc(var(--e-sp-5) + var(--e-sp-3)) var(--e-sp-3) var(--e-sp-4);
+  color: var(--e-ink);
+}
+.settings-nav button {
+  display: grid;
+  grid-template-columns: var(--e-sp-5) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e-sp-2);
+  width: 100%;
+  padding: var(--e-sp-3);
+  border: 1px solid transparent;
+  border-radius: var(--e-r-chip);
+  background: transparent;
+  color: var(--e-ink-soft);
+  text-align: left;
+  cursor: pointer;
+}
+.settings-nav button svg {
+  width: var(--e-sp-4);
+  height: var(--e-sp-4);
+}
+.settings-nav button strong {
+  color: inherit;
+}
+.settings-nav button:hover {
+  background: var(--e-field-hover);
+  color: var(--e-ink);
+}
+.settings-nav button.active {
+  border-color: var(--e-ink);
+  background: var(--e-ink);
+  color: var(--e-on-solid);
+}
+/* The close control sits in its own row above the scrolling panel, so it stays
+   in view and never lands on a heading. */
+.settings-panel-region {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+.settings-panel-chrome {
+  display: flex;
+  justify-content: flex-end;
+  padding: calc(var(--e-sp-4) + var(--e-sp-1)) calc(var(--e-sp-4) + var(--e-sp-1)) 0;
+}
+.settings-panel {
+  min-width: 0;
+  overflow: auto;
+  padding: var(--e-sp-3) calc(var(--e-sp-4) + var(--e-sp-1)) calc(var(--e-sp-4) + var(--e-sp-1));
+}
+.settings-category {
+  width: 100%;
+}
+.settings-category-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-sp-3);
+  margin-bottom: var(--e-sp-4);
+}
+.settings-category-heading h3 {
+  margin: 0;
+  color: var(--e-ink);
+}
+.settings-field > label {
+  display: block;
+  margin: 0 0 var(--e-sp-2);
+}
+.settings-prompt-field textarea {
+  width: 100%;
+  min-height: calc(var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-7) + var(--e-sp-7));
+  resize: vertical;
+}
+.settings-help {
+  margin: var(--e-sp-2) 0 0;
+}
+/* A quiet marker naming the vendor above its key field, not a second heading.
+   Same treatment as the provider set labels below, because it does the same
+   job: micro type in the faintest ink, under the group title that outranks it. */
+.settings-vendor {
+  margin: 0;
+  color: var(--e-ink-faint);
+}
+/* The signup link lives inside the explaining sentence, so it inherits that
+   sentence's type and only marks itself as a link: underlined, in the go ink,
+   with the same focus ring every other borderless control uses. */
+.settings-signup-link {
+  color: var(--e-go-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.settings-signup-link:hover {
+  color: color-mix(in srgb, var(--e-go-ink) 80%, var(--e-ink));
+}
+.settings-signup-link:focus-visible {
+  outline: 1.5px solid var(--e-go);
+  outline-offset: 2px;
+  border-radius: var(--e-r-inner);
+}
+.settings-group {
+  margin-bottom: var(--e-sp-4);
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-well);
+  background: var(--e-surface-card);
+  overflow: hidden;
+}
+.settings-group-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--e-sp-3);
+  padding: var(--e-sp-4);
+  border-bottom: 1px solid var(--e-line);
+}
+.settings-group-heading h4 {
+  margin: 0;
+}
+.settings-control {
+  display: flex;
+  padding: var(--e-sp-4);
+}
+/* No rule between the controls in a group. The group's own border already
+   says where it starts and stops, and a second hairline inside it cut the two
+   key fields apart when they are one thought: paste a key, then the other key
+   (founder decision 2026-08-18). Spacing does the separating now. */
+.settings-control + .settings-control {
+  padding-top: 0;
+}
+.settings-control--stacked {
+  flex-direction: column;
+  gap: var(--e-sp-2);
+}
+.settings-control--split {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e-sp-4);
+}
+/* The mod face gives every stepper a fixed pill width, which left dead space
+   to the right of the plus in this narrower row. Inside Settings the control
+   hugs minus, value, plus at whatever the digits need. */
+.settings-control .e-stepper {
+  width: auto;
+}
+.settings-control--toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--e-sp-4);
+}
+.settings-theme-picker,
+.settings-reasoning-picker {
+  display: flex;
+  width: 100%;
+  min-height: calc(var(--e-sp-7) + var(--e-sp-1));
+}
+.settings-theme-picker .e-segmented__option,
+.settings-reasoning-picker .e-segmented__option {
+  flex: 1;
+  min-width: 0;
+  height: var(--e-sp-7);
+  padding-block: 0;
+}
+.settings-modal .model-row-main,
+.settings-modal .settings-option {
+  margin: 0;
+}
+.settings-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-4);
+}
+/* The provider choices sit in two labelled sets. The label is a quiet marker
+   above the choices, not a heading that competes with "Provider" itself. */
+.settings-provider-options {
+  gap: var(--e-sp-4);
+}
+.settings-provider-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-2);
+}
+.settings-provider-group-label {
+  color: var(--e-ink-faint);
+}
+.settings-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-sp-3);
+  padding: var(--e-sp-2) var(--e-sp-3);
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-chip);
+  background: var(--e-field-bg);
+  cursor: pointer;
+}
+.settings-option:hover {
+  background: var(--e-field-hover);
+}
+.settings-option.active {
+  border-color: var(--e-go);
+  background: color-mix(in srgb, var(--e-go) 20%, var(--e-wash-base));
+}
+.settings-modal .settings-option input[type='radio'] {
+  width: auto;
+  margin: var(--e-sp-1) 0 0;
+  accent-color: var(--e-go);
+}
+.settings-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+}
+.settings-option-label {
+  color: var(--e-ink);
+}
+.settings-option-hint {
+  margin: 0;
+}
+
+/* The founder/developer renderer readout follows the quiet floating-paper
+   recipe while remaining outside Board interaction ownership. It has no
+   pointer or focus surface; the Settings switch is its only control. */
+.renderer-counters {
+  position: fixed;
+  right: var(--e-sp-3);
+  bottom: var(--e-sp-3);
+  z-index: var(--e-z-panel);
+  width: min(
+    var(--e-renderer-counters-width),
+    calc(100vw - var(--e-sp-3) - var(--e-sp-3))
+  );
+  max-height: calc(100vh - var(--e-sp-3) - var(--e-sp-3));
+  overflow: hidden;
+  padding: var(--e-sp-3);
+  border: 1px solid var(--e-line-strong);
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-floating);
+  box-shadow: var(--e-shadow-lift);
+  color: var(--e-ink);
+  pointer-events: none;
+  contain: layout style paint;
+}
+.renderer-counters__header h2,
+.renderer-counters__header p,
+.renderer-counters__group-title,
+.renderer-counters__list,
+.renderer-counters__row dd {
+  margin: 0;
+}
+.renderer-counters__header p {
+  margin-top: var(--e-sp-1);
+}
+.renderer-counters__group {
+  padding-top: var(--e-sp-2);
+  margin-top: var(--e-sp-2);
+  border-top: 1px solid var(--e-line);
+}
+.renderer-counters__group-title {
+  color: var(--e-ink-soft);
+}
+.renderer-counters__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  margin-top: var(--e-sp-1);
+}
+.renderer-counters__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--e-sp-3);
+}
+.renderer-counters__row dt {
+  color: var(--e-ink-soft);
+}
+.renderer-counters__row dd {
+  color: var(--e-ink);
+  white-space: nowrap;
+}
+/* Board Info's wire record readout inside Settings (#968). It reads like a
+   log because it is one: monospace lines, arrival order, a bounded scroll. */
+.wire-record {
+  padding: 0 var(--e-sp-4) var(--e-sp-4);
+}
+.wire-record__bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.wire-record__bar p {
+  margin: 0;
+  flex: 1;
+  text-align: left;
+}
+.wire-record__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  margin: var(--e-sp-3) 0 0;
+  padding: var(--e-sp-2) var(--e-sp-3);
+  list-style: none;
+  max-height: 32vh;
+  overflow: auto;
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-field-bg);
+  font-family: var(--e-mono);
+}
+.wire-record__row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: var(--e-sp-2);
+  align-items: baseline;
+}
+.wire-record__time {
+  color: var(--e-ink-faint);
+  white-space: nowrap;
+}
+.wire-record__kind {
+  color: var(--e-ink-soft);
+  white-space: nowrap;
+}
+.wire-record__kind--failure {
+  color: var(--e-avoid-ink);
+}
+.wire-record__body {
+  color: var(--e-ink);
+  overflow-wrap: anywhere;
+}
+/* Log lines read at the micro size whatever role sizes their spans; the
+   t-value role supplies the case-preserving mono voice, this supplies the
+   density a log earns. */
+.wire-record__row .t-value {
+  font-size: var(--e-fs-micro);
+}
+@media (max-width: 720px) {
+  .settings-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .settings-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: var(--e-sp-2);
+    border-right: none;
+    border-bottom: 1px solid var(--e-line);
+  }
+  .settings-nav button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--e-sp-2);
+    text-align: center;
+  }
+  .settings-nav__title {
+    grid-column: 1 / -1;
+    padding: var(--e-sp-2) var(--e-sp-2) var(--e-sp-3);
+  }
+  .settings-panel {
+    padding: var(--e-sp-3) calc(var(--e-sp-4) + var(--e-sp-1)) calc(var(--e-sp-4) + var(--e-sp-1));
+  }
+}
+@media (max-width: 560px) {
+  .settings-control--split {
+    grid-template-columns: 1fr;
+    gap: var(--e-sp-2);
+  }
+}
+.gallery-modal {
+  width: min(860px, 100%);
+  max-width: 860px;
+}
+.gallery-stage {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: var(--e-sp-3);
+}
+.gallery-stage figure {
+  margin: 0;
+  min-width: 0;
+}
+.gallery-stage img {
+  display: block;
+  width: 100%;
+  max-height: 52vh;
+  object-fit: contain;
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-card);
+}
+.gallery-stage figcaption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--e-ink-soft);
+  font-size: var(--e-fs-label);
+}
+.gallery-caption-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gallery-count {
+  flex: none;
+  color: var(--e-ink);
+}
+.gallery-nav {
+  justify-self: center;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+  margin-top: var(--e-sp-4);
+}
+.gallery-grid button {
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-card);
+  padding: 0;
+  background: var(--e-surface-card);
+  overflow: hidden;
+}
+.gallery-grid button.active {
+  border-color: var(--e-go);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--e-go) 12%, transparent);
+}
+.gallery-grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.25;
+  object-fit: cover;
+}
+/* model manager (AI settings modal) */
+.model-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  margin: var(--e-sp-3) var(--e-sp-4) var(--e-sp-2);
+}
+.model-row {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  padding: var(--e-sp-2);
+  background: var(--e-field-bg);
+}
+.model-row.is-default {
+  border-color: var(--e-go);
+  background: color-mix(in srgb, var(--e-go) 20%, var(--e-wash-base));
+}
+.model-row-main {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-3);
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.model-row input[type='radio'] {
+  width: auto;
+  margin: 0;
+  accent-color: var(--e-go);
+  flex: none;
+}
+.model-row-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.model-row-label {
+  color: var(--e-ink);
+}
+.model-row-slug {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.model-default-badge {
+  margin-left: auto;
+  color: var(--e-go);
+}
+.settings-control--stacked > dl {
+  display: grid;
+  gap: var(--e-sp-1);
+  margin: 0;
+}
+.settings-control--stacked > dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--e-sp-3);
+}
+.settings-control--stacked > dl dd {
+  margin: 0;
+}
+.settings-control--stacked > ul {
+  margin: 0;
+  padding-left: var(--e-sp-4);
+}
+.model-edit-row input {
+  min-width: 0;
+}
+.model-edit-row {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+}
+.model-add {
+  display: flex;
+  gap: var(--e-sp-2);
+  align-items: center;
+  margin: 0 var(--e-sp-4) var(--e-sp-4);
+}
+.model-add input {
+  flex: 1;
+}
+.model-add .e-button {
+  flex: none;
+}
+/* Sits directly under the field it refuses, inside the same inset, in the
+   system's negative ink so it reads as a refusal rather than as more help. */
+.model-add-error {
+  margin: calc(-1 * var(--e-sp-2)) var(--e-sp-4) var(--e-sp-4);
+  color: var(--e-avoid-ink);
+}
+
+.settings-reasoning {
+  margin-top: 0;
+  border-top: 1px solid var(--e-line);
+}
+
+/* Ideas — the Idea gallery: the current cover, a create row, and the shelf. */
+.idea-modal {
+  width: min(100%, 560px);
+}
+/* The one ceremonial surface in the modal (SYSTEM §1.8: Idea covers). */
+.idea-cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--e-sp-1);
+  min-height: 150px;
+  padding: var(--e-sp-5) var(--e-sp-4) var(--e-sp-4);
+  border-radius: var(--e-r-well);
+}
+.idea-cover__eyebrow {
+  color: var(--e-on-solid);
+  opacity: 0.8;
+}
+.idea-cover__name {
+  width: 100%;
+  margin: 0;
+  padding: 0 0 2px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--e-on-solid);
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+  font-variant-ligatures: none;
+  /* The cover name is the screen's one headline — the display role. */
+  font-size: var(--e-fs-display);
+  font-weight: 700;
+  line-height: 1.3;
+  transition: border-color var(--e-t-fast) var(--e-ease-out);
+}
+.idea-cover__name:hover {
+  border-bottom-color: color-mix(in srgb, var(--e-on-solid) 45%, transparent);
+}
+/* On a brand-green field the focus boundary flips to on-solid (SYSTEM §7). */
+.idea-cover__name:focus {
+  outline: none;
+  border-bottom-color: var(--e-on-solid);
+}
+.idea-cover__meta {
+  color: var(--e-on-solid);
+  opacity: 0.75;
+}
+.idea-cover-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  flex-wrap: wrap;
+  margin-top: var(--e-sp-3);
+}
+.idea-cover-actions .idea-delete-current {
+  margin-left: auto;
+}
+.idea-create {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  margin-top: var(--e-sp-5);
+  padding-top: var(--e-sp-5);
+  border-top: 1px solid var(--e-line);
+}
+.idea-create .e-field {
+  flex: 1;
+  min-width: 0;
+}
+.idea-shelf {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-sp-2);
+  list-style: none;
+  margin: var(--e-sp-5) 0 0;
+  padding: var(--e-sp-5) 0 0;
+  border-top: 1px solid var(--e-line);
+}
+.idea-shelf__row {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-1);
+}
+.idea-shelf__open {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-3);
+  flex: 1;
+  min-width: 0;
+  padding: var(--e-sp-2) var(--e-sp-3);
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-card);
+  color: var(--e-ink);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+.idea-shelf__open:hover {
+  background: color-mix(in srgb, var(--e-ink) 4%, var(--e-surface-card));
+}
+.idea-shelf__open:focus-visible {
+  outline: none;
+  border-color: var(--e-go);
+}
+.idea-shelf__text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.idea-shelf__name {
+  color: var(--e-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.idea-shelf__meta {
+  color: var(--e-ink-soft);
+}
+.idea-shelf__go {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--e-ink-faint);
+  transition: color var(--e-t-fast) var(--e-ease-out);
+}
+.idea-shelf__open:hover .idea-shelf__go {
+  color: var(--e-ink);
+}
+.idea-shelf__delete:hover:not(:disabled) {
+  color: var(--e-avoid-ink);
+}
+.idea-shelf-empty {
+  margin: var(--e-sp-5) 0 0;
+  padding-top: var(--e-sp-5);
+  border-top: 1px solid var(--e-line);
+  color: var(--e-ink-soft);
+}
+/* The undo window for a just-deleted shelf Board — local, not a toast. */
+.idea-undo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-sp-2);
+  margin-top: var(--e-sp-3);
+  padding: var(--e-sp-2) var(--e-sp-3);
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-card);
+}
+.idea-undo__text {
+  color: var(--e-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.idea-error {
+  color: var(--e-avoid-ink);
+  margin: var(--e-sp-2) 0 0;
+}
+
+/* Profile recovery rows (startup surface) share the plain row recipe. */
+.idea-row {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-card);
+  padding: var(--e-sp-2) var(--e-sp-3);
+  background: var(--e-surface-card);
+}
+.idea-row-date {
+  color: var(--e-ink-soft);
+}
+
+/* Group member disclosure compatibility. */
+.peek-item {
+  background: var(--e-surface-card);
+  border: 1px solid var(--e-line);
+  border-left: 3px solid var(--e-line-strong);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: var(--e-sp-2);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.peek-item.context-item {
+  padding: 0;
+  white-space: normal;
+}
+.peek-item.context-item[open] {
+  background: var(--e-surface-card);
+}
+.peek-item.context-item.dragging {
+  opacity: 0.55;
+}
+.peek-item.context-item summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 10px;
+  cursor: pointer;
+  list-style: none;
+}
+.peek-item.context-item summary::-webkit-details-marker {
+  display: none;
+}
+.peek-item.context-item summary:focus {
+  outline: none;
+}
+.peek-item.context-item summary:focus-visible {
+  box-shadow: inset 0 0 0 1.5px var(--e-go);
+}
+.peek-item.context-item summary::before {
+  content: '›';
+  color: var(--e-ink-faint);
+  font-size: 16px;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 0.12s;
+}
+.peek-item.context-item[open] summary::before {
+  transform: rotate(90deg);
+}
+.context-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.context-body {
+  border-top: 1px solid var(--e-line);
+  padding: var(--e-sp-2) var(--e-sp-3) var(--e-sp-3) var(--e-sp-6);
+  white-space: pre-wrap;
+}
+.group-modal-section {
+  display: grid;
+  gap: var(--e-sp-2);
+  margin-bottom: var(--e-sp-5);
+}
+.group-modal-section > .e-field-label {
+  margin-bottom: 0;
+}
+.group-modal-section__title {
+  color: var(--e-ink);
+}
+.group-modal-field {
+  width: 100%;
+}
+.group-modal-panel {
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-card);
+  padding: var(--e-sp-3);
+}
+.group-version-review {
+  white-space: normal;
+}
+.group-version-review .version-switcher,
+.group-version-review .result-meta {
+  margin-bottom: var(--e-sp-2);
+}
+.group-version-text {
+  max-height: 260px;
+  padding: var(--e-sp-2) 0;
+}
+.group-version-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--e-sp-2);
+  flex-wrap: wrap;
+  margin-top: var(--e-sp-2);
+}
+.group-version-actions .run-state {
+  margin-left: 0;
+  margin-right: auto;
+}
+.group-member-list .group-member-item {
+  margin: 0;
+  border-color: var(--e-line);
+  border-left-width: 1px;
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-card);
+  font-size: inherit;
+  line-height: inherit;
+}
+.group-member-list .group-member-item[open] {
+  background: var(--e-surface-card);
+}
+.group-member-list .group-member-item summary {
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-2) var(--e-sp-3);
+}
+.group-member-item .group-member-remove {
+  flex: none;
+}
+.group-member-item .group-member-drag {
+  flex: none;
+  margin-left: auto;
+  order: 3;
+  color: var(--e-ink-faint);
+  cursor: grab;
+}
+.group-member-item .group-member-drag:active {
+  cursor: grabbing;
+}
+.group-member-body {
+  color: var(--e-ink);
+}
+.group-member-body pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: inherit;
+}
+.peek-raw {
+  margin-top: var(--e-sp-5);
+  border-top: 1px solid var(--e-line);
+  padding-top: var(--e-sp-4);
+}
+.peek-raw summary {
+  cursor: pointer;
+  color: var(--e-ink-soft);
+  font-size: 12px;
+}
+.peek-raw pre {
+  background: var(--e-surface-field);
+  border: 1px solid var(--e-line);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow: auto;
+  margin-top: var(--e-sp-3);
+}
+
+/* Shared ContextRow consumers: live context, chain plan, and frozen provenance. */
+.context-surface__sections,
+.context-surface__section,
+.context-surface__rows,
+.context-surface__row-slot,
+.context-surface__exact-text,
+.conversation-context-surface__facts,
+.conversation-context-surface__guidance {
+  display: grid;
+}
+
+.context-surface__sections {
+  gap: var(--e-sp-5);
+}
+
+.context-surface__section,
+.context-surface__rows,
+.context-surface__row-slot,
+.conversation-context-surface__facts,
+.conversation-context-surface__guidance {
+  gap: var(--e-sp-2);
+}
+
+.context-surface__section-title {
+  margin: 0;
+  color: var(--e-ink-soft);
+}
+
+.context-surface__section.already-explored .context-surface__section-title {
+  color: var(--e-avoid-ink);
+}
+
+.context-surface__section--mods .context-surface__section-title {
+  color: var(--e-mod-ink);
+}
+
+.context-surface__task {
+  padding: var(--e-sp-2) var(--e-sp-3);
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-card);
+  color: var(--e-ink);
+  white-space: pre-wrap;
+}
+
+.context-surface__mod-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-sp-1) var(--e-sp-3);
+  margin-bottom: var(--e-sp-1);
+  color: var(--e-ink-soft);
+}
+
+.context-surface__mod-disclosures {
+  display: grid;
+  gap: var(--e-sp-2);
+}
+
+.context-surface__legacy-mods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-sp-1);
+}
+
+.context-surface__instructions {
+  display: grid;
+  gap: var(--e-sp-1);
+  margin: 0;
+  padding-inline-start: var(--e-sp-5);
+  color: var(--e-ink);
+  white-space: pre-wrap;
+}
+
+.context-surface__mod-chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--e-ink-faint);
+  transition: transform var(--e-t-fast) var(--e-ease-out);
+}
+
+.context-surface__mod-disclosure[data-expanded="true"] .context-surface__mod-chevron {
+  transform: rotate(180deg);
+}
+
+.context-surface__mod-body {
+  display: grid;
+  gap: var(--e-sp-1);
+  margin-top: var(--e-sp-2);
+  padding-left: var(--e-sp-3);
+  color: var(--e-ink-soft);
+  font-family: var(--e-sans);
+  font-size: var(--e-fs-ui);
+  line-height: 1.5;
+}
+
+.context-surface__exact-text {
+  justify-items: start;
+  gap: var(--e-sp-3);
+  padding-top: var(--e-sp-3);
+  border-top: 1px solid var(--e-line);
+}
+
+.context-surface__raw-text {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: var(--e-sp-3);
+  overflow: auto;
+  border: 1px solid var(--e-line);
+  border-radius: var(--e-r-chip);
+  background: var(--e-surface-field);
+  color: var(--e-ink);
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-ui);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.version-context-surface__text {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  overflow: auto;
+}
+
+.context-surface__budget-detail,
+.context-surface__reason {
+  margin-bottom: var(--e-sp-2);
+  padding-left: var(--e-sp-2);
+  border-left: 2px solid var(--e-attention);
+  color: var(--e-ink-soft);
+}
+
+.context-surface__reason {
+  margin-top: var(--e-sp-2);
+  margin-bottom: 0;
+  border-left-color: var(--e-avoid);
+}
+
+.context-surface__detail-label {
+  display: block;
+  margin-bottom: var(--e-sp-1);
+  color: var(--e-ink);
+}
+
+.context-surface__members,
+.context-surface__assets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-sp-1);
+  margin-bottom: var(--e-sp-2);
+}
+
+.context-surface__members span,
+.context-surface__asset {
+  padding: 2px var(--e-sp-2);
+  border: 1px solid var(--e-line-strong);
+  border-radius: 999px;
+  font-family: var(--e-mono);
+  font-size: var(--e-fs-micro);
+}
+
+.chain-context-surface__rows .e-context-row__body {
+  padding-left: var(--e-sp-3);
+}
+
+.context-drag-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transform: translate3d(var(--e-context-drag-x), var(--e-context-drag-y), 0);
+}
+
+.context-drag-image {
+  position: fixed;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.context-surface .e-context-row--lifted {
+  opacity: 0.35;
+  transition:
+    opacity var(--e-t-fast) var(--e-ease-out),
+    border-color var(--e-t-fast) var(--e-ease-out);
+}
+
+.version-context-surface .e-context-row__body,
+.conversation-context-surface .e-context-row__body {
+  padding-left: var(--e-sp-3);
+}
+
+.conversation-context-surface__guidance {
+  margin-top: var(--e-sp-2);
+  padding-top: var(--e-sp-2);
+  border-top: 1px solid var(--e-line);
+}

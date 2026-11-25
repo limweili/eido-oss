@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Privacy policy · Eido</title>
+<meta name="description" content="How Eido handles local Profile data and user-selected online services.">
+<link rel="canonical" href="https://eido.so/privacy">
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body data-publication-state="draft">
+<!-- Publication check: confirm operator identity, ABN/ACN, state, address, and monitored privacy email. -->
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="legal-shell">
+  <nav class="legal-nav" aria-label="Legal">
+    <a class="wordmark-link" href="/">eido<span class="mark">.</span></a>
+    <a href="/privacy" aria-current="page">Privacy policy</a>
+    <a href="/terms">Terms of service</a>
+  </nav>
+
+  <main id="main">
+    <article class="legal-document">
+      <header>
+        <h1>Privacy policy</h1>
+        <p class="document-lede">
+          This policy covers the open-source desktop app and eido.so. Earlier
+          desktop builds had different privacy settings. Cloudflare hosts the
+          website and downloads, including update files for earlier versions.
+        </p>
+      </header>
+
+      <div class="plain-summary">
+        <strong>Short version</strong>
+        <p>
+          Eido keeps your Profile on your device. Editing, exports, and local
+          CLI and MCP access work offline. There is no Eido account.
+          Eido collects no product analytics. An AI run can send prompts,
+          connected card content, and attachments to the provider you configure.
+          Online AI and search use your own API keys or your installed AI tool's
+          provider access.
+        </p>
+      </div>
+
+      <nav class="on-this-page" aria-label="On this page">
+        <h2>On this page</h2>
+        <ul>
+          <li><a href="#who">Who this policy covers</a></li>
+          <li><a href="#local">What stays local</a></li>
+          <li><a href="#leaves">What leaves your device</a></li>
+          <li><a href="#providers">Providers</a></li>
+          <li><a href="#purposes">Why information is handled</a></li>
+          <li><a href="#retention">Retention and deletion</a></li>
+          <li><a href="#rights">Your choices and rights</a></li>
+          <li><a href="#regions">Regional information</a></li>
+        </ul>
+      </nav>
+
+      <div class="legal-prose">
+        <section id="who">
+          <h2>1. Who this policy covers</h2>
+          <p>
+            Eido is the Australian operator of the Eido desktop application,
+            eido.so, and updates.eido.so. In this policy, “Eido”, “we”, and
+            “us” mean that operator.
+          </p>
+          <p>
+            We use the practical standards in the Australian Privacy
+            Principles as our baseline for everyone. Where the Privacy Act
+            1988 (Cth) or another privacy law applies, we also follow the
+            obligations that law places on us. This policy is notice. Agreeing
+            to it is not consent to unrelated or new uses of information.
+          </p>
+          <p>
+            This policy covers information handled by Eido. Services you connect
+            using your own account or API key also have their own terms and
+            privacy practices.
+          </p>
+        </section>
+
+        <section id="local">
+          <h2>2. What stays on your device</h2>
+          <p>
+            The installed Eido Profile is a local SQLite database. It can hold
+            your Ideas, boards, cards, connections, attachments, prompts,
+            generated results, conversations, Mods, history, settings, and
+            activity or provenance records. Eido does not operate a hosted
+            Profile database, cloud sync service, or account service.
+          </p>
+          <p>
+            Your OpenRouter and Linkup API keys are stored outside the Profile
+            and are excluded from Portable Exports. They are kept in local
+            files protected by the operating system's encrypted storage and file
+            permissions. A locked protected store leaves AI credentials unavailable
+            while your local board keeps working. Device security and access to
+            your operating-system account remain part of the protection boundary.
+          </p>
+          <p>
+            You can create a Portable Export of the logical Profile and its
+            referenced assets. It does not include API keys, SQLite working
+            files, or every device-only setting. Local agents and command-line
+            tools you invoke can make bounded, allowlisted reads or changes to
+            the installed Profile; their activity can be recorded in it.
+          </p>
+        </section>
+
+        <section id="leaves">
+          <h2>3. When information leaves your device</h2>
+          <p>
+            Eido sends run material to AI and web providers when you start a
+            run. Displaying a link preview can also make a request to the site
+            the link points to.
+          </p>
+
+          <dl class="data-movement">
+            <div class="data-row">
+              <dt>You run AI</dt>
+              <dd>
+                Eido can send the compiled prompt, relevant connected card
+                content, selected settings, and included images or files.
+              </dd>
+              <dd>
+                OpenRouter routes the model you choose to a downstream provider
+                selected under OpenRouter's routing and your account settings, or
+                a locally invoked AI tool handles the request under its own
+                provider account. You start the run.
+              </dd>
+            </div>
+            <div class="data-row">
+              <dt>You read, search, or research the web</dt>
+              <dd>
+                Eido can send the public page address, search question, page
+                request, or research brief needed for the action.
+              </dd>
+              <dd>
+                Linkup, OpenRouter, or a routed provider performs the action,
+                depending on the feature and credentials you use.
+              </dd>
+            </div>
+            <div class="data-row">
+              <dt>Eido displays a link preview</dt>
+              <dd>
+                Eido can request the public page and its preview images directly
+                to display the link's title, description, thumbnail, and favicon.
+                An existing preview can refresh when you open a board.
+              </dd>
+              <dd>
+                The page and image hosts receive the requested addresses and
+                ordinary network information.
+              </dd>
+            </div>
+            <div class="data-row">
+              <dt>You visit the website or download a release</dt>
+              <dd>
+                Cloudflare receives ordinary connection information such as IP
+                address, request time, requested page or file, and network or
+                browser information.
+              </dd>
+              <dd>
+                Cloudflare serves and protects the website, installers, and
+                signed update files for older app versions.
+              </dd>
+            </div>
+          </dl>
+
+          <p>
+            Eido does not proxy AI or web requests through an Eido server. The
+            request goes from your device to the service performing the action.
+            Context can include more than the text visible in one card, because
+            Eido may compile connected material and attachments for the run.
+          </p>
+          <p>
+            Eido does not ask you to place sensitive personal information in a
+            board or prompt. Keep sensitive information local unless you
+            understand the recipient's terms and have authority to disclose it,
+            especially where it concerns another person.
+          </p>
+        </section>
+
+        <section id="providers">
+          <h2>4. Providers and their jobs</h2>
+          <p>
+            We name material providers rather than hide them behind “trusted
+            partners”. Their policies can change, and the selected AI route can
+            use additional subprocessors. Check the provider controls connected
+            to your own account before sending sensitive material.
+          </p>
+
+          <dl class="vendor-list">
+            <div>
+              <dt>OpenRouter and routed model providers</dt>
+              <dd>
+                Perform online AI runs you start using your OpenRouter API key.
+                OpenRouter receives the compiled run material and routes it to
+                the selected model provider. Attachments may use separate tools:
+                Eido's current PDF path asks OpenRouter to use Cloudflare AI for
+                parsing. Retention and model-training rules depend on your
+                OpenRouter settings, the selected endpoint, and enabled tools.
+                Eido does not currently force Zero Data Retention on the request.
+                Read <a href="https://openrouter.ai/privacy">OpenRouter's privacy policy</a>,
+                <a href="https://openrouter.ai/providers">provider information</a>,
+                and <a href="https://openrouter.ai/docs/guides/features/zdr">ZDR controls</a>.
+              </dd>
+            </div>
+            <div>
+              <dt>Linkup</dt>
+              <dd>
+                Performs web search, page fetch, or research when you add a
+                Linkup key and use those tools. It can receive the search
+                question, public page address, filters, and research brief. A
+                submitted research job cannot currently be cancelled at Linkup;
+                Eido's Cancel action stops waiting and polling. Read
+                <a href="https://www.linkup.so/privacy-policy">Linkup's privacy policy</a>.
+              </dd>
+            </div>
+            <div>
+              <dt>Cloudflare</dt>
+              <dd>
+                Serves and protects eido.so, installers, and signed update files
+                for older app versions.
+                It processes ordinary network and security metadata. The site is
+                static and Eido adds no advertising or website-analytics scripts.
+                Cloudflare also participates in PDF parsing when that OpenRouter
+                feature is used. Read
+                <a href="https://www.cloudflare.com/policies/privacy/">Cloudflare's privacy policy</a>.
+              </dd>
+            </div>
+            <div>
+              <dt>AI tools installed by you</dt>
+              <dd>
+                Eido can invoke supported tools such as Claude Code, Codex, or
+                Antigravity on your device. “Locally invoked” does not necessarily
+                mean local inference: the tool may send prompts and attachments
+                to its provider using your existing account. That provider's
+                terms and privacy practices apply.
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section id="purposes">
+          <h2>5. What we handle and why</h2>
+          <h3>Local Profile and settings</h3>
+          <p>
+            Eido's software handles Profile content and device settings to save,
+            display, edit, export, recover, and run the features you request. The
+            operator does not receive a hosted copy through ordinary local use.
+          </p>
+          <h3>AI and web requests</h3>
+          <p>
+            Eido sends the request material to provide the action you started.
+            Where EEA or UK law applies, the usual basis is taking steps at your
+            request or performing our agreement with you. Separate consent may
+            be needed for sensitive information or another purpose.
+          </p>
+          <h3>Website and downloads</h3>
+          <p>
+            Routine request data is processed to deliver pages and files,
+            maintain availability, and protect the service. If
+            EEA or UK law applies, we rely on our legitimate interests in secure,
+            reliable delivery where those interests are not overridden, and on
+            legal obligations where required.
+          </p>
+        </section>
+
+        <section id="overseas">
+          <h2>6. Overseas processing</h2>
+          <p>
+            Eido is operated from Australia. Cloudflare uses a global network.
+            OpenRouter and some model providers process in the United States or
+            other countries shown in their current provider information. Linkup
+            states that its processing occurs in the European Union. Local AI tools
+            can use the locations disclosed by their provider.
+          </p>
+          <p>
+            The countries involved can change with the model, endpoint, tool,
+            subprocessor, and your account settings. Where cross-border privacy
+            rules apply to Eido, we take reasonable steps and will put an
+            applicable lawful transfer mechanism in place before Eido initiates
+            a transfer that requires one. A privacy policy is not itself a
+            transfer safeguard.
+          </p>
+        </section>
+
+        <section id="retention">
+          <h2>7. Retention and deletion</h2>
+          <p>
+            Local Profile data remains on your device until you edit or delete it,
+            replace the Profile, remove application data, or the operating system
+            removes it. Deleting an Idea removes it from the active logical
+            Profile, but limited recovery generations, tombstones, blob material,
+            quarantined files, or operating-system backups may remain for a time.
+            Eido does not promise immediate secure erasure of every physical copy.
+          </p>
+          <p>
+            API keys remain in their separate local files until you clear them or
+            remove the relevant application data. Clearing a key does not promise
+            forensic secure erasure from storage media or backups.
+          </p>
+          <p>
+            Provider retention follows the provider, endpoint, account settings,
+            and contracts described above. We retain legal records only while reasonably needed for safety, disputes, or legal
+            obligations.
+          </p>
+        </section>
+
+        <section id="security">
+          <h2>8. Security</h2>
+          <p>
+            Eido uses measures intended to protect the product boundary, including
+            an isolated desktop renderer, a restrictive content security policy,
+            permission-protected credential files, defensive SQLite settings,
+            and bounded local agent interfaces. No software or storage method
+            is perfectly secure. Your
+            device security, operating-system account, connected providers, and
+            backups remain part of the protection boundary.
+          </p>
+          <p>
+            If a data breach affects personal information Eido controls, we will
+            assess it and notify affected people and regulators where required by
+            law, and otherwise where notice would help people protect themselves.
+          </p>
+        </section>
+
+        <section id="rights">
+          <h2>9. Your choices and rights</h2>
+          <ul>
+            <li>Keep ordinary board work local by not starting online AI or web actions.</li>
+            <li>Choose which supported AI route or tool handles a run.</li>
+            <li>Clear stored API keys.</li>
+            <li>Create a Portable Export of your Profile.</li>
+            <li>Edit or delete Ideas in the active Profile, subject to the local recovery limits above.</li>
+            <li>Ask us to access, correct, delete, restrict, or explain information Eido controls, where reasonably possible and legally required.</li>
+            <li>Complain about our handling of personal information.</li>
+          </ul>
+          <p>
+            Eido does not require an account. The operator does not hold your
+            local Profile, so we usually cannot access, correct, or delete that local content
+            for you. A request may require enough information to verify your
+            identity and find the relevant record without exposing more data
+            than necessary. Legal rights are subject to exceptions; if we refuse
+            a request, we will explain why where the law requires it.
+          </p>
+        </section>
+
+        <section id="children">
+          <h2>10. Children</h2>
+          <p>
+            Eido is for people aged 18 or older, or the age of legal majority
+            where they live. It is not directed to children. Do not use Eido to
+            send a child's personal information to an online provider unless you
+            are legally authorised and the provider permits it. If we become aware
+            that a child has provided information to Eido's operator, we will
+            investigate.
+          </p>
+        </section>
+
+        <section id="automated-decisions">
+          <h2>11. AI and automated decisions</h2>
+          <p>
+            Eido's current AI features help generate, organise, and explore
+            material. Eido does not use personal information to make eligibility,
+            employment, credit, health, insurance, or similarly significant
+            automated decisions about people. AI output can still affect a person
+            if a user chooses to rely on it. Review important output and keep a
+            person responsible for consequential decisions.
+          </p>
+        </section>
+
+        <section id="regions">
+          <h2>12. Regional information</h2>
+          <h3>Australia</h3>
+          <p>
+            We aim to apply the practical protections described in this policy
+            to everyone. If the Privacy Act applies to our handling, you may have
+            rights under the Australian Privacy Principles. You can complain to
+            us first and, where the Act applies, to the
+            <a href="https://www.oaic.gov.au/privacy/privacy-complaints">Office of the Australian Information Commissioner</a>.
+          </p>
+          <h3>European Economic Area and United Kingdom</h3>
+          <p>
+            If EU GDPR or UK GDPR applies, you may have rights to information,
+            access, correction, erasure, restriction, portability, objection,
+            consent withdrawal, and safeguards for certain significant automated
+            decisions. You may complain to the supervisory authority where you
+            live or work. These rights are not absolute. Australia is not treated
+            as adequate by the EU or UK, so applicable transfers need a separate
+            lawful mechanism. If Eido begins targeting these markets in a way
+            that requires an EU or UK representative, we will publish that
+            representative's details before doing so.
+          </p>
+          <h3>California and other United States states</h3>
+          <p>
+            If a state privacy law applies, you may have rights to know, access,
+            correct, delete, or receive certain information, and to opt out of
+            certain sale, sharing, targeted advertising, or profiling practices.
+            Eido does not use personal information for cross-context behavioural
+            advertising and does not receive payment for personal information.
+            Whether a vendor relationship has a statutory “sale” or “sharing”
+            label depends on the law, contract, and actual use. We will not
+            discriminate against you for exercising an applicable right.
+          </p>
+        </section>
+
+        <section id="changes">
+          <h2>13. Changes to this policy</h2>
+          <p>
+            We will update the effective date and keep prior material versions
+            available when practical. If a change materially expands what Eido
+            collects, why it is used, or who receives it, we will give a clear
+            notice before the new practice begins where practical and obtain
+            consent where law requires it. We will not treat this policy as
+            blanket permission for an unrelated use.
+          </p>
+        </section>
+
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+      <a href="/">Back to Eido</a>
+      <a href="/legal">Legal</a>
+      <a href="/terms">Terms of service</a>
+    </nav>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Goal"
+  short_description: "Write durable, reasoning-led goals"
+  default_prompt: "Use $write-goal to turn this intent into a durable outcome-led goal."

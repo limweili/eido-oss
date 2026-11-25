@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mod builder workbench — wave · radar · compiler (PROTOTYPE)</title>
+<style>
+  :root{
+    --paper:#f6f5f1; --panel:#fffdf8; --ink:#2b2a27; --mut:#8a867e;
+    --line:#dedbd2; --line2:#eceade; --acc:#a946c8;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box; margin:0}
+  html,body{background:var(--paper); color:var(--ink);
+    font:14px/1.5 -apple-system,'SF Pro Text','Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace}
+  button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+  input{font:inherit; color:inherit}
+
+  .plate{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; padding:18px 22px 4px}
+  .plate h1{font-family:ui-monospace,Menlo,monospace; font-size:19px; letter-spacing:.14em}
+  .plate .chip{font-family:ui-monospace,Menlo,monospace; font-size:9.5px; letter-spacing:.16em;
+    border:1.5px solid var(--ink); border-radius:999px; padding:2px 9px; font-weight:700}
+  .plate .note{color:var(--mut); font-size:12px}
+  .hint{color:var(--mut); font-size:12px; padding:0 22px 12px}
+
+  .cols{display:flex; gap:14px; padding:0 22px; align-items:flex-start}
+
+  /* ————— palette ————— */
+  .palette{flex:0 0 190px; background:var(--panel); border:1.5px solid var(--line);
+    border-radius:14px; padding:14px; position:sticky; top:12px}
+  .palette h2{font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.2em;
+    color:var(--mut); margin:10px 0 8px; border-bottom:1.5px solid var(--line2); padding-bottom:4px}
+  .palette h2:first-child{margin-top:0}
+  .pal{display:flex; align-items:center; gap:8px; border:1.5px solid var(--ink); border-radius:10px;
+    padding:7px 10px; margin-bottom:7px; cursor:grab; background:var(--panel);
+    font-family:ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.1em; font-weight:700}
+  .pal:active{cursor:grabbing}
+  .pal i{font-style:normal; color:var(--acc); width:14px; text-align:center}
+  .palette .ph{font-size:10.5px; color:var(--mut); line-height:1.5; margin-top:10px}
+
+  /* ————— board ————— */
+  .boardWrap{flex:1; overflow-x:auto}
+  #board{position:relative; border:1.5px solid var(--line); border-radius:14px;
+    background:var(--panel); min-width:900px}
+  #board.gridbg{background-image:
+    linear-gradient(to right, var(--line2) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line2) 1px, transparent 1px);
+    background-size:72px 72px; background-position:10px 10px}
+  #board.dropHi{outline:2px dashed var(--acc); outline-offset:-4px}
+
+  .item{position:absolute; background:var(--panel); border:2px solid var(--ink); border-radius:12px;
+    display:flex; flex-direction:column; overflow:hidden; user-select:none; -webkit-user-select:none}
+  .item.drag{opacity:.75; z-index:30; box-shadow:0 10px 26px rgba(43,42,39,.18)}
+  .item header{display:flex; align-items:center; gap:6px; padding:4px 8px; cursor:grab;
+    border-bottom:1.5px solid var(--line2); background:color-mix(in srgb,var(--acc) 6%, var(--panel))}
+  .item header:active{cursor:grabbing}
+  .item header .lbl{flex:1; min-width:0; border:none; background:none; outline:none;
+    font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.14em; font-weight:700;
+    text-transform:uppercase; padding:2px 0; cursor:text}
+  .item header .lbl:focus{border-bottom:1.5px solid var(--acc)}
+  .item header .lbl[readonly]{cursor:grab; pointer-events:auto}
+  .item header .kind{font-family:ui-monospace,Menlo,monospace; font-size:8.5px; color:var(--mut);
+    letter-spacing:.12em}
+  .item header .del{color:var(--mut); font-size:13px; line-height:1; padding:0 2px}
+  .item header .del:hover{color:#d72e35}
+  .item .body{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:4px; padding:6px 10px; min-height:0}
+  .rz{position:absolute; right:1px; bottom:1px; width:16px; height:16px; cursor:nwse-resize;
+    background:linear-gradient(135deg, transparent 50%, var(--mut) 50%); border-radius:0 0 9px 0; opacity:.55}
+
+  /* minimal knob */
+  .knob{cursor:ns-resize; touch-action:none}
+  .knob svg{display:block}
+  .pct{font-family:ui-monospace,Menlo,monospace; font-size:12px; color:var(--ink);
+    font-variant-numeric:tabular-nums}
+
+  /* slider */
+  .sl{width:100%; display:flex; align-items:center; gap:10px}
+  .sltrack{flex:1; height:10px; border-radius:999px; background:var(--line2); position:relative;
+    cursor:ew-resize; touch-action:none}
+  .slfill{position:absolute; left:0; top:0; bottom:0; border-radius:999px; background:var(--acc)}
+  .slknob{position:absolute; top:50%; width:18px; height:18px; border-radius:50%; background:var(--ink);
+    transform:translate(-50%,-50%); border:3px solid var(--panel); box-shadow:0 0 0 1.5px var(--ink)}
+
+  /* switch */
+  .sw{width:44px; height:24px; border:2px solid var(--ink); border-radius:999px; position:relative;
+    background:var(--panel); transition:background .15s; cursor:pointer}
+  .sw b{position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+    background:var(--ink); transition:left .15s, background .15s}
+  .sw.on{background:var(--acc)} .sw.on b{left:22px; background:#fffdf8}
+
+  /* count */
+  .step{display:flex; align-items:center; border:2px solid var(--ink); border-radius:999px;
+    overflow:hidden; height:28px}
+  .step button{width:30px; height:100%; font-family:ui-monospace,Menlo,monospace; font-weight:700; font-size:15px}
+  .step button:hover{background:var(--line2)}
+  .step b{min-width:30px; text-align:center; font-family:ui-monospace,Menlo,monospace; font-size:13px;
+    border-left:2px solid var(--ink); border-right:2px solid var(--ink); height:100%;
+    display:flex; align-items:center; justify-content:center}
+
+  /* words */
+  .wtxt{width:100%; border:none; border-bottom:2px solid var(--ink); background:none; outline:none;
+    font-family:ui-monospace,Menlo,monospace; font-size:13px; padding:3px 1px}
+  .wtxt:focus{border-color:var(--acc)}
+
+  /* visualizer bodies */
+  .item.viz-item .body{padding:4px 8px 6px; align-items:stretch}
+  .vzcanvas{flex:1; min-height:0; width:100%}
+  .jacks{display:flex; flex-wrap:wrap; gap:4px; padding-top:5px}
+  .jack{display:flex; align-items:center; gap:4px; border:1.5px solid var(--line); border-radius:999px;
+    padding:1px 8px 1px 6px; font-family:ui-monospace,Menlo,monospace; font-size:9px; letter-spacing:.08em;
+    color:var(--mut); background:var(--panel)}
+  .jack.set{border-color:var(--ink); color:var(--ink)}
+  .jack em{font-style:normal; color:var(--acc); font-weight:700}
+  .jack:hover{border-color:var(--acc)}
+  .jack::before{content:'◇'; font-size:8px}
+
+  .pop{position:absolute; z-index:99; background:var(--panel); border:2px solid var(--ink);
+    border-radius:10px; padding:4px; display:flex; flex-direction:column; min-width:150px;
+    box-shadow:0 10px 26px rgba(43,42,39,.16)}
+  .pop button{text-align:left; padding:5px 10px; border-radius:7px;
+    font-family:ui-monospace,Menlo,monospace; font-size:11px; letter-spacing:.06em}
+  .pop button:hover{background:var(--line2)}
+  .pop .none{color:var(--mut)}
+
+  /* ————— compiler ————— */
+  .compiler{margin:16px 22px 60px; background:var(--panel); border:1.5px solid var(--line); border-radius:14px}
+  .chead{display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1.5px solid var(--line2)}
+  .chead h2{font-family:ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:.2em}
+  .chead .note{color:var(--mut); font-size:11.5px}
+  .chead .btn{margin-left:auto}
+  .btn{border:2px solid var(--ink); border-radius:999px; padding:5px 12px;
+    font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.14em; font-weight:700}
+  .btn:hover{background:var(--line2)}
+  .secs{display:flex; gap:12px; padding:14px 16px; overflow-x:auto; align-items:flex-start}
+  .sec{flex:0 0 240px; border:1.5px solid var(--line); border-radius:12px; background:var(--paper)}
+  .sec > header{display:flex; align-items:center; gap:6px; padding:7px 10px; cursor:grab;
+    border-bottom:1.5px solid var(--line2)}
+  .sec > header i{width:8px; height:8px; border-radius:50%; background:var(--sc); flex:none; font-style:normal}
+  .sec > header .sname{flex:1; min-width:0; border:none; background:none; outline:none;
+    font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.16em; font-weight:700;
+    text-transform:uppercase; cursor:text}
+  .sec > header .sname:focus{border-bottom:1.5px solid var(--sc)}
+  .sec > header .sdel{color:var(--mut); font-size:12px}
+  .sec > header .sdel:hover{color:#d72e35}
+  .sbody{padding:8px; display:flex; flex-direction:column; gap:6px; min-height:48px}
+  .sec.dropHi{outline:2px dashed var(--sc); outline-offset:-3px}
+  .chipline{background:var(--panel); border:1.5px solid var(--line); border-left:3.5px solid var(--sc);
+    border-radius:8px; padding:5px 8px; font-size:12px; line-height:1.45; cursor:grab}
+  .chipline:hover{border-color:var(--sc)}
+  .chipline.mutedln{opacity:.5; font-style:italic}
+  .chipline .src{display:block; font-family:ui-monospace,Menlo,monospace; font-size:8.5px;
+    letter-spacing:.12em; color:var(--mut); margin-top:1px}
+  .chipline input{width:100%; border:none; border-bottom:1.5px solid var(--sc); background:none; outline:none;
+    font-size:12px}
+  .addtxt{align-self:flex-start; color:var(--mut); font-family:ui-monospace,Menlo,monospace;
+    font-size:9.5px; letter-spacing:.12em; padding:3px 4px}
+  .addtxt:hover{color:var(--ink)}
+  .addsec{flex:0 0 150px; border:2px dashed var(--line); border-radius:12px; padding:20px 10px;
+    color:var(--mut); font-family:ui-monospace,Menlo,monospace; font-size:10px; letter-spacing:.14em}
+  .addsec:hover{border-color:var(--acc); color:var(--ink)}
+  #txt{margin:0 16px 16px; padding:14px; background:var(--paper); border:1.5px solid var(--line2);
+    border-radius:10px; font-family:ui-monospace,Menlo,monospace; font-size:12px; white-space:pre-wrap}
+</style>
+</head>
+<body>
+  <!-- PROTOTYPE — throwaway. Question: does board + wired visualizers +
+       user-defined compiler hold together as one builder? Open this file
+       directly in a browser; no server, no persistence. -->
+  <div class="plate">
+    <h1>MOD WORKBENCH</h1><span class="chip">PROTOTYPE 04</span>
+    <span class="note">drag parts from the left onto the board · move by the title bar · resize by the corner ·
+      click a ◇ jack to wire a control in · name your own sections below</span>
+  </div>
+  <p class="hint">Everything is % — a control's label and sentence are yours to edit (double-click the label on
+    the board; click a line in the compiler to edit its sentence, using {value} where the value should go).</p>
+
+  <div class="cols">
+    <aside class="palette">
+      <h2>CONTROLS</h2>
+      <div class="pal" draggable="true" data-kind="dial"><i>◉</i>DIAL</div>
+      <div class="pal" draggable="true" data-kind="slider"><i>―</i>SLIDER</div>
+      <div class="pal" draggable="true" data-kind="switch"><i>⏻</i>SWITCH</div>
+      <div class="pal" draggable="true" data-kind="count"><i>±</i>COUNT</div>
+      <div class="pal" draggable="true" data-kind="words"><i>“</i>WORDS</div>
+      <h2>VISUALIZERS</h2>
+      <div class="pal" draggable="true" data-kind="wave"><i>∿</i>SEMANTIC WAVE</div>
+      <div class="pal" draggable="true" data-kind="radar"><i>✦</i>RADAR</div>
+      <p class="ph">Visualizers never speak — they picture whatever controls you wire into their jacks.
+        The radar writes back: drag its points.</p>
+    </aside>
+    <main class="boardWrap"><div id="board" class="gridbg"></div></main>
+  </div>
+
+  <section class="compiler">
+    <div class="chead">
+      <h2>PROMPT COMPILER</h2>
+      <span class="note">sections are yours — rename, add, reorder (drag a section by its header),
+        drag lines between sections, + text for free lines</span>
+      <button class="btn" id="viewTxt">VIEW AS TEXT</button>
+    </div>
+    <div class="secs" id="secs"></div>
+    <pre id="txt" hidden></pre>
+  </section>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CELL=72, PAD=10, COLS=12;
+let uid=0; const nid=()=>'n'+(++uid);
+
+/* ————————— state ————————— */
+const SEC_COLORS=['#a946c8','#d76519','#24986a','#3f78df','#8f9aa3','#d72e35'];
+const S={ items:[], sections:[] };
+
+const KINDS={
+  dial:  {w:2,h:2, minW:2,minH:2, label:'DIAL',   mk:mkDial,   speaks:true,  wirable:true},
+  slider:{w:3,h:1, minW:2,minH:1, label:'SLIDER', mk:mkSlider, speaks:true,  wirable:true},
+  switch:{w:3,h:1, minW:2,minH:1, label:'SWITCH', mk:mkSwitch, speaks:true,  wirable:false},
+  count: {w:3,h:1, minW:2,minH:1, label:'COUNT',  mk:mkCount,  speaks:true,  wirable:true},
+  words: {w:4,h:1, minW:3,minH:1, label:'WORDS',  mk:mkWords,  speaks:true,  wirable:false},
+  wave:  {w:6,h:4, minW:4,minH:3, label:'WAVE',   mk:mkWave,   speaks:false, viz:true},
+  radar: {w:6,h:5, minW:4,minH:4, label:'RADAR',  mk:mkRadar,  speaks:false, viz:true},
+};
+const WAVE_INPUTS=[
+  ['amp','HEIGHT'],['freq','SPEED'],['ripple','RIPPLE'],['steady','STEADY'],['grid','GRID'],['waves','WAVES']
+];
+const RADAR_AXES=5;
+
+function addSection(name){ const s={id:nid(), name}; S.sections.push(s); return s; }
+function secColor(sec){ return SEC_COLORS[S.sections.indexOf(sec) % SEC_COLORS.length]; }
+
+function addItem(kind, x, y, props={}){
+  const K=KINDS[kind];
+  const it={ id:nid(), kind, x, y, w:K.w, h:K.h,
+    label:props.label ?? K.label, frame:props.frame ?? null,
+    value:props.value ?? (kind==='switch'?false : kind==='count'?2 : kind==='words'?'' : 50),
+    sec:props.sec ?? (K.speaks ? S.sections[0].id : null),
+    seq:props.seq ?? (S.items.length+1),
+    inputs: kind==='wave' ? {amp:null,freq:null,ripple:null,steady:null,grid:null,waves:null}
+          : kind==='radar'? {a0:null,a1:null,a2:null,a3:null,a4:null} : null,
+    ...('x' in props ? {} : {}) };
+  Object.assign(it, props.x!==undefined?{x:props.x}:{}, props.y!==undefined?{y:props.y}:{});
+  if(props.w) it.w=props.w; if(props.h) it.h=props.h;
+  S.items.push(it);
+  buildItem(it);
+  return it;
+}
+function removeItem(it){
+  S.items=S.items.filter(i=>i!==it);
+  S.items.forEach(i=>{ if(i.inputs) for(const k in i.inputs) if(i.inputs[k]===it.id) i.inputs[k]=null; });
+  it._el.remove();
+  refresh();
+}
+const byId=id=>S.items.find(i=>i.id===id);
+/* a wired control's value, normalized 0..1 (count normalizes over 10) */
+function inVal(id, dflt){ const c=byId(id); if(!c) return dflt;
+  return c.kind==='count' ? c.value/10 : c.value/100; }
+
+/* ————————— emission: state → sentences ————————— */
+function emitLine(it){
+  const f=it.frame;
+  if(it.kind==='dial'||it.kind==='slider'){
+    const v=Math.round(it.value)+'%';
+    return f ? f.replaceAll('{value}',v) : `${cap(it.label)}: ${v}.`;
+  }
+  if(it.kind==='count'){
+    return f ? f.replaceAll('{value}',it.value) : `${cap(it.label)}: ${it.value}.`;
+  }
+  if(it.kind==='switch'){
+    if(!it.value) return null; // silent
+    return f || `${cap(it.label)}.`;
+  }
+  if(it.kind==='words'){
+    if(!it.value.trim()) return null; // silent
+    return f ? f.replaceAll('{value}',it.value.trim()) : `${cap(it.label)}: ${it.value.trim()}.`;
+  }
+  return null;
+}
+const cap=s=>{ s=s.toLowerCase(); return s.charAt(0).toUpperCase()+s.slice(1); };
+
+/* ————————— board ————————— */
+const board=$('#board');
+function fitBoard(){
+  const rows=Math.max(9, ...S.items.map(i=>i.y+i.h))+1;
+  board.style.height=(rows*CELL+PAD*2)+'px';
+  board.style.minWidth=(COLS*CELL+PAD*2)+'px';
+}
+function place(it){
+  const el=it._el;
+  el.style.left=(PAD+it.x*CELL)+'px'; el.style.top=(PAD+it.y*CELL)+'px';
+  el.style.width=(it.w*CELL-10)+'px'; el.style.height=(it.h*CELL-10)+'px';
+}
+function buildItem(it){
+  const K=KINDS[it.kind];
+  const el=document.createElement('article');
+  el.className='item'+(K.viz?' viz-item':'');
+  el.dataset.id=it.id;
+  el.innerHTML=`<header title="drag to move · double-click the name to rename">
+      <input class="lbl" value="${esc(it.label)}" spellcheck="false" readonly>
+      <span class="kind">${K.label}</span>
+      <button class="del" title="remove">×</button>
+    </header>
+    <div class="body"></div><b class="rz" title="resize"></b>`;
+  board.appendChild(el);
+  it._el=el;
+  place(it);
+  const lbl=el.querySelector('.lbl');
+  lbl.addEventListener('input', ()=>{ it.label=lbl.value||K.label; refresh(); });
+  lbl.addEventListener('dblclick', ()=>{ lbl.readOnly=false; lbl.focus(); lbl.select(); });
+  lbl.addEventListener('blur', ()=>{ lbl.readOnly=true; });
+  lbl.addEventListener('keydown', e=>{ if(e.key==='Enter') lbl.blur(); });
+  el.querySelector('.del').addEventListener('pointerdown', e=>e.stopPropagation());
+  el.querySelector('.del').addEventListener('click', ()=>removeItem(it));
+  /* move by the whole header (the label only captures input while editing) */
+  const head=el.querySelector('header');
+  head.addEventListener('pointerdown', e=>{
+    if(e.target.closest('.del')) return;
+    if(e.target===lbl && !lbl.readOnly) return;
+    e.preventDefault(); head.setPointerCapture(e.pointerId);
+    const sx=e.clientX, sy=e.clientY, ox=it.x, oy=it.y;
+    el.classList.add('drag');
+    const mv=ev=>{
+      it.x=Math.max(0, Math.min(COLS-it.w, ox+Math.round((ev.clientX-sx)/CELL)));
+      it.y=Math.max(0, oy+Math.round((ev.clientY-sy)/CELL));
+      place(it); fitBoard();
+    };
+    const up=()=>{ el.classList.remove('drag');
+      head.removeEventListener('pointermove',mv); head.removeEventListener('pointerup',up);
+      head.removeEventListener('pointercancel',up); };
+    head.addEventListener('pointermove',mv); head.addEventListener('pointerup',up);
+    head.addEventListener('pointercancel',up);
+  });
+  /* resize by corner */
+  const rz=el.querySelector('.rz');
+  rz.addEventListener('pointerdown', e=>{
+    e.preventDefault(); e.stopPropagation(); rz.setPointerCapture(e.pointerId);
+    const sx=e.clientX, sy=e.clientY, ow=it.w, oh=it.h;
+    const mv=ev=>{
+      it.w=Math.max(K.minW, Math.min(COLS-it.x, ow+Math.round((ev.clientX-sx)/CELL)));
+      it.h=Math.max(K.minH, oh+Math.round((ev.clientY-sy)/CELL));
+      place(it); fitBoard(); if(it._onresize) it._onresize();
+    };
+    const up=()=>{ rz.removeEventListener('pointermove',mv); rz.removeEventListener('pointerup',up);
+      rz.removeEventListener('pointercancel',up); };
+    rz.addEventListener('pointermove',mv); rz.addEventListener('pointerup',up);
+    rz.addEventListener('pointercancel',up);
+  });
+  K.mk(it, el.querySelector('.body'));
+  fitBoard();
+}
+
+/* ————————— control bodies ————————— */
+function arcPath(cx,cy,r,a0,a1){
+  const p=a=>[cx+r*Math.cos((a-90)*Math.PI/180), cy+r*Math.sin((a-90)*Math.PI/180)];
+  const [x0,y0]=p(a0),[x1,y1]=p(a1);
+  return `M ${x0} ${y0} A ${r} ${r} 0 ${a1-a0>180?1:0} 1 ${x1} ${y1}`;
+}
+/* the minimal knob: solid core, light needle, one value arc */
+function mkDial(it, body){
+  body.innerHTML=`<div class="knob">
+    <svg width="76" height="76" viewBox="0 0 100 100">
+      <path d="${arcPath(50,50,44,-120,120)}" fill="none" stroke="var(--line2)" stroke-width="9" stroke-linecap="round"/>
+      <path class="varc" fill="none" stroke="var(--acc)" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="50" cy="50" r="31" fill="var(--ink)"/>
+      <line class="ndl" x1="50" y1="50" x2="50" y2="24" stroke="#f6f5f1" stroke-width="6" stroke-linecap="round"/>
+    </svg></div><output class="pct"></output>`;
+  const varc=body.querySelector('.varc'), ndl=body.querySelector('.ndl'), out=body.querySelector('output');
+  it._up=()=>{
+    const a=-120+it.value/100*240;
+    varc.setAttribute('d', it.value<2?'M 0 0':arcPath(50,50,44,-120,a));
+    ndl.setAttribute('transform',`rotate(${a} 50 50)`);
+    out.textContent=Math.round(it.value)+' %';
+  };
+  vdragPct(body.querySelector('.knob'), it);
+  it._up();
+}
+function mkSlider(it, body){
+  body.innerHTML=`<div class="sl"><div class="sltrack">
+      <div class="slfill"></div><div class="slknob"></div>
+    </div><output class="pct"></output></div>`;
+  const tr=body.querySelector('.sltrack'), fill=body.querySelector('.slfill'),
+        kn=body.querySelector('.slknob'), out=body.querySelector('output');
+  it._up=()=>{ fill.style.width=it.value+'%'; kn.style.left=it.value+'%';
+    out.textContent=Math.round(it.value)+' %'; };
+  tr.addEventListener('pointerdown', e=>{
+    e.preventDefault(); tr.setPointerCapture(e.pointerId);
+    const set=ev=>{ const r=tr.getBoundingClientRect();
+      it.value=Math.max(0,Math.min(100, (ev.clientX-r.left)/r.width*100)); refresh(); };
+    set(e);
+    const up=()=>{ tr.removeEventListener('pointermove',set); tr.removeEventListener('pointerup',up);
+      tr.removeEventListener('pointercancel',up); };
+    tr.addEventListener('pointermove',set); tr.addEventListener('pointerup',up);
+    tr.addEventListener('pointercancel',up);
+  });
+  it._up();
+}
+function vdragPct(el, it){
+  el.addEventListener('pointerdown', e=>{
+    e.preventDefault(); el.setPointerCapture(e.pointerId);
+    const y0=e.clientY, v0=it.value;
+    const mv=ev=>{ it.value=Math.max(0,Math.min(100, v0+(y0-ev.clientY)*0.8)); refresh(); };
+    const up=()=>{ el.removeEventListener('pointermove',mv); el.removeEventListener('pointerup',up);
+      el.removeEventListener('pointercancel',up); };
+    el.addEventListener('pointermove',mv); el.addEventListener('pointerup',up);
+    el.addEventListener('pointercancel',up);
+  });
+}
+function mkSwitch(it, body){
+  body.innerHTML=`<div class="sw"><b></b></div>`;
+  const sw=body.querySelector('.sw');
+  sw.addEventListener('click', ()=>{ it.value=!it.value; refresh(); });
+  it._up=()=>sw.classList.toggle('on', !!it.value);
+  it._up();
+}
+function mkCount(it, body){
+  body.innerHTML=`<div class="step"><button data-d="-1">−</button><b></b><button data-d="1">+</button></div>`;
+  body.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+    it.value=Math.max(0,Math.min(10, it.value + +b.dataset.d)); refresh(); }));
+  const n=body.querySelector('b');
+  it._up=()=>n.textContent=it.value;
+  it._up();
+}
+function mkWords(it, body){
+  body.innerHTML=`<input class="wtxt" placeholder="type here…" spellcheck="false">`;
+  const inp=body.querySelector('.wtxt'); inp.value=it.value;
+  inp.addEventListener('input', ()=>{ it.value=inp.value; refresh(); });
+  inp.addEventListener('pointerdown', e=>e.stopPropagation());
+  it._up=()=>{};
+}
+
+/* ————————— jacks (shared by visualizers) ————————— */
+let pop=null;
+function closePop(){ if(pop){ pop.remove(); pop=null; } }
+document.addEventListener('pointerdown', e=>{ if(pop && !pop.contains(e.target)) closePop(); }, true);
+function jackMenu(anchor, it, key){
+  closePop();
+  pop=document.createElement('div'); pop.className='pop';
+  const cands=S.items.filter(i=>KINDS[i.kind].wirable);
+  pop.innerHTML=`<button class="none" data-c="">— nothing</button>`+
+    cands.map(c=>`<button data-c="${c.id}">${esc(c.label)}</button>`).join('');
+  document.body.appendChild(pop);
+  const r=anchor.getBoundingClientRect();
+  pop.style.left=(r.left+scrollX)+'px'; pop.style.top=(r.bottom+scrollY+4)+'px';
+  pop.addEventListener('click', e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    it.inputs[key]=b.dataset.c||null; closePop(); refresh();
+  });
+}
+function buildJacks(it, wrap, defs){
+  wrap.innerHTML=defs.map(([k,name])=>
+    `<button class="jack" data-k="${k}"><em>${name}</em><span></span></button>`).join('');
+  wrap.querySelectorAll('.jack').forEach(j=>{
+    j.addEventListener('pointerdown', e=>e.stopPropagation());
+    j.addEventListener('click', ()=>jackMenu(j, it, j.dataset.k));
+  });
+  return ()=>wrap.querySelectorAll('.jack').forEach(j=>{
+    const c=byId(it.inputs[j.dataset.k]);
+    j.classList.toggle('set', !!c);
+    j.querySelector('span').textContent=c ? '· '+c.label : '· —';
+  });
+}
+
+/* ————————— the semantic wave ————————— */
+const ACC=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();
+function mkWave(it, body){
+  body.innerHTML=`<canvas class="vzcanvas" width="640" height="300"></canvas><div class="jacks"></div>`;
+  const cv=body.querySelector('canvas'), ctx=cv.getContext('2d');
+  const upJacks=buildJacks(it, body.querySelector('.jacks'), WAVE_INPUTS);
+  it._up=upJacks;
+  it._draw=t=>{
+    const W=cv.width,H=cv.height,mid=H/2;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='rgba(43,42,39,.08)'; ctx.lineWidth=1;
+    for(let g=0;g<=4;g++){ ctx.beginPath(); ctx.moveTo(0,g*H/4); ctx.lineTo(W,g*H/4); ctx.stroke(); }
+    const amp   = inVal(it.inputs.amp,   .5);
+    const freq  = inVal(it.inputs.freq,  .5);
+    const rip   = inVal(it.inputs.ripple,.3);
+    const steady= inVal(it.inputs.steady,.8);
+    const grid  = inVal(it.inputs.grid,  0);
+    /* WAVES jack → how many echo waves sit behind the main one */
+    const wsrc=byId(it.inputs.waves);
+    const layers=1+(wsrc ? (wsrc.kind==='count'?Math.min(8,wsrc.value):Math.round(inVal(it.inputs.waves,0)*8)) : 2);
+    const A=8+amp*(H*0.32), k=1.2+freq*3.2, jit=1-steady;
+    const q=grid>.5 ? (grid-.5)*36 : 0;
+    for(let L=layers-1; L>=0; L--){
+      ctx.beginPath();
+      const ph=t*0.0011 + L*0.75;
+      for(let x=0;x<=W;x+=2){
+        const u=x/W*Math.PI*2*k;
+        let y=Math.sin(u+ph)*A;
+        y+=Math.sin(u*6+ph*2.1)*A*0.35*rip;
+        y+=Math.sin(u*11-ph*1.4)*Math.sin(u*3.7+ph)*A*0.30*jit;
+        y*=1 - L*(0.7/Math.max(layers,2));
+        if(q) y=Math.round(y/q)*q;
+        x===0?ctx.moveTo(x,mid+y):ctx.lineTo(x,mid+y);
+      }
+      ctx.strokeStyle=ACC;
+      ctx.globalAlpha=L===0?0.9:Math.max(.08, .42-L*.05);
+      ctx.lineWidth=L===0?2.4:1.6;
+      ctx.stroke(); ctx.globalAlpha=1;
+    }
+  };
+  it._up();
+}
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function loop(t){
+  S.items.forEach(i=>{ if(i._draw) i._draw(reduceMotion?0:(t||0)); });
+  if(!reduceMotion) requestAnimationFrame(loop);
+})(0);
+
+/* ————————— the radar (writes back) ————————— */
+function mkRadar(it, body){
+  body.innerHTML=`<svg class="vzcanvas" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="jacks"></div>`;
+  const svg=body.querySelector('svg');
+  const defs=Array.from({length:RADAR_AXES},(_,i)=>['a'+i,'AXIS '+(i+1)]);
+  const upJacks=buildJacks(it, body.querySelector('.jacks'), defs);
+  const CX=160, CY=122, R=88;
+  const axPt=(i,r)=>{ const a=(i/RADAR_AXES*360-90)*Math.PI/180;
+    return [CX+r*Math.cos(a), CY+r*Math.sin(a)]; };
+  it._up=()=>{
+    upJacks();
+    let rings='';
+    for(let g=1; g<=4; g++){
+      rings+=`<polygon points="${Array.from({length:RADAR_AXES},(_,i)=>axPt(i,R*g/4).join(',')).join(' ')}"
+        fill="none" stroke="var(--line)" stroke-width="1"/>`;
+    }
+    let spokes='', labels='', verts='';
+    const pts=[];
+    for(let i=0;i<RADAR_AXES;i++){
+      const src=byId(it.inputs['a'+i]);
+      const v=src ? inVal(src.id,.5) : .5;
+      const [x,y]=axPt(i,R*Math.max(.04,v)); pts.push(x+','+y);
+      const [ex,ey]=axPt(i,R);
+      spokes+=`<line x1="${CX}" y1="${CY}" x2="${ex}" y2="${ey}" stroke="var(--line)" stroke-width="1"/>`;
+      const [lx,ly]=axPt(i,R+16);
+      const anch=Math.abs(lx-CX)<8?'middle':lx>CX?'start':'end';
+      labels+=`<text x="${lx}" y="${ly+3}" text-anchor="${anch}" font-size="9.5"
+        font-family="ui-monospace,Menlo,monospace" letter-spacing="1.5"
+        fill="${src?'var(--ink)':'var(--mut)'}">${esc(src?src.label:'—')}</text>`;
+      verts+=`<circle class="vx" data-i="${i}" cx="${x}" cy="${y}" r="8"
+        fill="${src?'var(--ink)':'var(--line)'}" style="cursor:${src?'grab':'default'}"/>`;
+    }
+    svg.innerHTML=rings+spokes+
+      `<polygon points="${pts.join(' ')}" fill="var(--acc)" opacity=".14"/>
+       <polygon points="${pts.join(' ')}" fill="none" stroke="var(--acc)" stroke-width="2.5" stroke-linejoin="round"/>`+
+      verts+labels;
+    svg.querySelectorAll('.vx').forEach(vx=>{
+      vx.addEventListener('pointerdown', e=>{
+        const i=+vx.dataset.i, src=byId(it.inputs['a'+i]);
+        if(!src) return;
+        e.preventDefault(); e.stopPropagation(); vx.setPointerCapture(e.pointerId);
+        const mv=ev=>{
+          const r=svg.getBoundingClientRect();
+          const sx=(ev.clientX-r.left)/r.width*320, sy=(ev.clientY-r.top)/r.height*240;
+          const a=(i/RADAR_AXES*360-90)*Math.PI/180, ux=Math.cos(a), uy=Math.sin(a);
+          const t=Math.max(0,Math.min(1, ((sx-CX)*ux+(sy-CY)*uy)/R));
+          src.value = src.kind==='count' ? Math.round(t*10) : Math.round(t*100);
+          refresh();
+        };
+        const up=()=>{ vx.removeEventListener('pointermove',mv); vx.removeEventListener('pointerup',up);
+          vx.removeEventListener('pointercancel',up); };
+        vx.addEventListener('pointermove',mv); vx.addEventListener('pointerup',up);
+        vx.addEventListener('pointercancel',up);
+      });
+    });
+  };
+  it._up();
+}
+
+/* ————————— palette → board (native DnD) ————————— */
+let dragKind=null, dragChip=null, dragSec=null;
+document.querySelectorAll('.pal').forEach(p=>{
+  p.addEventListener('dragstart', e=>{
+    dragKind=p.dataset.kind;
+    e.dataTransfer.setData('text/plain', dragKind);
+    e.dataTransfer.effectAllowed='copy';
+  });
+  p.addEventListener('dragend', ()=>{ dragKind=null; board.classList.remove('dropHi'); });
+});
+board.addEventListener('dragover', e=>{
+  if(!dragKind) return;
+  e.preventDefault(); e.dataTransfer.dropEffect='copy'; board.classList.add('dropHi');
+});
+board.addEventListener('dragleave', ()=>board.classList.remove('dropHi'));
+board.addEventListener('drop', e=>{
+  if(!dragKind) return;
+  e.preventDefault(); board.classList.remove('dropHi');
+  const r=board.getBoundingClientRect();
+  const K=KINDS[dragKind];
+  const x=Math.max(0, Math.min(COLS-K.w, Math.round((e.clientX-r.left-PAD)/CELL)));
+  const y=Math.max(0, Math.round((e.clientY-r.top-PAD)/CELL));
+  addItem(dragKind, x, y);
+  dragKind=null; refresh();
+});
+
+/* ————————— compiler ————————— */
+const secsEl=$('#secs');
+function renderCompiler(){
+  const parts=[];
+  for(const sec of S.sections){
+    const sc=secColor(sec);
+    const rows=S.items.filter(i=>i.sec===sec.id && (i.kind==='text' || KINDS[i.kind]?.speaks))
+      .sort((a,b)=>a.seq-b.seq);
+    const chips=rows.map(itm=>{
+      if(itm.kind==='text'){
+        return `<div class="chipline" draggable="true" data-cid="${itm.id}"
+          title="click to edit · drag to another section">${esc(itm.value)||'<i>…</i>'}
+          <span class="src">TEXT · click to edit</span></div>`;
+      }
+      const line=emitLine(itm);
+      const muted=line===null;
+      return `<div class="chipline${muted?' mutedln':''}" draggable="true" data-cid="${itm.id}"
+        title="click to edit the sentence · drag to another section">
+        ${muted?`(${esc(itm.label)} — silent)`:esc(line)}
+        <span class="src">${esc(itm.label)} · ${KINDS[itm.kind].label}${itm.frame?'':' · label speaks (no sentence yet)'}</span>
+      </div>`;
+    }).join('');
+    const empty=rows.length===0;
+    parts.push(`<div class="sec" data-sid="${sec.id}" style="--sc:${sc}">
+      <header draggable="true"><i></i>
+        <input class="sname" value="${esc(sec.name)}" spellcheck="false">
+        ${empty?'<button class="sdel" title="remove empty section">×</button>':''}
+      </header>
+      <div class="sbody">${chips}
+        <button class="addtxt">+ TEXT</button>
+      </div>
+    </div>`);
+  }
+  secsEl.innerHTML=parts.join('')+`<button class="addsec">+ SECTION</button>`;
+  renderTxt();
+}
+function renderTxt(){
+  const t=S.sections.map(sec=>{
+    const rows=S.items.filter(i=>i.sec===sec.id && (i.kind==='text' || KINDS[i.kind]?.speaks))
+      .sort((a,b)=>a.seq-b.seq);
+    const lines=rows.map(i=>i.kind==='text'?(i.value.trim()||null):emitLine(i)).filter(Boolean);
+    return lines.length?`## ${sec.name}\n`+lines.join('\n'):null;
+  }).filter(Boolean).join('\n\n');
+  $('#txt').textContent=t||'(nothing speaks yet)';
+}
+$('#viewTxt').addEventListener('click', ()=>{
+  const p=$('#txt'); p.hidden=!p.hidden;
+  $('#viewTxt').textContent=p.hidden?'VIEW AS TEXT':'HIDE TEXT';
+});
+
+/* compiler events — delegated so rebuilds keep working */
+secsEl.addEventListener('click', e=>{
+  if(e.target.closest('.addsec')){ addSection('SECTION '+(S.sections.length+1)); refresh(); return; }
+  const sdel=e.target.closest('.sdel');
+  if(sdel){ const sid=sdel.closest('.sec').dataset.sid;
+    S.sections=S.sections.filter(s=>s.id!==sid); refresh(); return; }
+  const at=e.target.closest('.addtxt');
+  if(at){ const sid=at.closest('.sec').dataset.sid;
+    const t={id:nid(), kind:'text', value:'', sec:sid, seq:maxSeq(sid)+1};
+    S.items.push(t); refresh(); startChipEdit(t.id); return; }
+  const chip=e.target.closest('.chipline');
+  if(chip && !chip.querySelector('input')) startChipEdit(chip.dataset.cid);
+});
+function maxSeq(sid){ return Math.max(0, ...S.items.filter(i=>i.sec===sid).map(i=>i.seq)); }
+function startChipEdit(cid){
+  const itm=byId(cid); if(!itm) return;
+  const chip=secsEl.querySelector(`.chipline[data-cid="${cid}"]`); if(!chip) return;
+  const isText=itm.kind==='text';
+  const cur=isText?itm.value:(itm.frame||'');
+  chip.innerHTML=`<input value="${esc(cur)}" spellcheck="false"
+    placeholder="${isText?'free line of the prompt…':'sentence — put {value} where the value goes'}">`;
+  const inp=chip.querySelector('input'); inp.focus();
+  inp.addEventListener('pointerdown', e=>e.stopPropagation());
+  const commit=()=>{
+    if(isText){ itm.value=inp.value; if(!inp.value.trim()) S.items=S.items.filter(i=>i!==itm); }
+    else itm.frame=inp.value.trim()||null;
+    refresh();
+  };
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter') inp.blur();
+    if(e.key==='Escape'){ inp.value=cur; inp.blur(); } });
+}
+secsEl.addEventListener('input', e=>{
+  const sn=e.target.closest('.sname'); if(!sn) return;
+  const sec=S.sections.find(s=>s.id===sn.closest('.sec').dataset.sid);
+  sec.name=sn.value||'SECTION'; renderTxt();
+});
+/* chips + sections drag */
+secsEl.addEventListener('dragstart', e=>{
+  const chip=e.target.closest('.chipline');
+  if(chip){ dragChip=chip.dataset.cid; e.dataTransfer.setData('text/plain','chip'); return; }
+  const head=e.target.closest('.sec > header');
+  if(head){ dragSec=head.closest('.sec').dataset.sid; e.dataTransfer.setData('text/plain','sec'); }
+});
+secsEl.addEventListener('dragend', ()=>{ dragChip=dragSec=null;
+  secsEl.querySelectorAll('.dropHi').forEach(x=>x.classList.remove('dropHi')); });
+secsEl.addEventListener('dragover', e=>{
+  const sec=e.target.closest('.sec');
+  if((dragChip||dragSec) && sec){ e.preventDefault();
+    secsEl.querySelectorAll('.dropHi').forEach(x=>x.classList.remove('dropHi'));
+    sec.classList.add('dropHi'); }
+});
+secsEl.addEventListener('drop', e=>{
+  const secEl=e.target.closest('.sec'); if(!secEl) return;
+  e.preventDefault();
+  const sid=secEl.dataset.sid;
+  if(dragChip){
+    const itm=byId(dragChip); if(!itm) return;
+    const before=e.target.closest('.chipline');
+    itm.sec=sid;
+    itm.seq = before && before.dataset.cid!==dragChip && byId(before.dataset.cid)
+      ? byId(before.dataset.cid).seq-0.5 : maxSeq(sid)+1;
+    dragChip=null; refresh();
+  } else if(dragSec && dragSec!==sid){
+    const from=S.sections.findIndex(s=>s.id===dragSec), to=S.sections.findIndex(s=>s.id===sid);
+    const [m]=S.sections.splice(from,1); S.sections.splice(to,0,m);
+    dragSec=null; refresh();
+  }
+});
+
+/* ————————— refresh ————————— */
+function refresh(){
+  S.items.forEach(i=>{ if(i._up) i._up(); });
+  renderCompiler();
+  if(reduceMotion) S.items.forEach(i=>{ if(i._draw) i._draw(0); });
+}
+
+/* ————————— seed scene ————————— */
+const secVoice=addSection('VOICE'), secRules=addSection('RULES'), secShape=addSection('SHAPE OF THE ANSWER');
+const warmth =addItem('dial',   0,4,{label:'WARMTH',     value:72, sec:secVoice.id, seq:2});
+const pace   =addItem('dial',   2,4,{label:'PACE',       value:50, sec:secVoice.id, seq:3});
+const detail =addItem('dial',   4,4,{label:'DETAIL',     value:65, sec:secVoice.id, seq:4});
+const conf   =addItem('slider', 0,6,{label:'CONFIDENCE', value:80, sec:secVoice.id, seq:5,
+  frame:'Take positions with {value} confidence.'});
+const form   =addItem('slider', 3,6,{label:'FORMALITY',  value:40, sec:secVoice.id, seq:6});
+const exmpl  =addItem('count',  6,5,{label:'EXAMPLES',   value:3,  sec:secShape.id, seq:1,
+  frame:'Give {value} examples.'});
+const hedge  =addItem('switch', 9,5,{label:'NO HEDGING', value:true, sec:secRules.id, seq:1,
+  frame:'Do not hedge.'});
+const aud    =addItem('words',  6,6,{label:'WRITE AS IF FOR', value:'a busy founder', sec:secVoice.id, seq:1,
+  frame:'Write as if for {value}.'});
+const wave   =addItem('wave',   0,0,{label:'SEMANTIC WAVE'});
+const radar  =addItem('radar',  6,0,{label:'TONE OF VOICE', h:5});
+Object.assign(wave.inputs, {amp:warmth.id, freq:pace.id, ripple:detail.id,
+  steady:conf.id, grid:form.id, waves:exmpl.id});
+Object.assign(radar.inputs, {a0:warmth.id, a1:pace.id, a2:detail.id, a3:conf.id, a4:form.id});
+refresh();
+</script>
+</body>
+</html>

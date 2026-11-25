@@ -1,0 +1,223 @@
+/* Select — segmented through four options, stacked pills from five onward. */
+.mod-face--select .i-seg {
+  display: flex;
+  min-width: 0;
+  height: 32px;
+  align-items: stretch;
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+  touch-action: none;
+}
+
+.mod-face--select :is(.i-seg-cell, .i-stack-row) {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--e-ink-soft);
+  cursor: pointer;
+  transition:
+    background-color var(--e-t-fast) var(--e-ease-out),
+    color var(--e-t-fast) var(--e-ease-out);
+}
+
+.mod-face--select .i-seg-slot {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+/* Flat cells with 1px seams; only the control's ends carry the pill radius. */
+.mod-face--select .i-seg-cell {
+  width: 100%;
+  flex: 1 1 auto;
+  justify-content: center;
+  padding: 0 var(--e-sp-2);
+  border-radius: 0;
+}
+
+.mod-face--select .i-seg-slot:first-child .i-seg-cell {
+  border-radius: 999px 0 0 999px;
+}
+
+.mod-face--select .i-seg-slot:last-child .i-seg-cell {
+  border-radius: 0 999px 999px 0;
+}
+
+.mod-face--select .i-seg-slot + .i-seg-slot .i-seg-cell {
+  border-left: 1px solid var(--e-line);
+}
+
+.mod-face--select .i-stack {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--e-sp-1);
+  touch-action: none;
+}
+
+.mod-face--select .i-stack-slot {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.mod-face--select .i-stack-row {
+  width: 100%;
+  height: var(--e-sp-5);
+  padding: 0 var(--e-sp-3);
+  border-radius: 999px;
+  background: var(--e-surface-recessed);
+  text-align: left;
+}
+
+.mod-face--select :is(.i-seg-cell, .i-stack-row):hover {
+  background: color-mix(in srgb, var(--e-ink) 6%, var(--e-surface-recessed));
+  color: var(--e-ink);
+}
+
+/* The picked option wears the Mod's accent, like the reference. */
+.mod-face--select :is(.i-seg-cell, .i-stack-row).is-picked {
+  background: var(--e-mod-face-accent, var(--e-mod));
+  color: var(--e-mod-face-on-accent, var(--e-on-solid));
+}
+
+.mod-face--select :is(.i-seg-cell, .i-stack-row):focus-visible {
+  z-index: 1;
+  outline: 1px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+.mod-face--select :is(.i-seg-cell, .i-stack-row) .opt-name {
+  min-width: 0;
+  overflow: hidden;
+  pointer-events: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mod-face--select .i-seg-slot .row-x {
+  top: -7px;
+  right: -2px;
+  transform: none;
+}
+
+.mod-face--select .i-stack-slot .row-x {
+  top: -6px;
+  right: 0;
+  transform: none;
+}
+
+.mod-face--select :is(.i-seg-slot, .i-stack-slot):is(:hover, :focus-within) .row-x {
+  opacity: 1;
+}
+
+/* Order — stable token DOM; every drag preview is a unitless transform. */
+.mod-face--order .i-order {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+  gap: var(--e-sp-2);
+  padding: var(--e-sp-2);
+  overflow: hidden;
+  border-radius: var(--e-r-card);
+  background: var(--e-surface-recessed);
+}
+
+.mod-face--order .i-order-nums {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--e-sp-2);
+}
+
+.mod-face--order .i-order-num {
+  display: flex;
+  height: var(--e-sp-5);
+  align-items: center;
+  color: var(--e-ink-faint);
+}
+
+.mod-face--order .i-order-list {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--e-sp-2);
+  touch-action: none;
+}
+
+.mod-face--order .i-order-token {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  height: var(--e-sp-5);
+  align-items: center;
+  gap: var(--e-sp-2);
+  padding: 0 var(--e-sp-3);
+  border-radius: 999px;
+  background: color-mix(
+    in srgb,
+    var(--e-mod-face-accent, var(--e-mod)) 30%,
+    var(--e-surface-recessed)
+  );
+  color: var(--e-ink);
+  cursor: grab;
+  transform: translateY(calc(var(--e-mod-face-order-shift, 0) * 100%));
+  transition: transform var(--e-t-move) var(--e-ease-settle);
+  user-select: none;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.mod-face--order .i-order-token.is-top {
+  background: var(--e-mod-face-accent, var(--e-mod));
+  color: var(--e-mod-face-on-accent, var(--e-on-solid));
+}
+
+.mod-face--order .i-order-token.is-lift {
+  z-index: var(--e-z-canvas-chrome);
+  box-shadow: var(--e-shadow-lift);
+  cursor: grabbing;
+  transition: none;
+}
+
+.mod-face--order .i-order-token:focus-visible {
+  outline: 1px solid var(--e-go);
+  outline-offset: 2px;
+}
+
+.mod-face--order .i-order-token .tk-name {
+  min-width: 0;
+  overflow: hidden;
+  flex: 1 1 auto;
+  text-overflow: ellipsis;
+}
+
+.mod-face--order .i-order-token:has(.row-x) .tk-name {
+  padding-right: var(--e-sp-4);
+}
+
+.mod-face--order .i-order-token .tk-name[contenteditable='plaintext-only'] {
+  cursor: text;
+  user-select: text;
+}
+
+.mod-face--order .i-order-token .row-x {
+  right: var(--e-sp-1);
+}
+
+.mod-face--order .i-order-token:is(:hover, :focus-within) .row-x {
+  opacity: 1;
+}
+
+.mod-face-host[aria-disabled='true'] :is(
+  .mod-face--select .i-seg-cell,
+  .mod-face--select .i-stack-row,
+  .mod-face--order .i-order-token
+) {
+  cursor: inherit;
+}

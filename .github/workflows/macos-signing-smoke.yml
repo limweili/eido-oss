@@ -1,0 +1,131 @@
+name: macOS signing smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-signing-smoke-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  signing-smoke:
+    name: macOS signing smoke - macos-15 (arm64)
+    if: github.ref == 'refs/heads/main'
+    environment: macos-signing-smoke
+    runs-on: macos-15
+    timeout-minutes: 150
+    steps:
+      - name: Check out the exact dispatched SHA
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Verify the exact current main revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          current_main="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq '.object.sha')"
+          test -n "$current_main"
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$current_main" = "$GITHUB_SHA"
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build the current renderer and Electron boundary
+        run: |
+          npm run build -- --mode desktop-proof
+          npm run build:electron
+
+      - name: Preflight the signing identity before packaging
+        env:
+          EIDO_MACOS_CSC_LINK: ${{ secrets.EIDO_MACOS_CSC_LINK }}
+          EIDO_MACOS_CSC_KEY_PASSWORD: ${{ secrets.EIDO_MACOS_CSC_KEY_PASSWORD }}
+          EIDO_MACOS_NOTARIZATION_API_KEY_BASE64: ${{ secrets.EIDO_MACOS_NOTARIZATION_API_KEY_BASE64 }}
+          EIDO_MACOS_NOTARIZATION_API_KEY_ID: ${{ vars.EIDO_MACOS_NOTARIZATION_API_KEY_ID }}
+          EIDO_MACOS_NOTARIZATION_API_ISSUER: ${{ vars.EIDO_MACOS_NOTARIZATION_API_ISSUER }}
+          EIDO_MACOS_EXPECTED_TEAM_ID: ${{ vars.EIDO_MACOS_EXPECTED_TEAM_ID }}
+          EIDO_MACOS_EXPECTED_AUTHORITY: ${{ vars.EIDO_MACOS_EXPECTED_AUTHORITY }}
+          EIDO_MACOS_TESTED_SHA: ${{ github.sha }}
+          EIDO_MACOS_RUN_ID: ${{ github.run_id }}
+          EIDO_MACOS_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: node scripts/release-signing/macos-smoke.mjs preflight
+
+      - name: Build the non-promotable signed DMG
+        env:
+          APP_BUILDER_TMP_DIR: ${{ runner.temp }}/eido-macos-signing-smoke
+          CSC_LINK: ${{ runner.temp }}/eido-macos-signing-smoke/certificate.p12
+          CSC_KEY_PASSWORD: ${{ secrets.EIDO_MACOS_CSC_KEY_PASSWORD }}
+          EIDO_MACOS_EXPECTED_TEAM_ID: ${{ vars.EIDO_MACOS_EXPECTED_TEAM_ID }}
+          EIDO_MACOS_EXPECTED_AUTHORITY: ${{ vars.EIDO_MACOS_EXPECTED_AUTHORITY }}
+          EIDO_MACOS_TESTED_SHA: ${{ github.sha }}
+          EIDO_MACOS_RUN_ID: ${{ github.run_id }}
+          EIDO_MACOS_RUN_ATTEMPT: ${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! npx --no-install electron-builder --config release/signing-smoke/macos-builder.mjs --mac dmg --arm64 --publish never; then
+            node scripts/release-signing/macos-smoke.mjs record-package-failure
+            exit 1
+          fi
+
+      - name: Notarize and staple the distributed DMG
+        env:
+          EIDO_MACOS_NOTARIZATION_API_KEY_ID: ${{ vars.EIDO_MACOS_NOTARIZATION_API_KEY_ID }}
+          EIDO_MACOS_NOTARIZATION_API_ISSUER: ${{ vars.EIDO_MACOS_NOTARIZATION_API_ISSUER }}
+          EIDO_MACOS_EXPECTED_TEAM_ID: ${{ vars.EIDO_MACOS_EXPECTED_TEAM_ID }}
+          EIDO_MACOS_EXPECTED_AUTHORITY: ${{ vars.EIDO_MACOS_EXPECTED_AUTHORITY }}
+          EIDO_MACOS_TESTED_SHA: ${{ github.sha }}
+          EIDO_MACOS_RUN_ID: ${{ github.run_id }}
+          EIDO_MACOS_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: node scripts/release-signing/macos-smoke.mjs notarize-dmg
+
+      - name: Remove signing credentials from the runner
+        if: ${{ always() }}
+        env:
+          EIDO_MACOS_TESTED_SHA: ${{ github.sha }}
+          EIDO_MACOS_RUN_ID: ${{ github.run_id }}
+          EIDO_MACOS_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: node scripts/release-signing/macos-smoke.mjs cleanup
+
+      - name: Verify signing, notarization, install, offline launch, and cleanup
+        env:
+          EIDO_MACOS_EXPECTED_TEAM_ID: ${{ vars.EIDO_MACOS_EXPECTED_TEAM_ID }}
+          EIDO_MACOS_EXPECTED_AUTHORITY: ${{ vars.EIDO_MACOS_EXPECTED_AUTHORITY }}
+          EIDO_MACOS_TESTED_SHA: ${{ github.sha }}
+          EIDO_MACOS_RUN_ID: ${{ github.run_id }}
+          EIDO_MACOS_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: node scripts/release-signing/macos-smoke.mjs verify
+
+      - name: Upload verified signed smoke bytes
+        if: ${{ success() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-macos-signing-smoke-${{ github.sha }}
+          path: |
+            .local/macos-signing-smoke/eido-macos-signing-smoke-non-promotable-0.0.0-arm64.dmg
+            .local/macos-signing-smoke/macos-signing-evidence.json
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Upload normalized failure diagnostics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eido-macos-signing-smoke-failure-${{ github.sha }}
+          path: .local/macos-signing-smoke/failure-diagnostics.json
+          if-no-files-found: ignore
+          retention-days: 3

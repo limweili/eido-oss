@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Eido — Architecture Review: Deepening Opportunities</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+    </script>
+    <style>
+      .seam { stroke-dasharray: 4 4; }
+      .leak { stroke: #dc2626; }
+      .deep { background: linear-gradient(135deg, #0f172a, #1e293b); }
+      .dup-block {
+        background: repeating-linear-gradient(135deg, rgba(220,38,38,0.08) 0 8px, rgba(220,38,38,0.14) 8px 16px);
+      }
+      .arrow-down {
+        width: 0; height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 8px solid #64748b;
+        margin: 0 auto;
+      }
+      .arrow-right {
+        width: 0; height: 0;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-left: 8px solid #64748b;
+      }
+      .card-anchor { scroll-margin-top: 2rem; }
+      pre code { white-space: pre-wrap; word-break: break-word; }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-5xl mx-auto px-6 py-12 space-y-14">
+
+      <!-- HEADER -->
+      <header class="space-y-4 border-b border-slate-200 pb-8">
+        <p class="text-xs uppercase tracking-wider text-slate-400 font-mono">limweili/eido — repository root — 2026-07-06</p>
+        <h1 class="font-serif text-4xl font-bold text-slate-900">Eido — Architecture Review: Deepening Opportunities</h1>
+        <p class="text-slate-600 max-w-3xl leading-relaxed">
+          This review ran right after the performance work stream closed out (13 PRs merged). The codebase is
+          healthy — gates green, 310 tests — and what follows are deepening opportunities, not fires. Each
+          candidate turns a shallow interface (copy this code) into a deep one (call this module).
+        </p>
+      </header>
+
+      <!-- LEGEND -->
+      <section class="rounded-lg border border-slate-200 bg-white p-5">
+        <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-3">Legend</p>
+        <div class="grid sm:grid-cols-4 gap-4 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="inline-block rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 text-xs font-semibold">Strong</span>
+            <span class="text-slate-600">clear win, low risk</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block rounded-full bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 text-xs font-semibold">Worth exploring</span>
+            <span class="text-slate-600">real, needs care</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2 py-0.5 text-xs font-semibold">Speculative</span>
+            <span class="text-slate-600">noticed, not proposed</span>
+          </div>
+          <div class="text-slate-600">
+            <span class="font-semibold text-slate-800">Deletion test:</span> delete the module — does complexity disperse (module earns its place) or vanish (module was never doing anything)?
+          </div>
+        </div>
+      </section>
+
+      <!-- CANDIDATES -->
+      <section id="candidates" class="space-y-14">
+
+        <!-- CANDIDATE 1 -->
+        <article id="c1" class="card-anchor space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl font-bold flex-1">1. One run lifecycle module <span class="text-slate-400 text-base font-sans">(brain layer)</span></h2>
+            <span class="inline-block rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 text-xs font-semibold">Strong</span>
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-mono">in-process</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 font-mono text-sm">
+            <span class="bg-slate-100 rounded px-2 py-1">brain/runEngine.ts:50-109 + 413-467</span>
+            <span class="bg-slate-100 rounded px-2 py-1">brain/conversationRunner.ts:65-93</span>
+            <span class="bg-slate-100 rounded px-2 py-1">brain/followUpRunner.ts:33-46</span>
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Problem —</span> three run loops (Ask runs, Conversations, Follow-ups) each hand-roll the same lifecycle plumbing: a registry of active AbortControllers (three different map shapes for the same concept), an isRunCanceled check reimplemented twice with different run-status queries, and a plainError function that is byte-for-byte identical in all three files. A cancel-semantics bug must be fixed three times by hand.</p>
+
+          <pre class="rounded-lg bg-slate-900 text-slate-100 p-3 text-xs overflow-x-auto"><code>Map&lt;string, Set&lt;AbortController&gt;&gt;                 // runEngine.ts
+Map&lt;string, AbortController&gt;                     // conversationRunner.ts
+Map&lt;string, {controller, assistantMessageId}&gt;    // followUpRunner.ts</code></pre>
+
+          <p class="text-slate-700"><span class="font-semibold">Also:</span> the two-pass Compaction protocol (compile with no summaries → generate cheap-model summaries → recompile) is written out longhand in both <code class="font-mono text-xs bg-slate-100 rounded px-1">runEngine.ts:160-182</code> and <code class="font-mono text-xs bg-slate-100 rounded px-1">conversationRunner.ts:160-196</code> — a comment in the second literally says "mirrors runCard's two passes": copy acknowledged, not reused.</p>
+
+          <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            <span class="font-semibold text-slate-700">Deletion test —</span> deleting any one file disperses nothing; the complexity was never concentrated. Three deep-looking modules hiding one smeared shallow concept.
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Solution —</span> one <code class="font-mono text-xs bg-slate-100 rounded px-1">runLifecycle</code> module owning controller registries, cancel semantics, and error-to-plain-word translation; plus one <code class="font-mono text-xs bg-slate-100 rounded px-1">compileUnderBudget</code> function owning the two-pass Compaction protocol with the compile primitive injected. All three runners become thin callers.</p>
+
+          <ul class="text-slate-700 text-sm space-y-1 list-disc list-inside">
+            <li><span class="font-semibold">Locality</span> — cancel bugs get one home, one test surface</li>
+            <li><span class="font-semibold">Leverage</span> — the next runner kind inherits cancel/budget behavior for free</li>
+            <li><span class="font-semibold">Testability</span> — tests move from three mocked loops to one real interface</li>
+          </ul>
+
+          <!-- BEFORE/AFTER -->
+          <div class="grid md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex gap-2 justify-between" style="min-height:280px">
+                <div class="flex-1 border-2 border-slate-400 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-xs uppercase tracking-wider text-slate-500 text-center font-semibold">Ask runner</p>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">registry</div>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">canceled?</div>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">plainError</div>
+                </div>
+                <div class="flex-1 border-2 border-slate-400 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-xs uppercase tracking-wider text-slate-500 text-center font-semibold">Conversation runner</p>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">registry</div>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">canceled?</div>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">plainError</div>
+                </div>
+                <div class="flex-1 border-2 border-slate-400 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-xs uppercase tracking-wider text-slate-500 text-center font-semibold">Follow-up runner</p>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">registry</div>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">canceled?</div>
+                  <div class="dup-block border border-red-300 rounded text-[10px] text-center py-2 text-red-800">plainError</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex flex-col items-center gap-2" style="min-height:280px">
+                <div class="flex gap-2 w-full">
+                  <div class="flex-1 border border-slate-300 rounded-md p-2 text-center text-[10px] text-slate-500">Ask runner</div>
+                  <div class="flex-1 border border-slate-300 rounded-md p-2 text-center text-[10px] text-slate-500">Conversation runner</div>
+                  <div class="flex-1 border border-slate-300 rounded-md p-2 text-center text-[10px] text-slate-500">Follow-up runner</div>
+                </div>
+                <div class="arrow-down"></div>
+                <div class="deep w-full flex-1 rounded-md p-3 flex flex-col gap-1.5 justify-center">
+                  <p class="text-xs uppercase tracking-wider text-slate-200 text-center font-semibold">run lifecycle</p>
+                  <div class="bg-white/10 border border-white/20 rounded text-[10px] text-center py-1.5 text-slate-200">registry</div>
+                  <div class="bg-white/10 border border-white/20 rounded text-[10px] text-center py-1.5 text-slate-200">canceled?</div>
+                  <div class="bg-white/10 border border-white/20 rounded text-[10px] text-center py-1.5 text-slate-200">plainError</div>
+                  <div class="bg-white/10 border border-white/20 rounded text-[10px] text-center py-1.5 text-slate-200">compile under budget</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CANDIDATE 2 -->
+        <article id="c2" class="card-anchor space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl font-bold flex-1">2. Start and settle a Run once <span class="text-slate-400 text-base font-sans">(graph store)</span></h2>
+            <span class="inline-block rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 text-xs font-semibold">Strong</span>
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-mono">in-process</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 font-mono text-sm">
+            <span class="bg-slate-100 rounded px-2 py-1">graph/store.ts:1938-2069 (beginRun)</span>
+            <span class="bg-slate-100 rounded px-2 py-1">graph/store.ts:2071-2136 (beginGroupDigestRun)</span>
+            <span class="bg-slate-100 rounded px-2 py-1">graph/store.ts:2452-2584 (beginConversationRun)</span>
+            <span class="bg-slate-100 rounded px-2 py-1">graph/store.ts:2151-2280 + 2719-2796 (finish/fail/cancel ×2)</span>
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Problem —</span> "start a run against a card, producing an Output Version" is one concept implemented three times: each <code class="font-mono text-xs bg-slate-100 rounded px-1">begin*</code> action independently finds-or-creates the result card — re-deriving inline the exact lookup the Graph Index already exposes as <code class="font-mono text-xs bg-slate-100 rounded px-1">resultCardFor</code>, a leverage point built this session and then bypassed — then appends the Output Version, assembles the RunRecord, builds the event triad, commits, pushes undo. Terminal transitions are six near-identical blocks (finishRun / failRun / cancelRun + conversation variants).</p>
+
+          <pre class="rounded-lg bg-slate-900 text-slate-100 p-3 text-xs overflow-x-auto"><code>// result-card find-or-create — byte-for-byte at store.ts:1945 and :2459
+// output/version append — identical at :1990, :2077, :2505
+// adding contextBudget this session required touching multiple begin* sites</code></pre>
+
+          <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            <span class="font-semibold text-slate-700">Deletion test —</span> deleting beginRun concentrates nothing; its logic already lives independently in the other two. The set is shallow: three interfaces exposing the same implementation detail three ways.
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Solution —</span> one internal <code class="font-mono text-xs bg-slate-100 rounded px-1">startRun(sourceCardId, kind, fields)</code> helper owning result-card find-or-create (via the Graph Index), version append, and event assembly; one <code class="font-mono text-xs bg-slate-100 rounded px-1">settleRun(runId, status)</code> helper for the six terminal blocks. The three public actions stay but become thin.</p>
+
+          <ul class="text-slate-700 text-sm space-y-1 list-disc list-inside">
+            <li><span class="font-semibold">Leverage</span> — the next run kind or RunRecord field is one edit</li>
+            <li><span class="font-semibold">Locality</span> — provenance invariants get one place to test</li>
+            <li><span class="font-semibold">Testability</span> — every Run→version→event invariant checked once</li>
+          </ul>
+
+          <div class="grid md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex flex-col gap-2 justify-center" style="min-height:280px">
+                <div class="flex flex-col gap-1">
+                  <p class="text-[10px] text-slate-500">beginRun</p>
+                  <div class="flex gap-0.5">
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <p class="text-[10px] text-slate-500">beginGroupDigestRun</p>
+                  <div class="flex gap-0.5">
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <p class="text-[10px] text-slate-500">beginConversationRun</p>
+                  <div class="flex gap-0.5">
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                    <div class="dup-block border border-red-300 rounded-sm flex-1 h-6"></div>
+                  </div>
+                </div>
+                <p class="text-[9px] text-slate-400 text-center pt-1">6 identical stages × 3 pipelines</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex flex-col items-center gap-2 justify-center" style="min-height:280px">
+                <div class="flex gap-2 w-full">
+                  <div class="flex-1 border border-slate-300 rounded-md p-1.5 text-center text-[9px] text-slate-500">beginRun</div>
+                  <div class="flex-1 border border-slate-300 rounded-md p-1.5 text-center text-[9px] text-slate-500">beginGroupDigestRun</div>
+                  <div class="flex-1 border border-slate-300 rounded-md p-1.5 text-center text-[9px] text-slate-500">beginConversationRun</div>
+                </div>
+                <div class="arrow-down"></div>
+                <div class="deep w-full rounded-md p-2">
+                  <p class="text-[10px] uppercase tracking-wider text-slate-200 text-center font-semibold mb-1">startRun / settleRun</p>
+                  <div class="flex gap-0.5">
+                    <div class="bg-white/10 border border-white/20 rounded-sm flex-1 h-6"></div>
+                    <div class="bg-white/10 border border-white/20 rounded-sm flex-1 h-6"></div>
+                    <div class="bg-white/10 border border-white/20 rounded-sm flex-1 h-6"></div>
+                    <div class="bg-white/10 border border-white/20 rounded-sm flex-1 h-6"></div>
+                    <div class="bg-white/10 border border-white/20 rounded-sm flex-1 h-6"></div>
+                    <div class="bg-white/10 border border-white/20 rounded-sm flex-1 h-6"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CANDIDATE 3 -->
+        <article id="c3" class="card-anchor space-y-4 rounded-xl border-2 border-emerald-300 bg-emerald-50/40 p-6 shadow-md">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl font-bold flex-1">3. A commit that knows about events <span class="text-slate-400 text-base font-sans">(graph store)</span></h2>
+            <span class="inline-block rounded-full bg-amber-400 text-amber-950 border border-amber-500 px-2.5 py-1 text-xs font-bold uppercase tracking-wide">Top recommendation</span>
+            <span class="inline-block rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 text-xs font-semibold">Strong</span>
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-mono">in-process</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 font-mono text-sm">
+            <span class="bg-slate-100 rounded px-2 py-1">graph/store.ts — pervasive</span>
+            <span class="bg-slate-100 rounded px-2 py-1">67× commit() calls</span>
+            <span class="bg-slate-100 rounded px-2 py-1">41× makeEvent() calls</span>
+            <span class="bg-slate-100 rounded px-2 py-1">27× hand-rolled intentLog spreads</span>
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Problem —</span> every mutating action re-derives the "append Intent Log Events inside a commit" ritual by hand. The concept has no name and no single location — a guarded-vs-unguarded mistake must be hunted call site by call site. This is the missing seam the roadmap already wants: the reviewed Graph Index design (context-layer.md) needs <code class="font-mono text-xs bg-slate-100 rounded px-1">commit()</code> to emit BoardChange records, and issue #154 (command contracts — the only open issue) is blocked on exactly that.</p>
+
+          <pre class="rounded-lg bg-slate-900 text-slate-100 p-3 text-xs overflow-x-auto"><code>intentLog: [...s.intentLog, event]                       // unconditional
+intentLog: event ? [...s.intentLog, event] : s.intentLog  // event-guarded
+intentLog: events.length ? [...s.intentLog, ...events] : s.intentLog // length-guarded</code></pre>
+
+          <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            <span class="font-semibold text-slate-700">Deletion test —</span> nothing to delete; the behavior is smeared so thin no module holds it. That absence <span class="italic">is</span> the finding. The change funnel exists (one commit()) but events ride around it, not through it.
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Solution —</span> extend <code class="font-mono text-xs bg-slate-100 rounded px-1">commit(updater, events?)</code> so event append happens once inside the funnel. Every action passes its events instead of splicing the log. BoardChange emission then has a natural birthplace: the same call already sees what changed.</p>
+
+          <!-- INFO CALLOUT -->
+          <div class="rounded-md border border-sky-300 bg-sky-50 p-3 text-sm text-sky-900 flex gap-2">
+            <span class="font-bold">ⓘ</span>
+            <p>Aligns with ADR 0001 (event log as long-term source) and the reviewed Graph Index design; prerequisite for parked issue #154.</p>
+          </div>
+
+          <ul class="text-slate-700 text-sm space-y-1 list-disc list-inside">
+            <li><span class="font-semibold">Leverage</span> — one primitive serving ~25 actions and the doorway to Tier-2 incremental indexes, Playback slices, and issue #154</li>
+            <li><span class="font-semibold">Locality</span> — event-append correctness becomes one function, one test</li>
+            <li><span class="font-semibold">Highest leverage of the set</span> — it unblocks the only remaining open issue</li>
+          </ul>
+
+          <!-- MERMAID DIAGRAM -->
+          <div class="grid md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before — actions bypass the funnel</p>
+              <div class="rounded-lg border border-slate-200 bg-white p-3" style="min-height:320px">
+                <pre class="mermaid text-xs">
+flowchart TD
+  A1[addCard] --> S[(state)]
+  A2[updateCard] --> S
+  A3[beginRun] --> S
+  A4[finishRun] --> S
+  A1 -.-> L[(intentLog)]
+  A2 -.-> L
+  A3 -.-> L
+  A4 -.-> L
+  classDef leak stroke:#dc2626,stroke-width:2px,stroke-dasharray: 4 4;
+  class A1,A2,A3,A4 leak
+                </pre>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">After — one funnel, fanning out</p>
+              <div class="rounded-lg border border-slate-200 bg-white p-3" style="min-height:320px">
+                <pre class="mermaid text-xs">
+flowchart TD
+  A1[addCard] --> C
+  A2[updateCard] --> C
+  A3[beginRun] --> C
+  A4[finishRun] --> C
+  C["commit(updater, events?)"] --> S[(state)]
+  C --> L[(intentLog)]
+  C -.future.-> B[/BoardChange stream/]
+  classDef deep fill:#0f172a,color:#fff,stroke:#0f172a;
+  classDef future stroke-dasharray: 4 4,stroke:#64748b,fill:#f1f5f9;
+  class C deep
+  class B future
+                </pre>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CANDIDATE 4 -->
+        <article id="c4" class="card-anchor space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl font-bold flex-1">4. One constructor for the board projection <span class="text-slate-400 text-base font-sans">(canvas↔graph seam)</span></h2>
+            <span class="inline-block rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 text-xs font-semibold">Strong (small)</span>
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-mono">in-process</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 font-mono text-sm">
+            <span class="bg-slate-100 rounded px-2 py-1">canvas/graphSelectors.ts:70-79 (boardOf)</span>
+            <span class="bg-slate-100 rounded px-2 py-1">canvas/ChainPreview.tsx:39-42</span>
+            <span class="bg-slate-100 rounded px-2 py-1">canvas/ContextPeek.tsx:21-24</span>
+            <span class="bg-slate-100 rounded px-2 py-1">+8 sites app-wide with sentinel updatedAt:''</span>
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Problem —</span> the SavedBoard projection (<code class="font-mono text-xs bg-slate-100 rounded px-1">{version:1, cards, connections, outputs, runs, updatedAt:''}</code>) is hand-assembled as a literal at every seam crossing. The named constructor exists (<code class="font-mono text-xs bg-slate-100 rounded px-1">boardOf</code>) but two UI modules re-literal it instead. If SavedBoard grows a required field, three-plus sites need matching edits and nothing forces it. Related: <code class="font-mono text-xs bg-slate-100 rounded px-1">save.ts emptyBoard()</code> and <code class="font-mono text-xs bg-slate-100 rounded px-1">store.ts normalizeBoardForRuntime()</code> are two independent partial-defaulting functions for the same type — emptyBoard's output isn't a valid runtime board until a second pass elsewhere backfills it.</p>
+
+          <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            <span class="font-semibold text-slate-700">Deletion test —</span> deleting boardOf today breaks nothing — the symptom itself: the abstraction exists but has no leverage.
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Solution —</span> export one <code class="font-mono text-xs bg-slate-100 rounded px-1">boardOf</code> constructor and one board normalizer; every hand-rolled literal calls it.</p>
+
+          <ul class="text-slate-700 text-sm space-y-1 list-disc list-inside">
+            <li><span class="font-semibold">Locality</span> — the SavedBoard shape has one home</li>
+            <li>the sentinel <code class="font-mono text-xs bg-slate-100 rounded px-1">updatedAt:''</code> gets one honest home</li>
+            <li><span class="font-semibold">Testability</span> — trivially testable in isolation</li>
+          </ul>
+
+          <div class="grid md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 grid grid-cols-4 gap-1.5 content-center" style="min-height:280px">
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">literal</div>
+                <p class="col-span-4 text-[9px] text-slate-400 text-center pt-1">8 scattered copies of {version:1, cards, connections, outputs, runs, updatedAt:''}</p>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex flex-col items-center justify-center gap-3" style="min-height:280px">
+                <div class="deep rounded-md px-4 py-3">
+                  <p class="text-xs uppercase tracking-wider text-slate-200 font-semibold text-center">boardOf</p>
+                </div>
+                <div class="grid grid-cols-4 gap-1.5 w-full">
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                  <div class="border border-slate-300 rounded text-[9px] text-center py-1.5 text-slate-500">call</div>
+                </div>
+                <p class="text-[9px] text-slate-400 text-center">one constructor, 8 arrows in</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CANDIDATE 5 -->
+        <article id="c5" class="card-anchor space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl font-bold flex-1">5. Card chrome: version chips, provisional labels, cancel buttons <span class="text-slate-400 text-base font-sans">(canvas)</span></h2>
+            <span class="inline-block rounded-full bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-1 text-xs font-semibold">Worth exploring</span>
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-mono">local-substitutable</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 font-mono text-sm">
+            <span class="bg-slate-100 rounded px-2 py-1">cards/ResultCard.tsx</span>
+            <span class="bg-slate-100 rounded px-2 py-1">cards/ConversationResultCard.tsx</span>
+            <span class="bg-slate-100 rounded px-2 py-1">cards/GroupCard.tsx</span>
+            <span class="bg-slate-100 rounded px-2 py-1">cards/AskAiCard.tsx</span>
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Problem —</span> <code class="font-mono text-xs bg-slate-100 rounded px-1">provisionalReasonLabel</code> is copy-pasted verbatim in three files; the version-switcher chip block (ver-chip active/kept/provisional + chooseVersion handler) is copy-pasted three times; the budget-label lookup (boardSnapshotNow → contextLabel) twice. The interface for a version chooser is currently "copy this code" — as shallow as an interface gets. BudgetMarker and SourceChangedBadge (extracted this session) prove the pattern works.</p>
+
+          <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            <span class="font-semibold text-slate-700">Deletion test —</span> deleting any copy just forces retyping it — pure shallow duplication.
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Solution —</span> shared VersionSwitcher component + provisional-label helper + budget-label hook, composed by each result-shaped card.</p>
+
+          <ul class="text-slate-700 text-sm space-y-1 list-disc list-inside">
+            <li>chip behavior (keyboard, styling, kept/provisional) becomes one test surface</li>
+            <li>new card kinds compose instead of copying</li>
+          </ul>
+
+          <div class="grid md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex gap-2 justify-between" style="min-height:260px">
+                <div class="flex-1 border-2 border-slate-400 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-[10px] text-slate-500 text-center font-semibold">ResultCard</p>
+                  <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">chip row</div>
+                </div>
+                <div class="flex-1 border-2 border-slate-400 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-[10px] text-slate-500 text-center font-semibold">ConversationResultCard</p>
+                  <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">chip row</div>
+                </div>
+                <div class="flex-1 border-2 border-slate-400 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-[10px] text-slate-500 text-center font-semibold">GroupCard</p>
+                  <div class="dup-block border border-red-300 rounded text-[9px] text-center py-3 text-red-800">chip row</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex gap-2 justify-between" style="min-height:260px">
+                <div class="flex-1 border border-slate-300 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-[10px] text-slate-500 text-center font-semibold">ResultCard</p>
+                  <div class="bg-slate-800 text-slate-100 rounded text-[9px] text-center py-3">VersionSwitcher</div>
+                </div>
+                <div class="flex-1 border border-slate-300 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-[10px] text-slate-500 text-center font-semibold">ConversationResultCard</p>
+                  <div class="bg-slate-800 text-slate-100 rounded text-[9px] text-center py-3">VersionSwitcher</div>
+                </div>
+                <div class="flex-1 border border-slate-300 rounded-md p-2 flex flex-col gap-1.5">
+                  <p class="text-[10px] text-slate-500 text-center font-semibold">GroupCard</p>
+                  <div class="bg-slate-800 text-slate-100 rounded text-[9px] text-center py-3">VersionSwitcher</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CANDIDATE 6 -->
+        <article id="c6" class="card-anchor space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl font-bold flex-1">6. Name the LOD sub-policies <span class="text-slate-400 text-base font-sans">(canvas scene)</span></h2>
+            <span class="inline-block rounded-full bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-1 text-xs font-semibold">Worth exploring</span>
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-mono">in-process</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 font-mono text-sm">
+            <span class="bg-slate-100 rounded px-2 py-1">canvas/boardScene.ts:107-294 (createBoardScene)</span>
+            <span class="bg-slate-100 rounded px-2 py-1">boardScene.test.ts (13 tests, all whole-scene)</span>
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Problem —</span> the scene planner derives ~19 interacting flags in one 190-line function. It passes the deletion test — deleting it would disperse LOD policy back into Board.tsx as ad-hoc conditionals — the module earns its existence. But internally the policy has no named parts, so every test constructs a full scene and asserts emergent properties, and this session's #167 regression came precisely from misreading the interaction of two flags (settled vs moving suppression). The fix required a comment block to explain two constraints one flag now encodes.</p>
+
+          <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+            <span class="font-semibold text-slate-700">Deletion test —</span> passes (deep) — friction is internal organization, not existence.
+          </div>
+
+          <p class="text-slate-700"><span class="font-semibold">Solution —</span> split into named, independently testable sub-policies (aperture state, board-scale class, detail budget, suppression) that createBoardScene composes.</p>
+
+          <!-- WARNING CALLOUT -->
+          <div class="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 flex gap-2">
+            <span class="font-bold">⚠</span>
+            <p>This area is guarded by the dense-board perf gates and was stabilized this session (#150 / #158 / #167). Refactor only with the gates run locally before and after.</p>
+          </div>
+
+          <ul class="text-slate-700 text-sm space-y-1 list-disc list-inside">
+            <li><span class="font-semibold">Locality</span> — the #167-style settled-vs-moving rule becomes a two-case unit test, not a browser-perf-gate archaeology dig</li>
+            <li>perf gates stay as integration backstops, not the only net</li>
+          </ul>
+
+          <div class="grid md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">Before</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex items-center justify-center" style="min-height:240px">
+                <div class="border-2 border-slate-400 rounded-md p-3 w-full">
+                  <p class="text-[10px] text-slate-500 text-center font-semibold mb-2">createBoardScene</p>
+                  <div class="flex flex-wrap gap-1 justify-center">
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">aperture</span>
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">settled</span>
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">moving</span>
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">scale</span>
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">density</span>
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">budget</span>
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">suppress</span>
+                    <span class="text-[8px] bg-slate-200 rounded px-1.5 py-0.5 text-slate-600">…+12 more</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-400 mb-2">After</p>
+              <div class="rounded-lg border border-slate-200 bg-stone-50 p-3 flex flex-col items-center justify-center gap-2" style="min-height:240px">
+                <div class="grid grid-cols-2 gap-1.5 w-full">
+                  <div class="border border-slate-300 rounded-md p-2 text-center text-[9px] text-slate-600 bg-white">aperture state</div>
+                  <div class="border border-slate-300 rounded-md p-2 text-center text-[9px] text-slate-600 bg-white">board-scale class</div>
+                  <div class="border border-slate-300 rounded-md p-2 text-center text-[9px] text-slate-600 bg-white">detail budget</div>
+                  <div class="border border-slate-300 rounded-md p-2 text-center text-[9px] text-slate-600 bg-white">suppression</div>
+                </div>
+                <div class="arrow-down"></div>
+                <div class="deep rounded-md px-4 py-2 w-full text-center">
+                  <p class="text-[10px] text-slate-200 font-semibold">createBoardScene</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CANDIDATE 7 -->
+        <article id="c7" class="card-anchor space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2">
+            <h2 class="font-serif text-2xl font-bold flex-1">7. Small shallow-triplicates <span class="text-slate-400 text-base font-sans">(quick sweep)</span></h2>
+            <span class="inline-block rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 text-xs font-semibold">Strong (tiny)</span>
+            <span class="inline-block rounded-full bg-slate-100 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-mono">in-process</span>
+          </div>
+          <ul class="text-slate-700 text-sm space-y-3 list-disc list-inside">
+            <li>
+              The identical 8-line FNV-1a hash function exists in <code class="font-mono text-xs bg-slate-100 rounded px-1">contextCompaction.ts</code>, <code class="font-mono text-xs bg-slate-100 rounded px-1">groupDigestFreshness.ts</code>, and <code class="font-mono text-xs bg-slate-100 rounded px-1">sourceContext.ts</code>. Worse: one caller hashes with key-sorted JSON (stableStringify) while another uses raw JSON.stringify — one cache system already fixed a stability bug the other is still exposed to.
+              <span class="block text-slate-500 mt-0.5">→ one shared fingerprint module.</span>
+            </li>
+            <li>
+              <code class="font-mono text-xs bg-slate-100 rounded px-1">CompletionStream</code>: exported from <code class="font-mono text-xs bg-slate-100 rounded px-1">runEngine.ts</code>, correctly imported by <code class="font-mono text-xs bg-slate-100 rounded px-1">contextCompaction.ts</code>, silently redeclared locally in <code class="font-mono text-xs bg-slate-100 rounded px-1">conversationRunner.ts</code> — same name, no import; a divergence would never be flagged.
+              <span class="block text-slate-500 mt-0.5">→ import the canonical one (or hoist to openRouter.ts where streamCompletion lives).</span>
+            </li>
+            <li>
+              <code class="font-mono text-xs bg-slate-100 rounded px-1">lineage.ts</code> privately reimplements the chosen-version rule that <code class="font-mono text-xs bg-slate-100 rounded px-1">graphIndex.ts</code> already exports as <code class="font-mono text-xs bg-slate-100 rounded px-1">chosenVersion()</code>.
+              <span class="block text-slate-500 mt-0.5">→ import it.</span>
+            </li>
+            <li>
+              <code class="font-mono text-xs bg-slate-100 rounded px-1">history.ts cardUpdateAction</code> and <code class="font-mono text-xs bg-slate-100 rounded px-1">store.ts recordCardStructuralChange</code> diff the same before/after card arrays with two different equality rules (one compares size, one doesn't).
+              <span class="block text-slate-500 mt-0.5">→ derive the Intent Log Events from the patches cardUpdateAction already returns.</span>
+            </li>
+          </ul>
+        </article>
+
+      </section>
+
+      <!-- ALSO LOOKED AT -->
+      <section class="rounded-xl border border-slate-200 bg-slate-100/60 p-6 space-y-3">
+        <div class="flex items-center gap-2">
+          <h3 class="font-serif text-lg font-semibold text-slate-700">Also looked at, not proposing</h3>
+          <span class="inline-block rounded-full bg-slate-200 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-semibold">Speculative</span>
+          <span class="inline-block rounded-full bg-slate-200 text-slate-600 border border-slate-300 px-2.5 py-1 text-xs font-semibold">Speculative</span>
+        </div>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          Board.tsx has accreted past its adapter seam (deep-link history stack, measured-size tracking, clipboard,
+          keyboard — 1100 lines against a header comment that says "thin adapter"); the cleanest first slice is
+          extracting the deep-link/viewport-history state machine, which has zero React Flow coupling. And the
+          overview visibility decision is split across boardScene/renderPlanning/BoardOverviewLayer with the
+          composed invariant only checkable in browser tests — real, but freshly stabilized and gate-guarded;
+          touch last. Both are worth revisiting after candidates 5-6 land.
+        </p>
+      </section>
+
+      <!-- TOP RECOMMENDATION -->
+      <section id="top-recommendation" class="rounded-xl border-2 border-emerald-400 bg-emerald-50 p-8 space-y-4">
+        <p class="text-xs uppercase tracking-wider text-emerald-700 font-semibold">Top recommendation</p>
+        <h2 class="font-serif text-3xl font-bold text-slate-900">
+          <a href="#c3" class="hover:underline">3 — A commit that knows about events</a>
+        </h2>
+        <ol class="text-slate-700 space-y-2 list-decimal list-inside">
+          <li><span class="font-semibold">Highest leverage</span> — one primitive serves ~25 actions.</li>
+          <li>It is the prerequisite for the only open issue (#154) and for the BoardChange change-stream the reviewed Graph Index design already specifies — the roadmap is already pointed here.</li>
+          <li><span class="font-semibold">Risk is low</span> — behavior is unchanged (same events, same log) while the seam it creates is exactly where Playback slices and future sync want to stand.</li>
+        </ol>
+        <div class="pt-2 border-t border-emerald-200">
+          <p class="text-sm text-slate-600"><span class="font-semibold text-slate-700">Suggested sequence afterwards:</span> 2 → 1 (run lifecycle both sides of the store seam), then 4 and 7 as an afternoon of small wins, then 5, then 6 with gates.</p>
+        </div>
+      </section>
+
+      <p class="text-center font-serif text-xl text-slate-800 pt-4">Which of these would you like to explore?</p>
+
+    </main>
+  </body>
+</html>

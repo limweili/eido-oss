@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eido Activity Language Research</title>
+  <style>
+    :root {
+      --paper: #fbf7ec;
+      --paper-deep: #efe6d3;
+      --ink: #171717;
+      --muted: #68625a;
+      --line: #221f1a;
+      --yellow: #f3d431;
+      --blue: #2f78d8;
+      --green: #18b77b;
+      --red: #ee4c2f;
+      --pink: #ee70bd;
+      --purple: #7853b7;
+      --cyan: #84d2e8;
+      --radius: 8px;
+      --shadow: 0 18px 60px rgba(23, 23, 23, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(23, 23, 23, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 23, 23, 0.02) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      min-height: 92vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 28px 0 20px;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-weight: 800;
+    }
+
+    .topline span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 12px 0 0 var(--yellow), 24px 0 0 var(--pink), 36px 0 0 var(--blue);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 0.86fr 1.14fr;
+      gap: 36px;
+      align-items: center;
+      padding: 52px 0 36px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(58px, 10vw, 146px);
+      line-height: 0.86;
+      letter-spacing: 0;
+      font-weight: 950;
+    }
+
+    .lede {
+      margin: 28px 0 0;
+      max-width: 660px;
+      font-size: clamp(19px, 2vw, 28px);
+      line-height: 1.16;
+      font-weight: 760;
+    }
+
+    .thesis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 3px solid var(--ink);
+      border-bottom: 3px solid var(--ink);
+    }
+
+    .thesis div {
+      padding: 18px 18px 18px 0;
+      min-height: 110px;
+      border-right: 2px solid var(--ink);
+      font-weight: 760;
+    }
+
+    .thesis div:last-child {
+      border-right: 0;
+      padding-left: 18px;
+    }
+
+    .thesis small {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .poster {
+      position: relative;
+      min-height: 620px;
+      overflow: hidden;
+      border: 3px solid var(--ink);
+      background: #fffdf5;
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+
+    .poster::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(23, 23, 23, 0.18) 0.7px, transparent 0.7px);
+      background-size: 5px 5px;
+      mix-blend-mode: multiply;
+      opacity: 0.24;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 620px;
+    }
+
+    .poster-label {
+      position: absolute;
+      left: 18px;
+      bottom: 16px;
+      z-index: 2;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .poster-label span {
+      background: rgba(255, 253, 245, 0.86);
+      border: 1px solid var(--ink);
+      padding: 5px 7px;
+      border-radius: 999px;
+    }
+
+    section {
+      padding: 76px 0;
+    }
+
+    .band {
+      border-top: 3px solid var(--ink);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 0.42fr 0.58fr;
+      gap: 28px;
+      align-items: start;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 82px);
+      line-height: 0.92;
+      letter-spacing: 0;
+    }
+
+    .section-head p,
+    .large-copy {
+      margin: 0;
+      font-size: clamp(18px, 2.2vw, 30px);
+      line-height: 1.18;
+      font-weight: 730;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .principle {
+      min-height: 250px;
+      padding: 18px;
+      border: 2px solid var(--ink);
+      background: rgba(255, 253, 245, 0.78);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .principle b {
+      display: block;
+      margin-bottom: 48px;
+      font-size: 12px;
+      line-height: 1.08;
+      text-transform: uppercase;
+      font-weight: 950;
+      overflow-wrap: anywhere;
+    }
+
+    .principle p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.22;
+      font-weight: 720;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mark {
+      position: absolute;
+      right: -22px;
+      top: -18px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      opacity: 0.78;
+      mix-blend-mode: multiply;
+    }
+
+    .m1 { background: var(--yellow); }
+    .m2 { background: var(--blue); border-radius: 34px; }
+    .m3 { background: var(--pink); width: 150px; }
+    .m4 { background: var(--green); border-radius: 999px 999px 18px 18px; }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .source {
+      border: 2px solid var(--ink);
+      background: #fffdf5;
+      min-height: 260px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+    }
+
+    .source img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .source:nth-child(5) img {
+      object-position: center;
+    }
+
+    .source p {
+      margin: 0;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .system {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .rules {
+      display: grid;
+      gap: 12px;
+    }
+
+    .rule {
+      display: grid;
+      grid-template-columns: 116px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      border: 2px solid var(--ink);
+      background: rgba(255, 253, 245, 0.74);
+    }
+
+    .glyph {
+      width: 96px;
+      height: 72px;
+      position: relative;
+      background: #fffdf5;
+      border: 1px solid rgba(23, 23, 23, 0.2);
+      overflow: hidden;
+    }
+
+    .glyph i {
+      position: absolute;
+      display: block;
+      mix-blend-mode: multiply;
+      opacity: 0.86;
+    }
+
+    .g-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--red);
+      left: 16px;
+      top: 19px;
+      box-shadow: 22px 4px 0 var(--yellow), 44px -6px 0 var(--green);
+    }
+
+    .g-line {
+      width: 86px;
+      height: 36px;
+      left: 6px;
+      top: 22px;
+      border-top: 5px solid var(--purple);
+      border-radius: 50%;
+      transform: rotate(-8deg);
+    }
+
+    .g-region {
+      width: 68px;
+      height: 44px;
+      left: 14px;
+      top: 14px;
+      border-radius: 18px;
+      background: var(--cyan);
+    }
+
+    .g-region::after {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      right: -8px;
+      top: 12px;
+      border-radius: 50%;
+      background: var(--pink);
+      mix-blend-mode: multiply;
+    }
+
+    .g-halo {
+      width: 58px;
+      height: 58px;
+      left: 19px;
+      top: 7px;
+      border-radius: 50%;
+      border: 8px solid var(--green);
+      box-shadow: inset 0 0 0 10px rgba(243, 212, 49, 0.55);
+    }
+
+    .rule h3 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .rule p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .board-pair {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .board-ref,
+    .recipe {
+      border: 2px solid var(--ink);
+      background: #fffdf5;
+      overflow: hidden;
+    }
+
+    .board-ref img {
+      height: 100%;
+      min-height: 360px;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    .recipe {
+      padding: 18px;
+      display: grid;
+      align-content: space-between;
+      min-height: 360px;
+    }
+
+    .recipe h3 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 0.98;
+    }
+
+    .recipe pre {
+      margin: 20px 0;
+      padding: 16px;
+      overflow: auto;
+      background: #171717;
+      color: #fffdf5;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: #fffdf5;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .footer {
+      padding: 44px 0 64px;
+      border-top: 3px solid var(--ink);
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid,
+      .section-head,
+      .system,
+      .board-pair {
+        grid-template-columns: 1fr;
+      }
+
+      .principles,
+      .source-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .poster,
+      canvas {
+        min-height: 520px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero {
+        min-height: auto;
+      }
+
+      .thesis,
+      .principles,
+      .source-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .thesis div,
+      .thesis div:last-child {
+        border-right: 0;
+        border-bottom: 2px solid var(--ink);
+        padding-left: 0;
+      }
+
+      .thesis div:last-child {
+        border-bottom: 0;
+      }
+
+      .rule {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero wrap">
+      <div class="topline">
+        <span><span class="dot" aria-hidden="true"></span> Eido research 04</span>
+        <span>Activity language / board portraits</span>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <h1>The board becomes the mark.</h1>
+          <p class="lede">A research direction for turning Eido activity into recognizable visual artifacts: seeded, tactile, proud, and shaped by the user's own board geography.</p>
+        </div>
+        <figure class="poster" aria-label="Generated board portrait study">
+          <canvas id="portraitCanvas" width="1200" height="760"></canvas>
+          <figcaption class="poster-label">
+            <span>seed: eido-board-portrait-01</span>
+            <span>locked randomness</span>
+            <span>board geography first</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="thesis" aria-label="Research thesis">
+        <div><small>Not a tracker</small> The artifact should feel like a journal print, not a productivity demand.</div>
+        <div><small>Not generic art</small> Every major mark should trace back to board position, color, connection, or event history.</div>
+        <div><small>Not rerolled</small> Procedural variation is welcome only when it is deterministic and locked.</div>
+      </div>
+    </header>
+
+    <section class="band">
+      <div class="wrap section-head">
+        <h2>Principles</h2>
+        <p>The new direction keeps the useful parts of Rhythm but moves the center of gravity from calendar completion to spatial recognition.</p>
+      </div>
+      <div class="wrap principles">
+        <article class="principle">
+          <span class="mark m1" aria-hidden="true"></span>
+          <b>Board first</b>
+          <p>The user's own layout, colors, clusters, and long-distance ties are the composition.</p>
+        </article>
+        <article class="principle">
+          <span class="mark m2" aria-hidden="true"></span>
+          <b>Recognition over uniformity</b>
+          <p>A mark can be strange or varied as long as the user can still find their own places inside it.</p>
+        </article>
+        <article class="principle">
+          <span class="mark m3" aria-hidden="true"></span>
+          <b>Journal, not guilt</b>
+          <p>Quiet periods are paper texture. Active periods are visible trace. Nothing becomes a broken streak.</p>
+        </article>
+        <article class="principle">
+          <span class="mark m4" aria-hidden="true"></span>
+          <b>Generated, then locked</b>
+          <p>Texture, jitter, and shape variants come from fixed seeds and stable board events.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap section-head">
+        <h2>References</h2>
+        <p>The inspiration is playful modular modernism, but the source of truth is still the Eido board itself.</p>
+      </div>
+      <div class="wrap source-grid">
+        <figure class="source">
+          <img src="assets/shape-studies-poster.png" alt="Modular shape studies poster">
+          <figcaption><p>Bold overprint, capsules, grain, and annotation marks.</p></figcaption>
+        </figure>
+        <figure class="source">
+          <img src="assets/activity-cell-field.png" alt="Grid of varied radial activity cells">
+          <figcaption><p>Many related glyphs with individual generated character.</p></figcaption>
+        </figure>
+        <figure class="source">
+          <img src="assets/modular-color-studies.png" alt="Modular color composition studies">
+          <figcaption><p>Tile studies with local palettes and controlled negative space.</p></figcaption>
+        </figure>
+        <figure class="source">
+          <img src="assets/modular-thumbnail-field.png" alt="Dense field of modular thumbnail studies">
+          <figcaption><p>A study-sheet family: repetition without sameness.</p></figcaption>
+        </figure>
+        <figure class="source">
+          <img src="assets/eido-board-reference.png" alt="Eido board reference with colored clusters and connections">
+          <figcaption><p>The actual board geography: regions, colors, density, and memory.</p></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap section-head">
+        <h2>Grammar</h2>
+        <p>Early primitives. They should remain accountable to graph events, but flexible enough for bolder visual language.</p>
+      </div>
+      <div class="wrap system">
+        <div class="rules">
+          <article class="rule">
+            <div class="glyph"><i class="g-dot"></i></div>
+            <div>
+              <h3>Capture</h3>
+              <p>New thoughts appear as dots, capsules, or seeds placed where they entered the board.</p>
+            </div>
+          </article>
+          <article class="rule">
+            <div class="glyph"><i class="g-line"></i></div>
+            <div>
+              <h3>Connect</h3>
+              <p>Ties become chords, bridges, or ribbons between actual board positions.</p>
+            </div>
+          </article>
+          <article class="rule">
+            <div class="glyph"><i class="g-region"></i></div>
+            <div>
+              <h3>Shape</h3>
+              <p>Groups, edits, and reorganized areas become translucent blocks, hulls, and contours.</p>
+            </div>
+          </article>
+          <article class="rule">
+            <div class="glyph"><i class="g-halo"></i></div>
+            <div>
+              <h3>Revisit</h3>
+              <p>Older material brought back into focus earns halos, echoes, and denser overprint.</p>
+            </div>
+          </article>
+        </div>
+        <div class="recipe">
+          <h3>Working generator recipe</h3>
+          <pre>{
+  "source": "board graph + intent log",
+  "window": "period, session, or day",
+  "spatialModel": "normalized board geography",
+  "palette": "user board colors + action notation",
+  "variation": "seeded jitter, texture, curvature",
+  "lock": "generator version + stable event ids"
+}</pre>
+          <p class="large-copy">The generator can make a board feel alive. It cannot invent the meaning. The meaning comes from where the user put things and how those things changed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap section-head">
+        <h2>Recognition Test</h2>
+        <p>The central test is not whether the page looks like a dashboard. The test is whether the user can recognize their own board inside the artifact.</p>
+      </div>
+      <div class="wrap board-pair">
+        <figure class="board-ref">
+          <img src="assets/eido-board-reference.png" alt="Source Eido board reference">
+        </figure>
+        <div class="recipe">
+          <h3>Ask before labels appear</h3>
+          <pre>Can you find the dense left cluster?
+Can you find the long right-side lane?
+Can you see which islands are isolated?
+Can you point to the region that came back?</pre>
+          <p class="large-copy">If the answer is yes, the system is doing Eido's work: preserving the shape of thought, not counting the typing.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap section-head">
+        <h2>Next</h2>
+        <p>Use this folder as a research repo for future prototypes, critique passes, and implementation planning.</p>
+      </div>
+      <div class="wrap links">
+        <a class="pill" href="01-rich-intent-capture.md">Intent capture</a>
+        <a class="pill" href="02-source-synthesis.md">Source synthesis</a>
+        <a class="pill" href="03-activity-portrait-design-system.md">Design system</a>
+        <a class="pill" href="04-generative-board-portrait-model.md">Generator model</a>
+        <a class="pill" href="05-open-questions-and-experiments.md">Experiments</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">Research track 04. This page is a custom standalone exploration and does not reuse the prior artifact code.</div>
+  </footer>
+
+  <script>
+    function hashString(input) {
+      var h = 2166136261;
+      for (var i = 0; i < input.length; i += 1) {
+        h ^= input.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    function rng(seed) {
+      var t = seed >>> 0;
+      return function next() {
+        t += 0x6D2B79F5;
+        var x = t;
+        x = Math.imul(x ^ (x >>> 15), x | 1);
+        x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function roundedRect(ctx, x, y, w, h, r) {
+      var rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.lineTo(x + w - rr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+      ctx.lineTo(x + w, y + h - rr);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+      ctx.lineTo(x + rr, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+      ctx.lineTo(x, y + rr);
+      ctx.quadraticCurveTo(x, y, x + rr, y);
+      ctx.closePath();
+    }
+
+    function drawPortrait() {
+      var canvas = document.getElementById("portraitCanvas");
+      var ctx = canvas.getContext("2d");
+      var random = rng(hashString("eido-board-portrait-01"));
+      var w = canvas.width;
+      var h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fffdf5";
+      ctx.fillRect(0, 0, w, h);
+
+      var regions = [
+        { x: 95, y: 410, w: 150, h: 190, c: "#8ed7ee", label: "left cluster" },
+        { x: 290, y: 250, w: 225, h: 205, c: "#78c7e8", label: "dense frame" },
+        { x: 330, y: 145, w: 275, h: 118, c: "#5bd2ac", label: "strand" },
+        { x: 522, y: 414, w: 295, h: 100, c: "#70bff2", label: "lower bridge" },
+        { x: 920, y: 430, w: 84, h: 252, c: "#f26c68", label: "vertical work" },
+        { x: 1015, y: 460, w: 86, h: 210, c: "#75c6e4", label: "right stack" },
+        { x: 820, y: 118, w: 76, h: 76, c: "#f0c44e", label: "top knot" },
+        { x: 970, y: 286, w: 150, h: 78, c: "#8ccc98", label: "quiet island" }
+      ];
+
+      ctx.globalCompositeOperation = "multiply";
+      regions.forEach(function (region, index) {
+        var jx = (random() - 0.5) * 18;
+        var jy = (random() - 0.5) * 18;
+        ctx.fillStyle = region.c;
+        ctx.globalAlpha = 0.27 + random() * 0.13;
+        roundedRect(ctx, region.x + jx, region.y + jy, region.w, region.h, 18 + random() * 18);
+        ctx.fill();
+        ctx.strokeStyle = region.c;
+        ctx.globalAlpha = 0.72;
+        ctx.lineWidth = index % 2 ? 4 : 3;
+        ctx.stroke();
+      });
+
+      var points = [];
+      regions.forEach(function (region, index) {
+        var count = [16, 28, 20, 18, 20, 16, 7, 6][index];
+        for (var i = 0; i < count; i += 1) {
+          points.push({
+            x: region.x + 18 + random() * (region.w - 36),
+            y: region.y + 18 + random() * (region.h - 36),
+            r: 6 + random() * 15,
+            c: ["#ee4c2f", "#2f78d8", "#f3d431", "#18b77b", "#ee70bd", "#7853b7"][Math.floor(random() * 6)],
+            old: random() > 0.78
+          });
+        }
+      });
+
+      ctx.globalAlpha = 0.34;
+      ctx.lineWidth = 3;
+      for (var k = 0; k < 36; k += 1) {
+        var a = points[Math.floor(random() * points.length)];
+        var b = points[Math.floor(random() * points.length)];
+        if (!a || !b || a === b) continue;
+        var mx = (a.x + b.x) / 2 + (random() - 0.5) * 190;
+        var my = (a.y + b.y) / 2 + (random() - 0.5) * 120;
+        ctx.strokeStyle = random() > 0.72 ? "#7853b7" : "#2c7a6b";
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.quadraticCurveTo(mx, my, b.x, b.y);
+        ctx.stroke();
+      }
+
+      points.forEach(function (point) {
+        ctx.globalAlpha = 0.82;
+        ctx.fillStyle = point.c;
+        if (random() > 0.55) {
+          roundedRect(ctx, point.x - point.r * 1.4, point.y - point.r * 0.75, point.r * 2.8, point.r * 1.5, point.r);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, point.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (point.old) {
+          ctx.globalAlpha = 0.75;
+          ctx.strokeStyle = "#171717";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, point.r + 7, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      });
+
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = "#171717";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(70, 665);
+      ctx.lineTo(150, 590);
+      ctx.lineTo(132, 646);
+      ctx.lineTo(206, 620);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(832, 86);
+      ctx.lineTo(906, 46);
+      ctx.lineTo(880, 118);
+      ctx.lineTo(948, 94);
+      ctx.stroke();
+
+      for (var n = 0; n < 900; n += 1) {
+        ctx.globalAlpha = 0.08 + random() * 0.16;
+        ctx.fillStyle = "#171717";
+        ctx.fillRect(random() * w, random() * h, 1.2, 1.2);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    drawPortrait();
+  </script>
+</body>
+</html>

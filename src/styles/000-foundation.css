@@ -1,0 +1,146 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+html {
+  font-feature-settings: "calt" 0;
+}
+
+body {
+  font-family: var(--e-sans);
+  color: var(--e-ink);
+  background: var(--e-surface-panel);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* The runtime media store publishes one motion mode for React and CSS. Keep
+   completion events alive at 1ms; no transition or animation delay survives. */
+:root[data-reduced-motion="true"] *,
+:root[data-reduced-motion="true"] *::before,
+:root[data-reduced-motion="true"] *::after {
+  animation-duration: var(--e-t-fast) !important;
+  animation-delay: 0ms !important;
+  transition-duration: var(--e-t-fast) !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+.mono,
+.t-micro,
+.t-label,
+.t-ui,
+.t-value,
+.t-title,
+.t-display,
+.t-title-canvas {
+  font-family: var(--e-mono);
+  font-feature-settings: "calt" 0;
+  font-variant-ligatures: none;
+}
+
+.t-micro {
+  font-size: var(--e-fs-micro);
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.t-label {
+  font-size: var(--e-fs-label);
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.t-ui {
+  font-size: var(--e-fs-ui);
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.t-value {
+  font-size: var(--e-fs-ui);
+  line-height: 1.2;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-title {
+  font-size: var(--e-fs-title);
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.t-display {
+  font-size: var(--e-fs-display);
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.t-title-canvas {
+  font-size: var(--e-fs-title-canvas);
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+.t-prose-s,
+.t-prose-m,
+.t-prose-l,
+.t-prose-xl,
+.t-prose-2xl,
+.t-prose-3xl,
+.t-hint {
+  font-family: var(--e-sans);
+}
+
+.t-prose-s {
+  font-size: var(--e-fs-prose-s);
+  line-height: 1.55;
+}
+
+.t-prose-m {
+  font-size: var(--e-fs-prose-m);
+  line-height: 1.6;
+}
+
+.t-prose-l {
+  font-size: var(--e-fs-prose-l);
+  line-height: 1.6;
+}
+
+/* The Note ladder's upper steps. Leading tightens as the type grows, because
+   1.6 at 34px opens a gap a reader's eye has to jump. */
+.t-prose-xl {
+  font-size: var(--e-fs-prose-xl);
+  line-height: 1.5;
+}
+
+.t-prose-2xl {
+  font-size: var(--e-fs-prose-2xl);
+  line-height: 1.4;
+}
+
+.t-prose-3xl {
+  font-size: var(--e-fs-prose-3xl);
+  line-height: 1.3;
+}
+
+.t-hint {
+  font-size: var(--e-fs-ui);
+  line-height: 1.5;
+  color: var(--e-ink-soft);
+}

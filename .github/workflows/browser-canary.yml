@@ -1,0 +1,157 @@
+name: Browser canary
+
+on:
+  # No trigger-level path filter. This required check must always report a
+  # conclusion. The job-level scope decision skips app/browser work when every
+  # changed path is inside site/.
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  schedule:
+    - cron: '17 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('browser-pr-{0}', github.event.pull_request.number) || format('browser-sha-{0}', github.sha) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pr-smoke:
+    if: github.event_name == 'pull_request'
+    name: Browser interactions
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - name: Check out the tested ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Select the proportionate CI lane
+        id: scope
+        continue-on-error: true
+        env:
+          EIDO_CHANGE_SCOPE_EVENT_NAME: ${{ github.event_name }}
+          EIDO_CHANGE_SCOPE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EIDO_CHANGE_SCOPE_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: node scripts/ci/marketing-site-scope.mjs
+
+      - name: Report scope-classifier fallback
+        if: ${{ always() && steps.scope.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::warning::Marketing-site scope classification failed; the full Browser interactions lane will run."
+          echo 'Marketing-site scope classification failed, so Browser interactions is failing open to the full app lane.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report why app interactions are not needed
+        if: steps.scope.outcome == 'success' && steps.scope.outputs.marketing_only == 'true'
+        env:
+          SCOPE_REASON: ${{ steps.scope.outputs.reason }}
+        run: echo "Browser interactions pass without app work because $SCOPE_REASON."
+
+      - name: Install locked dependencies
+        if: steps.scope.outcome != 'success' || steps.scope.outputs.marketing_only != 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        if: steps.scope.outcome != 'success' || steps.scope.outputs.marketing_only != 'true'
+        # ubuntu-24.04 already supplies Chromium's shared libraries. The app
+        # bundles its fonts, and these headless tests need only the shell.
+        run: npx playwright install chromium --only-shell
+
+      - name: Verify app startup before interactions
+        if: steps.scope.outcome != 'success' || steps.scope.outputs.marketing_only != 'true'
+        run: npm run test:browser:health
+
+      - name: Run focused PR smoke
+        if: steps.scope.outcome != 'success' || steps.scope.outputs.marketing_only != 'true'
+        run: npm run test:browser:smoke
+
+      - name: Run production interaction regression
+        if: (success() || failure()) && (steps.scope.outcome != 'success' || steps.scope.outputs.marketing_only != 'true')
+        run: npm run test:browser:production
+
+      - name: Preserve failure evidence
+        if: failure() && (steps.scope.outcome != 'success' || steps.scope.outputs.marketing_only != 'true')
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: browser-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  nightly:
+    if: github.event_name != 'pull_request'
+    name: Browser nightly ${{ matrix.shard }}/4 (non-blocking)
+    runs-on: ubuntu-24.04
+    # The complete green suite takes up to 9m42s including setup and cleanup.
+    # Allow runner variance without changing test/assertion limits.
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            port: 5181
+          - shard: 2
+            port: 5182
+          - shard: 3
+            port: 5183
+          - shard: 4
+            port: 5184
+    env:
+      EIDO_INTERACTION_TEST_PORT: ${{ matrix.port }}
+    steps:
+      - name: Check out the tested ref
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node for CI with npm cache
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .github/node-version
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install chromium --only-shell
+
+      - name: Verify app startup before interactions
+        run: npm run test:browser:health
+
+      # The nightly is the only run that sees every browser file, so it stops
+      # for nothing: a shard that halts at the first wobble reports one failure
+      # and hides the health of everything after it.
+      - name: Run full-suite shard
+        env:
+          EIDO_INTERACTION_MAX_FAILURES: '0'
+        run: npm run test:browser -- --shard=${{ matrix.shard }}/4
+
+      - name: Run production interaction regression
+        if: (success() || failure()) && matrix.shard == 1
+        run: npm run test:browser:production
+
+      - name: Preserve failure evidence
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: browser-nightly-${{ matrix.shard }}-${{ github.sha }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7

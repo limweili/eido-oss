@@ -1,0 +1,1855 @@
+/* ============================================================
+   MOD UI — instrument-flat component library
+   Eido mod builder redesign · lib/mod-ui.css
+   Blend of: Nothing EQ light (calm capsule anatomy),
+   TE×IKEA Frekvens (dot-matrix + graphic punch),
+   delay/reverb module grid (warm paper, value-carrying controls).
+   ============================================================ */
+
+:root {
+  /* ---- ground & surfaces (warm paper, ref 08 + ref 09 gray calm) ---- */
+  --mui-ground:       #e8e4dc;   /* page / board field            */
+  --mui-panel:        #f1eee8;   /* control chip, one step lighter */
+  --mui-raised:       #f8f6f1;   /* popup / floating surfaces     */
+  --mui-track:        #dcd7cc;   /* recessed capsule tracks       */
+  --mui-field:        #e9e5dd;   /* text input wells              */
+
+  /* ---- ink ---- */
+  --mui-ink:          #232019;   /* near-black warm ink           */
+  --mui-ink-soft:     #7b756a;   /* secondary text                */
+  --mui-ink-faint:    #a49d90;   /* tertiary / disabled           */
+  --mui-line:         rgba(35, 32, 25, 0.16);   /* hairlines      */
+  --mui-dot:          rgba(35, 32, 25, 0.26);   /* detent dots    */
+
+  /* ---- system signals ---- */
+  --mui-red:          #d8452f;   /* warm signal red: destructive, system accent */
+  --mui-yellow:       #e9a820;   /* rare secondary state mark only */
+
+  /* ---- per-control accent (overridden per instance) ----
+     NOTE: only the base --accent lives here. The --accent-tint /
+     --accent-wash derivations are declared on the instance scopes below
+     (.mui-control, .mui-popup, …) — a custom property resolves its var()s
+     where it is DECLARED, so deriving them on :root would freeze them
+     against this default purple no matter what --accent an instance sets. */
+  --accent:           #a946c8;
+
+  /* ---- type ----
+     JetBrains Mono is embedded via lib/mod-ui-font.css (data URIs,
+     file://-safe); the system mono stack is the fallback. JBM is wider
+     than SF Mono, so caps tracking is a step tighter than before. */
+  --mui-mono: "JetBrains Mono", ui-monospace, "SF Mono", "SFMono-Regular",
+              Menlo, Consolas, "Liberation Mono", monospace;
+  --mui-sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+  --mui-fs-label:  10px;
+  --mui-fs-value:  11px;
+  --mui-fs-micro:   9px;
+  --mui-ls:        0.09em;
+  --mui-ls-wide:   0.14em;
+
+  /* ---- rhythm ---- */
+  --mui-cell:  64px;             /* 1×1 footprint; 72px pitch with 8px gap */
+  --mui-gap:    8px;
+
+  /* ---- radii: the two-tier rule — surfaces slightly-squared,
+     instruments (tracks/handles/jacks/dots/swatches) fully round ---- */
+  --mui-r-card: 7px;             /* control chips, cards          */
+  --mui-r-chip: 6px;             /* buttons, inputs, small tiles  */
+  --mui-r-pop:  8px;             /* popups, floating palettes     */
+  --mui-r-well: 10px;            /* board wells / large containers */
+
+  /* ---- motion: tactile weight — picked up, displaced, settled ---- */
+  --mui-t-fast:      120ms;                            /* hover / press / reveal */
+  --mui-t-move:      220ms;                            /* displacement / settle  */
+  --mui-ease-out:    cubic-bezier(.25, .6, .25, 1);    /* standard decel         */
+  --mui-ease-settle: cubic-bezier(.2, .75, .25, 1.08); /* drop, slight overshoot */
+  --mui-scale-press: .97;
+  --mui-scale-lift:  1.02;
+
+  /* the ONE sanctioned shadow — worn only while lifted or floating
+     (popups, dragged cards). Nothing at rest casts a shadow. */
+  --mui-shadow-lift: 0 2px 4px rgba(35,32,25,.08), 0 12px 30px rgba(35,32,25,.16);
+}
+
+/* ============================================================
+   ACCENT DERIVATIONS — declared at every scope where an instance
+   --accent lands, so overriding --accent re-derives them for free.
+   (Never derive these on :root — see the note in the token block.)
+   ============================================================ */
+
+.mui-control,
+.mui-popup,
+.mui-node,
+.mui-pill-readout,
+.mui-card,
+.mui-step {
+  --accent-tint: color-mix(in srgb, var(--accent) 30%, var(--mui-track));
+  --accent-wash: color-mix(in srgb, var(--accent) 12%, var(--mui-panel));
+}
+
+/* ============================================================
+   CONTROL ROOT
+   anatomy: [label] / [body] / [readout]  + config affordance
+   + output node on the right edge
+   ============================================================ */
+
+.mui-control {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--mui-panel);
+  border: 1px solid var(--mui-line);
+  border-radius: var(--mui-r-card);
+  padding: 10px 12px;
+  font-family: var(--mui-mono);
+  color: var(--mui-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  min-width: 0;
+  min-height: 0;
+}
+.mui-control * { box-sizing: border-box; }
+
+/* keyboard focus: instruments get an offset accent ring (the outline
+   follows the element's own shape); text fields NEVER get an outline —
+   their focus is the border (state changes color, never geometry) */
+.mui-dial svg:focus-visible,
+.mui-slider-track:focus-visible,
+.mui-switch-pill:focus-visible {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 2px;
+}
+.mui-btn:focus-visible,
+.mui-chrome-btn:focus-visible,
+.mui-ring-btn:focus-visible,
+.mui-count-btn:focus-visible,
+.mui-swatch:focus-visible {
+  outline: 1.5px solid var(--mui-ink);
+  outline-offset: 2px;
+}
+
+/* head row — identity dot + label in ONE flex row, centers aligned
+   structurally (align-items) so font or size changes can never push
+   them apart */
+.mui-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex: none;
+  min-width: 0;
+}
+
+/* label — mono caps, letterspaced, quiet */
+.mui-label {
+  font-size: var(--mui-fs-label);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* body — hosts the actual instrument */
+.mui-body {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* readout — mono value */
+.mui-readout {
+  font-size: var(--mui-fs-value);
+  letter-spacing: 0.06em;
+  color: var(--mui-ink);
+  line-height: 1;
+  text-align: center;
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+/* ---- size degradation ---- */
+.mui-control.sz-xs { padding: 6px; }
+.mui-control.sz-xs .mui-label { display: none; }
+/* xs: the head collapses to just the identity dot, pinned in the corner
+   so it costs no layout */
+.mui-control.sz-xs .mui-head {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  margin: 0;
+  z-index: 6;
+}
+.mui-control.sz-xs .mui-readout { font-size: var(--mui-fs-micro); margin-top: 3px; }
+.mui-control.sz-sm { padding: 8px 10px; }
+.mui-control.sz-sm .mui-head { margin-bottom: 6px; }
+
+/* hover chip — replaces hidden label at xs.
+   display:none while hidden so it never adds layout overflow;
+   @starting-style keeps the fade-in. */
+.mui-hoverchip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--mui-ink);
+  color: var(--mui-ground);
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+.mui-control.sz-xs:hover .mui-hoverchip,
+.mui-control.force-chip .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   IDENTITY + CHROME — the control affordance standard.
+   Identity is persistent: a solid accent dot, top-left, ALWAYS
+   visible (like an Eido card's identity color); the label sits
+   permanently to its right, space reserved in layout. Clicking
+   the dot opens the color well. Actions are chrome: settings
+   glyph + optional ×, top-right, hover-revealed.
+   ============================================================ */
+
+/* accent dot — identity, always visible, opens the color well.
+   Lives IN the head row (flex sibling of the label), so its center
+   and the title's center are the same line — structural, not tuned. */
+.mui-ring-btn {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  padding: 0;
+  cursor: pointer;
+  transition: transform var(--mui-t-fast) var(--mui-ease-out),
+              filter var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-ring-btn:hover { transform: scale(1.25); filter: brightness(1.12); }
+
+/* action cluster — top-right: settings glyph, then optional × */
+.mui-chrome {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 1px;
+  opacity: 0;
+  transition: opacity var(--mui-t-fast) var(--mui-ease-out);
+  z-index: 6;
+}
+.mui-control:hover .mui-chrome { opacity: 1; }
+.mui-chrome-btn {
+  width: 19px;
+  height: 19px;
+  border: none;
+  padding: 0;
+  border-radius: var(--mui-r-chip);
+  background: transparent;
+  color: var(--mui-ink-soft);
+  font-family: var(--mui-mono);
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--mui-t-fast) var(--mui-ease-out),
+              color var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-chrome-btn:hover { background: rgba(35,32,25,.08); color: var(--mui-ink); }
+.mui-chrome-btn svg { display: block; }
+
+/* xs: the dot shrinks but never disappears — it may be the only
+   identity visible on a 1×1 cell */
+.mui-control.sz-xs .mui-ring-btn { width: 7px; height: 7px; }
+.mui-control.sz-xs .mui-chrome { top: 1px; right: 1px; transform: scale(.85); transform-origin: top right; }
+
+/* ============================================================
+   OUTPUT NODE — hollow jack on the right edge, chip on hover
+   ============================================================ */
+
+.mui-node {
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
+  cursor: crosshair;
+}
+.mui-node-dot {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--mui-ground);
+  border: 1.5px solid var(--mui-ink);
+  transition: background .1s ease, border-color .1s ease, transform .1s ease;
+}
+.mui-node:hover .mui-node-dot,
+.mui-node.is-hover .mui-node-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.15);
+}
+.mui-node.is-connected .mui-node-dot {
+  background: var(--accent);
+  border-color: var(--mui-ink);
+}
+.mui-node-chip {
+  position: absolute;
+  left: calc(100% + 7px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--mui-ink);
+  color: var(--mui-ground);
+  font-family: var(--mui-mono);
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+.mui-node:hover .mui-node-chip,
+.mui-node.is-hover .mui-node-chip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* standalone input node (visualizer columns) — same family, in-flow */
+.mui-node--free {
+  position: relative;
+  right: auto;
+  top: auto;
+  transform: none;
+}
+.mui-node--free .mui-node-chip { left: calc(100% + 7px); }
+.mui-node--free.chip-left .mui-node-chip {
+  left: auto;
+  right: calc(100% + 7px);
+}
+
+/* ============================================================
+   DIAL — solid ink core, light needle, one accent value arc,
+   mono % readout. No detent ring; stepped = ticks on the arc.
+   ============================================================ */
+
+.mui-dial .mui-body { flex-direction: column; }
+.mui-dial svg { display: block; flex: none; }
+.mui-dial .arc-track {
+  fill: none;
+  stroke: rgba(35, 32, 25, 0.13);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.mui-dial .arc-value {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke .12s ease;
+}
+.mui-dial .core { fill: var(--mui-ink); }
+.mui-dial .needle {
+  stroke: var(--mui-raised);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+}
+.mui-dial .tick {
+  stroke: var(--mui-dot);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.mui-dial svg { cursor: ns-resize; touch-action: none; }
+.mui-dial.is-dragging .core { fill: color-mix(in srgb, var(--mui-ink) 88%, var(--accent)); }
+
+/* ============================================================
+   SLIDER — Nothing-EQ capsule: rounded track, round ink handle,
+   accent fill, detent dots inside the track when stepped.
+   ============================================================ */
+
+.mui-slider .mui-body { flex-direction: row; gap: 10px; }
+.mui-slider-track {
+  --hd: 24px;                    /* handle diameter */
+  position: relative;
+  flex: 1 1 auto;
+  height: 32px;
+  min-width: 40px;
+  background: var(--mui-track);
+  border-radius: 999px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+/* the fill is ONE continuous body of tint: rounded by the track's left
+   cap, FLAT on the right, ending exactly at the handle center where it
+   tucks underneath — never a detached lozenge */
+.mui-slider-fill {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: calc(var(--hd) / 2 + (100% - var(--hd) - 8px) * var(--t, 0));
+  min-width: calc(var(--hd) / 2);
+  background: var(--accent-tint);
+  border-radius: 999px 0 0 999px;
+  pointer-events: none;
+}
+.mui-slider-detent {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--mui-dot);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.mui-slider-handle {
+  position: absolute;
+  top: 50%;
+  left: calc(4px + (100% - var(--hd) - 8px) * var(--t, 0));
+  width: var(--hd);
+  height: var(--hd);
+  border-radius: 50%;
+  background: var(--mui-ink);
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: background .1s ease;
+}
+.mui-slider.is-dragging .mui-slider-handle,
+.mui-slider .mui-slider-track:active .mui-slider-handle {
+  background: var(--accent);
+}
+.mui-slider .mui-readout { margin-top: 0; min-width: 4ch; text-align: right; }
+.mui-slider .mui-body .mui-readout { flex: none; }
+
+/* slider degradation */
+.mui-control.sz-sm.mui-slider .mui-slider-track { --hd: 20px; height: 26px; }
+.mui-control.sz-xs.mui-slider .mui-slider-track { --hd: 14px; height: 18px; }
+.mui-control.sz-xs.mui-slider .mui-body .mui-readout { display: none; }
+.mui-control.sz-xs.mui-slider .mui-body { gap: 0; }
+
+/* ============================================================
+   SWITCH — capsule toggle (ref 08 SYNC/STEREO family)
+   ============================================================ */
+
+.mui-switch-pill {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--mui-track);
+  cursor: pointer;
+  transition: background var(--mui-t-fast) var(--mui-ease-out);
+  flex: none;
+}
+.mui-switch-pill::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--mui-ink);
+  /* the throw settles with weight */
+  transition: left var(--mui-t-move) var(--mui-ease-settle),
+              background var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-switch.is-on .mui-switch-pill { background: var(--accent); }
+.mui-switch.is-on .mui-switch-pill::after {
+  left: calc(100% - 24px);
+  background: var(--mui-raised);
+}
+.mui-control.sz-xs .mui-switch-pill { width: 44px; height: 24px; }
+.mui-control.sz-xs .mui-switch-pill::after { width: 16px; height: 16px; }
+.mui-switch.sz-xs.is-on .mui-switch-pill::after { left: calc(100% - 20px); }
+.mui-switch .mui-readout { display: none; }
+
+/* ============================================================
+   COUNT — capsule stepper  [ −  n  + ]
+   ============================================================ */
+
+.mui-count-pill {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--mui-track);
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.mui-count-btn {
+  flex: none;
+  width: 32px;
+  border: none;
+  background: transparent;
+  font-family: var(--mui-mono);
+  font-size: 14px;
+  color: var(--mui-ink);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: background .1s ease;
+}
+.mui-count-btn:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+.mui-count-btn:active { background: color-mix(in srgb, var(--accent) 32%, transparent); }
+.mui-count-val {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--mui-ink);
+  min-width: 0;
+}
+.mui-count .mui-readout { display: none; }
+.mui-count.sz-xs { padding: 6px 8px; }
+.mui-control.sz-xs .mui-count-pill { height: 24px; }
+.mui-control.sz-xs .mui-count-btn { width: 14px; font-size: 11px; }
+.mui-control.sz-xs .mui-count-val { font-size: 10px; letter-spacing: 0; }
+
+/* ============================================================
+   TEXT FIELD — the one field style (words control, popup title
+   input, popup textarea). A field is a surface: chip radius, no
+   capsules. STATE CHANGES COLOR, NEVER GEOMETRY: same box, same
+   radius, same size in every state; focus = accent border, no
+   outline, background may shift.
+   ============================================================ */
+
+.mui-field-input {
+  border: 1px solid var(--mui-line);
+  border-radius: var(--mui-r-chip);
+  background: var(--mui-field);
+  font-family: var(--mui-mono);
+  color: var(--mui-ink);
+  outline: none;
+  caret-color: var(--accent);
+  transition: border-color var(--mui-t-fast) var(--mui-ease-out),
+              background var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-field-input::placeholder { color: var(--mui-ink-faint); }
+.mui-field-input:focus,
+.mui-field-input:focus-visible {
+  border-color: var(--accent);
+  background: var(--mui-raised);
+  outline: none;
+}
+
+/* ============================================================
+   WORDS — one-line text in the shared field style
+   ============================================================ */
+
+.mui-words-input {
+  width: 100%;
+  height: 32px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 0 11px;
+  min-width: 0;
+}
+.mui-words-input:hover:not(:focus) {
+  background: color-mix(in srgb, var(--mui-field) 88%, var(--mui-ink));
+}
+.mui-words .mui-readout { display: none; }
+.mui-control.sz-xs .mui-words-input { height: 24px; font-size: 9px; padding: 0 8px; }
+
+/* ============================================================
+   CONFIG POPUP
+   ============================================================ */
+
+.mui-popup {
+  position: absolute;
+  width: 236px;
+  background: var(--mui-raised);
+  border: 1px solid var(--mui-line);
+  border-radius: var(--mui-r-pop);
+  box-shadow: var(--mui-shadow-lift);   /* floating = lifted */
+  padding: 14px;
+  font-family: var(--mui-mono);
+  color: var(--mui-ink);
+  z-index: 1000;
+}
+
+/* compact color well — swatches only, opened from the accent ring */
+.mui-popup--well {
+  width: auto;
+  padding: 10px 11px;
+}
+.mui-popup--well .mui-popup-swatches {
+  grid-template-columns: repeat(8, 18px);
+  gap: 7px;
+}
+.mui-popup-field { margin-bottom: 13px; }
+.mui-popup-field:last-child { margin-bottom: 0; }
+.mui-popup-label {
+  display: block;
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls-wide);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  margin-bottom: 6px;
+  line-height: 1;
+}
+/* both popup fields wear the shared .mui-field-input style;
+   only sizing and casing live here */
+.mui-popup-input,
+.mui-popup-textarea {
+  width: 100%;
+  font-size: 11px;
+  padding: 7px 10px;
+}
+.mui-popup-input { height: 30px; text-transform: uppercase; letter-spacing: 0.08em; }
+.mui-popup-textarea {
+  resize: vertical;
+  min-height: 56px;
+  line-height: 1.5;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+/* steps stepper inside popup */
+.mui-popup-steps {
+  display: flex;
+  align-items: stretch;
+  height: 28px;
+  width: 118px;
+  border-radius: 999px;
+  background: var(--mui-field);
+  border: 1px solid var(--mui-line);
+  overflow: hidden;
+}
+.mui-popup-steps button {
+  flex: none;
+  width: 28px;
+  border: none;
+  background: transparent;
+  font-family: var(--mui-mono);
+  font-size: 13px;
+  color: var(--mui-ink);
+  cursor: pointer;
+  padding: 0;
+}
+.mui-popup-steps button:hover { background: rgba(35,32,25,.07); }
+.mui-popup-steps .val {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+/* color well — 8 swatches */
+.mui-popup-swatches {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 5px;
+}
+.mui-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: transform .1s ease;
+}
+.mui-swatch:hover { transform: scale(1.15); }
+.mui-swatch.is-active::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid var(--mui-ink);
+  border-radius: 50%;
+}
+
+/* ============================================================
+   PILL VALUE READOUT — "F 110HZ" family (ref 09)
+   accent-tinted left segment + accent hairline + mono caps value
+   ============================================================ */
+
+.mui-pill-readout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 18px 0 34px;
+  border-radius: 999px;
+  border: 1px solid var(--mui-line);
+  font-family: var(--mui-mono);
+  font-size: var(--mui-fs-value);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink);
+  font-variant-numeric: tabular-nums;
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--accent) 22%, var(--mui-panel)) 0,
+      color-mix(in srgb, var(--accent) 22%, var(--mui-panel)) 22px,
+      var(--accent) 22px,
+      var(--accent) 24px,
+      var(--mui-panel) 24px);
+}
+
+/* ============================================================
+   BUTTON — the one button standard. Every clickable is a
+   .mui-btn or an explicitly-defined quiet text affordance.
+   ============================================================ */
+
+.mui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--mui-ink);
+  border: 1px solid var(--mui-ink);
+  border-radius: var(--mui-r-chip);
+  font-family: var(--mui-mono);
+  font-size: var(--mui-fs-label);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background var(--mui-t-fast) var(--mui-ease-out),
+              transform var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-btn:hover { background: rgba(35,32,25,.07); }          /* quiet ink wash */
+.mui-btn:active { transform: scale(var(--mui-scale-press)); }
+.mui-btn--primary { background: var(--mui-ink); color: var(--mui-ground); }
+.mui-btn--primary:hover { background: color-mix(in srgb, var(--mui-ink) 84%, var(--mui-ground)); }
+.mui-btn--icon { width: 28px; padding: 0; }
+.mui-btn--sm { height: 22px; padding: 0 9px; font-size: var(--mui-fs-micro); }
+.mui-btn--sm.mui-btn--icon { width: 22px; padding: 0; }
+.mui-btn svg { display: block; }
+
+/* ============================================================
+   CARD — a compiler prompt line as a solid accent card.
+   Anatomy: eyebrow (title + mini value pill) / sentence / meta.
+   Text color set by ModUI.inkFor(accent); silent = accent wash.
+   ============================================================ */
+
+.mui-card {
+  position: relative;
+  background: var(--accent);
+  color: var(--mui-ink);              /* overridden per instance by inkFor */
+  border-radius: var(--mui-r-card);
+  padding: 10px 13px 11px;
+  font-family: var(--mui-mono);
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform var(--mui-t-move) var(--mui-ease-settle),
+              box-shadow var(--mui-t-move) var(--mui-ease-out);
+}
+.mui-card--silent {
+  background: var(--accent-wash);
+  color: var(--mui-ink);
+  border: 1px solid var(--mui-line);
+}
+.mui-card-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls-wide);
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: .85;
+  margin-bottom: 7px;
+}
+.mui-card-pill {
+  flex: none;
+  font-size: var(--mui-fs-micro);
+  letter-spacing: .08em;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+.mui-card-sentence {
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: .01em;
+}
+.mui-card-meta {
+  margin-top: 6px;
+  font-size: var(--mui-fs-micro);
+  letter-spacing: .06em;
+  line-height: 1.5;
+  opacity: .7;
+}
+
+/* ============================================================
+   JACK GLYPHS — the payload type, legible at both ends of a cable.
+   scalar = filled dot (the SPEC 02 jack, unchanged)
+   span   = the dot stretched to a small capsule
+   series = a tiny 3-segment polyline inside the ring
+   ============================================================ */
+
+.mui-node--span { width: 26px; }
+.mui-node--span:not(.mui-node--free) { right: -13px; }
+.mui-node--span .mui-node-dot {
+  width: 22px;
+  height: 12px;
+  border-radius: 999px;
+}
+.mui-node--series .mui-node-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mui-ink);
+}
+.mui-node--series .mui-node-dot svg {
+  width: 9px;
+  height: 9px;
+  display: block;
+}
+/* chip below the dot — for top-edge rails */
+.mui-node.chip-below .mui-node-chip {
+  left: 50%;
+  top: calc(100% + 7px);
+  transform: translateX(-50%);
+}
+
+/* ---- input jacks: the control-input-jack anatomy ----
+   An input straddles the LEFT edge (mirroring the output overhang) and
+   wears an inward chevron cue so in reads distinct from out at a glance.
+   Its hover chip points inward (to the right), like a left-edge rail. */
+.mui-node--in:not(.mui-node--free) { right: auto; left: -8px; }
+.mui-node-chev-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mui-ink);
+  pointer-events: none;
+}
+.mui-node-chev { width: 8px; height: 8px; display: block; }
+/* the chevron sits over an accent fill once wired → flip it to paper */
+.mui-node--in.is-connected .mui-node-chev-wrap { color: var(--mui-raised); }
+.mui-node--in:hover .mui-node-chev-wrap,
+.mui-node--in.is-hover .mui-node-chev-wrap { color: var(--mui-raised); }
+
+/* ---- artifact jacks: the SECOND cable family ----
+   A SQUARE port, wider ink — visually distinct from the round signal
+   jacks and NON-MATING with them (refusal by silence, no error state).
+   Does NOT join the signal-coercion matrix. */
+.mui-node--artifact .mui-node-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 2px;
+  border-width: 2px;
+}
+.mui-node--artifact.mui-node--in:not(.mui-node--free) { left: -9px; }
+.mui-node--artifact:not(.mui-node--in):not(.mui-node--free) { right: -9px; }
+.mui-node--artifact .mui-node-chev { width: 7px; height: 7px; }
+
+/* pad: two named jacks on the right edge — Y at the well's top-right,
+   X at its vertical center (the multi-jack primitive) */
+.mui-node--pady { top: 30%; }
+.mui-node--padx { top: 56%; }
+
+/* ============================================================
+   PAD — two sliders fused into one gesture. Recessed dot-grid
+   well, crosshair hairlines through the handle, round ink handle
+   (accent while dragging), ephemeral drag trail, axis-end names
+   in micro caps (never rotated).
+   ============================================================ */
+
+.mui-pad .mui-body { flex-direction: column; align-items: stretch; }
+.mui-pad-well {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  background-color: var(--mui-track);
+  background-image: radial-gradient(circle 1px at 1px 1px, rgba(35,32,25,.14) 98%, transparent);
+  background-size: 14px 14px;
+  background-position: 7px 7px;
+  border-radius: var(--mui-r-card);
+  cursor: crosshair;
+  touch-action: none;
+  overflow: hidden;
+}
+/* snap grid: slightly larger, darker dots REPLACING texture dots at
+   snap positions — one dot field, two weights */
+.mui-pad-snap {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(35, 32, 25, 0.34);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+/* crosshair — the pad's picture of its own value */
+.mui-pad-ch {
+  position: absolute;
+  background: var(--mui-line);
+  pointer-events: none;
+}
+.mui-pad-ch--v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  left: calc(14px + (100% - 28px) * var(--px, 0.5));
+}
+.mui-pad-ch--h {
+  left: 0;
+  right: 0;
+  height: 1px;
+  top: calc(14px + (100% - 28px) * var(--py, 0.5));
+}
+.mui-pad-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--mui-ink);
+  left: calc(14px + (100% - 28px) * var(--px, 0.5));
+  top: calc(14px + (100% - 28px) * var(--py, 0.5));
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: background .1s ease;
+}
+.mui-pad.is-dragging .mui-pad-handle { background: var(--accent); }
+/* drag trail — 3-4 ghost dots, gone in --mui-t-move; cut under
+   reduced motion (the lib never spawns them) */
+.mui-pad-ghost {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mui-ink);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: mui-ghost-fade var(--mui-t-move) var(--mui-ease-out) forwards;
+}
+@keyframes mui-ghost-fade {
+  from { opacity: .38; }
+  to   { opacity: 0; }
+}
+/* axis-end names: X ends on the bottom edge, Y ends on the left edge —
+   horizontal text, never rotated; lg only */
+.mui-pad-end {
+  position: absolute;
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink-faint);
+  pointer-events: none;
+  display: none;
+  line-height: 1;
+}
+.mui-pad.sz-lg .mui-pad-end { display: block; }
+.mui-pad-end--xlo { left: 10px; bottom: 7px; }
+.mui-pad-end--xhi { right: 10px; bottom: 7px; }
+.mui-pad-end--yhi { left: 10px; top: 7px; }
+.mui-pad-end--ylo { left: 10px; bottom: 22px; }
+/* sm (the 2×2 minimum): face + crosshair only; the hover chip carries
+   LABEL · x·y. Below 2×2 the pad is not supported — boards enforce
+   the minCells the control reports. */
+.mui-pad.sz-sm .mui-readout { display: none; }
+.mui-pad.sz-sm:hover .mui-hoverchip,
+.mui-pad.sz-xs:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   RANGE — two-handle slider on the slider's capsule anatomy.
+   Accent band between the handles: ONE continuous body, FLAT at
+   both ends, each end tucked under its handle center (the SPEC 02
+   slider-fill rule extended to two ends). Band-drag slides the
+   whole window, width preserved.
+   ============================================================ */
+
+.mui-range .mui-body { flex-direction: row; gap: 10px; }
+.mui-range-band {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: calc(4px + var(--hd) / 2 + (100% - var(--hd) - 8px) * var(--tl, 0));
+  width: calc((100% - var(--hd) - 8px) * (var(--th, 1) - var(--tl, 0)));
+  background: var(--accent-tint);
+  border-radius: 0;
+  pointer-events: none;
+}
+.mui-range-handle--lo { left: calc(4px + (100% - var(--hd) - 8px) * var(--tl, 0)); }
+.mui-range-handle--hi { left: calc(4px + (100% - var(--hd) - 8px) * var(--th, 1)); }
+.mui-range .mui-readout { margin-top: 0; min-width: 5ch; text-align: right; }
+.mui-range .mui-body .mui-readout { flex: none; }
+.mui-control.sz-sm.mui-range .mui-slider-track { --hd: 20px; height: 26px; }
+.mui-control.sz-xs.mui-range .mui-slider-track { --hd: 14px; height: 18px; }
+.mui-control.sz-xs.mui-range .mui-body .mui-readout { display: none; }
+.mui-control.sz-xs.mui-range .mui-body { gap: 0; }
+
+/* ============================================================
+   FILTER — the hero face sibling of range, same value shape.
+   The face IS the constraint drawn in ink: a 2px roll-off curve
+   over the dot-grid, accent wash under the pass region. Modes in
+   plain words on a micro-caps chip that cycles on click.
+   ============================================================ */
+
+.mui-filter .mui-body { flex-direction: column; align-items: stretch; }
+.mui-filter-well {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 12px;
+  background-color: var(--mui-track);
+  background-image: radial-gradient(circle 1px at 1px 1px, rgba(35,32,25,.14) 98%, transparent);
+  background-size: 14px 14px;
+  background-position: 7px 7px;
+  border-radius: var(--mui-r-card);
+  cursor: ew-resize;
+  touch-action: none;
+  overflow: hidden;
+}
+.mui-filter-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.mui-filter-svg .curve {
+  fill: none;
+  stroke: var(--mui-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mui-filter-svg .wash { fill: var(--accent-wash); stroke: none; }
+.mui-filter-svg .det { fill: var(--mui-dot); }
+.mui-filter-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  flex: none;
+}
+/* the mode chip — a sanctioned quiet text affordance. The fidelity chip
+   (ONE PASS · IN STAGES · AUTO) and revise's strictness chip share it. */
+.mui-filter-mode,
+.mui-foot-chip {
+  border: none;
+  background: transparent;
+  padding: 3px 6px;
+  margin-left: -6px;
+  border-radius: var(--mui-r-chip);
+  font-family: var(--mui-mono);
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  line-height: 1;
+  white-space: nowrap;
+  flex: none;
+  cursor: pointer;
+  transition: background var(--mui-t-fast) var(--mui-ease-out),
+              color var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-filter-mode:hover,
+.mui-foot-chip:hover { background: rgba(35,32,25,.08); color: var(--mui-ink); }
+.mui-filter-mode:focus-visible,
+.mui-foot-chip:focus-visible { outline: 1.5px solid var(--mui-ink); outline-offset: 2px; }
+.mui-filter .mui-readout {
+  margin-top: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.mui-filter.sz-xs .mui-filter-mode { display: none; }
+.mui-filter.is-mode-hidden .mui-filter-mode { display: none; }
+.mui-filter.sz-sm .mui-filter-foot { margin-top: 4px; }
+
+/* named-stop fallback (is-abbrev, set by the lib when the named form
+   would overflow its row): the readout shows the numeric form and the
+   full named value moves to the hover chip — the label-collapse
+   pattern applied to values */
+.mui-filter.is-abbrev:hover .mui-hoverchip,
+.mui-range.is-abbrev:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   CURVE — the series control: the slider's anatomy bent into 2D.
+   Recessed well, 2.4px accent line, round ink point handles
+   (accent while dragging), five speakable x-detents as dots.
+   ============================================================ */
+
+.mui-curve .mui-body { flex-direction: column; align-items: stretch; }
+.mui-curve-well {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: var(--mui-track);
+  border-radius: var(--mui-r-card);
+  overflow: hidden;
+}
+.mui-curve-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+}
+.mui-curve-svg .line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mui-curve-svg .pt {
+  fill: var(--mui-ink);
+  cursor: grab;
+  transition: fill .1s ease;
+}
+.mui-curve-svg .pt.is-active,
+.mui-curve.is-dragging .mui-curve-svg .pt.is-active { fill: var(--accent); }
+.mui-curve-svg .det { fill: var(--mui-dot); }
+/* the wired POSITION — a vertical accent hairline on the well and a dot
+   where it crosses the curve (the sampled-now the emission speaks) */
+.mui-curve-svg .pos-line { stroke: var(--accent); stroke-width: 1.5; }
+.mui-curve-svg .pos-dot { fill: var(--accent); }
+/* the POSITION input jack straddles the left edge, vertically centered */
+.mui-node--pos { top: 50%; }
+
+/* the fidelity foot row — chip left, readout right (the filter foot,
+   generalized). --center variant centers a lone chip (revise). */
+.mui-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  flex: none;
+}
+.mui-foot--center { justify-content: center; }
+.mui-foot .mui-readout {
+  margin-top: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+/* the curve/fork readout surfaces the full detent word on the chip when
+   the row would overflow (the named-stop fallback) */
+.mui-curve.is-abbrev:hover .mui-hoverchip,
+.mui-fork.is-abbrev:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   SELECT — one-of-N, nominal. ≤4 options: a segmented capsule,
+   cells split by hairlines, the pick shown by solid accent fill
+   (inkFor text), never a floating indicator. 5+: a vertical
+   stack of quiet capsule rows. JACKLESS BY DESIGN.
+   ============================================================ */
+
+.mui-select .mui-body { align-items: stretch; }
+.mui-select-host { flex: 1 1 auto; display: flex; min-width: 0; min-height: 0; }
+.mui-select-seg {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  align-self: center;
+  border-radius: 999px;
+  background: var(--mui-track);
+  overflow: hidden;
+  min-width: 0;
+  touch-action: none;
+}
+.mui-select-cell {
+  flex: 1 1 0;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 0 8px;
+  font-family: var(--mui-mono);
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background var(--mui-t-fast) var(--mui-ease-out),
+              color var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-select-cell + .mui-select-cell { border-left: 1px solid var(--mui-line); }
+.mui-select-cell:hover { background: rgba(35,32,25,.06); color: var(--mui-ink); }
+.mui-select-cell.is-picked { background: var(--accent); }
+.mui-select-stack {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 0;
+}
+.mui-select-row {
+  flex: none;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: var(--mui-track);
+  padding: 0 12px;
+  text-align: left;
+  font-family: var(--mui-mono);
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background var(--mui-t-fast) var(--mui-ease-out),
+              color var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-select-row:hover { background: color-mix(in srgb, var(--mui-track) 80%, var(--mui-ink)); }
+.mui-select-row.is-picked { background: var(--accent); }
+.mui-select-seg:focus-visible,
+.mui-select-stack:focus-visible {
+  outline: 1.5px solid var(--accent);
+  outline-offset: 2px;
+}
+.mui-select .mui-readout { display: none; }
+.mui-select.sz-sm:hover .mui-hoverchip,
+.mui-select.sz-xs:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   ORDER — drag-to-rank. Capsule tokens in a recessed well,
+   faint rank numerals in a fixed slot column (slots stay,
+   tokens move). The motion charter's showcase: lift, siblings
+   FLIP-displace, settle with weight. Scalar jack = displacement.
+   ============================================================ */
+
+.mui-order .mui-body { align-items: stretch; }
+.mui-order-well {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--mui-track);
+  border-radius: var(--mui-r-card);
+  padding: 8px 10px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.mui-order-nums {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mui-order-num {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  font-size: var(--mui-fs-micro);
+  color: var(--mui-ink-faint);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.mui-order-list {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  touch-action: none;
+}
+.mui-order-list:focus-visible { outline: 1.5px solid var(--accent); outline-offset: 2px; }
+.mui-order-token {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform var(--mui-t-move) var(--mui-ease-settle);
+}
+/* the podium is in the ink: rank-1 alone wears solid accent */
+.mui-order-token.is-top { background: var(--accent); }
+.mui-order-token.is-sel { box-shadow: inset 0 0 0 1.5px var(--mui-ink); }
+.mui-order-token.is-lift {
+  transition: none;
+  cursor: grabbing;
+  box-shadow: var(--mui-shadow-lift);
+  z-index: 5;
+  position: relative;
+}
+.mui-order .mui-readout {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.mui-order.sz-sm .mui-order-nums,
+.mui-order.sz-xs .mui-order-nums { display: none; }
+.mui-order.sz-sm:hover .mui-hoverchip,
+.mui-order.sz-xs:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   MIXER — N slim vertical faders, one shared face, shares
+   always summing to 100. Slider anatomy rotated and multiplied:
+   recessed capsule tracks, accent-tint fill cap-to-handle,
+   round ink handle. One jack per channel (variable multi-jack).
+   ============================================================ */
+
+.mui-mixer .mui-body { align-items: stretch; }
+.mui-mixer-row {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-evenly;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+}
+.mui-mixer-row:focus-visible { outline: 1.5px solid var(--accent); outline-offset: 2px; }
+.mui-mixer-ch {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 0;
+}
+.mui-mixer-track {
+  --hd: 12px;
+  position: relative;
+  flex: 1 1 auto;
+  width: 16px;
+  min-height: 34px;
+  background: var(--mui-track);
+  border-radius: 999px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+/* fill: one continuous body from the bottom cap to the handle center —
+   flat on top, tucked under the handle (the slider fill rule, rotated) */
+.mui-mixer-fill {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  height: calc(var(--hd) / 2 + (100% - var(--hd) - 6px) * var(--s, 0));
+  min-height: calc(var(--hd) / 2);
+  background: var(--accent-tint);
+  border-radius: 0 0 999px 999px;
+  pointer-events: none;
+}
+.mui-mixer-handle {
+  position: absolute;
+  left: 50%;
+  bottom: calc(3px + (100% - var(--hd) - 6px) * var(--s, 0));
+  width: var(--hd);
+  height: var(--hd);
+  border-radius: 50%;
+  background: var(--mui-ink);
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: background .1s ease;
+}
+.mui-mixer.is-dragging .mui-mixer-track.is-live .mui-mixer-handle { background: var(--accent); }
+.mui-mixer-track.is-sel { box-shadow: 0 0 0 1.5px var(--mui-dot); }
+.mui-mixer-lbl {
+  flex: none;
+  max-width: 100%;
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+}
+.mui-mixer .mui-readout { font-variant-numeric: tabular-nums; }
+.mui-mixer.sz-sm .mui-readout,
+.mui-mixer.sz-xs .mui-readout { display: none; }
+.mui-mixer.sz-xs .mui-mixer-lbl { display: none; }
+.mui-mixer.sz-sm:hover .mui-hoverchip,
+.mui-mixer.sz-xs:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* the named-stops rider: abbreviated dial/slider readouts surface the
+   full stop name on the hover chip, like the span kinds */
+.mui-dial.is-abbrev:hover .mui-hoverchip,
+.mui-slider.is-abbrev:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   VIZ SHELL — a visualizer is a LENS, not a control. Panel chip,
+   head bar (micro-caps title left; hover chrome right: optional
+   − / +, then ×), optional recessed well. NO identity dot, no
+   accent of its own — every hue arrives through wires.
+   ============================================================ */
+
+.mui-viz {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: var(--mui-panel);
+  border: 1px solid var(--mui-line);
+  border-radius: var(--mui-r-card);
+  padding: 10px 12px;
+  font-family: var(--mui-mono);
+  color: var(--mui-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  min-width: 0;
+  min-height: 0;
+}
+.mui-viz * { box-sizing: border-box; }
+.mui-viz-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  flex: none;
+  min-height: 10px;
+  min-width: 0;
+}
+.mui-viz-title {
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls-wide);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mui-viz:hover .mui-chrome { opacity: 1; }
+.mui-viz-body {
+  flex: 1 1 auto;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+.mui-viz-well {
+  flex: 1 1 auto;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: var(--mui-ground);
+  border-radius: var(--mui-r-well);
+  overflow: hidden;
+}
+
+/* ============================================================
+   INPUT RAIL — the visualizer input dot column, generalized to
+   three edges. Dots straddle the edge (8px outside, mirroring
+   the output-jack overhang). fixed-labeled: permanent micro
+   label. inheriting modes: hover chip. variable mode: per-slot
+   × on hover. Unwired slots render faint ink, never accent.
+   ============================================================ */
+
+.mui-rail {
+  position: absolute;
+  display: flex;
+  gap: 14px;
+  z-index: 8;
+}
+.mui-rail--left {
+  left: -8px;
+  top: 16px;
+  bottom: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+.mui-rail--right {
+  right: -8px;
+  top: 16px;
+  bottom: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+}
+.mui-rail--top {
+  top: -8px;
+  left: 20px;
+  right: 20px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+}
+.mui-rail-slot {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.mui-rail--top .mui-rail-slot {
+  flex-direction: column;
+  align-items: center;
+}
+.mui-rail-lbl {
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  color: var(--mui-ink-soft);
+  line-height: 1;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+.mui-rail--right .mui-rail-lbl { order: -1; margin-left: 0; margin-right: 8px; }
+.mui-rail--top .mui-rail-lbl { margin-left: 0; margin-top: 7px; }
+.mui-rail-slot.is-unwired .mui-node-dot { border-color: var(--mui-ink-faint); }
+.mui-rail-slot.is-unwired .mui-rail-lbl { color: var(--mui-ink-faint); }
+.mui-rail-x {
+  width: 16px;
+  height: 16px;
+  border: none;
+  padding: 0;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mui-ink-soft);
+  font-family: var(--mui-mono);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--mui-t-fast) var(--mui-ease-out),
+              background var(--mui-t-fast) var(--mui-ease-out);
+}
+.mui-rail--right .mui-rail-x { order: -2; margin-left: 0; margin-right: 4px; }
+.mui-rail--top .mui-rail-x { margin-left: 0; margin-top: 3px; }
+.mui-rail-slot:hover .mui-rail-x { opacity: 1; }
+.mui-rail-x:hover { background: rgba(35,32,25,.08); color: var(--mui-ink); }
+
+/* ============================================================
+   POPUP EXTRAS — pad axis blocks, filter modes, curve timebase
+   ============================================================ */
+
+.mui-popup-ends { display: flex; gap: 8px; }
+.mui-popup-ends .mui-popup-input { min-width: 0; text-transform: none; letter-spacing: 0.02em; }
+.mui-popup-axis {
+  border-top: 1px solid var(--mui-line);
+  margin-top: 13px;
+  padding-top: 12px;
+}
+.mui-popup-axis-head {
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls-wide);
+  text-transform: uppercase;
+  color: var(--mui-red);
+  line-height: 1;
+  margin-bottom: 11px;
+}
+.mui-popup-modes { display: flex; gap: 6px; flex-wrap: wrap; }
+.mui-popup-select {
+  width: 100%;
+  height: 30px;
+  font-size: var(--mui-fs-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0 8px;
+}
+
+/* ============================================================
+   MOTION UTILITIES — the lib ships the vocabulary; consumers
+   (workbench drag) ship the drag code. FLIP is the sanctioned
+   displacement technique (measure → reorder → invert → play
+   over --mui-t-move with --mui-ease-settle).
+   ============================================================ */
+
+.mui-lifted {
+  transform: scale(var(--mui-scale-lift));
+  box-shadow: var(--mui-shadow-lift);
+  z-index: 30;
+}
+.mui-pressable { cursor: pointer; }
+.mui-pressable:active { transform: scale(var(--mui-scale-press)); }
+
+/* reduced motion: kill transform motion, keep opacity */
+@media (prefers-reduced-motion: reduce) {
+  .mui-lifted,
+  .mui-btn:active,
+  .mui-pressable:active,
+  .mui-ring-btn:hover,
+  .mui-swatch:hover,
+  .mui-node:hover .mui-node-dot,
+  .mui-node.is-hover .mui-node-dot { transform: none; }
+  .mui-card,
+  .mui-btn,
+  .mui-node-dot,
+  .mui-swatch,
+  .mui-ring-btn,
+  .mui-switch-pill,
+  .mui-switch-pill::after,
+  .mui-slider-handle,
+  .mui-pad-handle,
+  .mui-filter-mode,
+  .mui-rail-x,
+  .mui-order-token,
+  .mui-mixer-handle,
+  .mui-select-cell,
+  .mui-select-row {
+    transition-property: opacity, background-color, border-color, color;
+  }
+  /* order under reduced motion: reorder snaps, no lift transforms */
+  .mui-order-token.is-lift { box-shadow: none; }
+  /* the pad never spawns trail ghosts under reduced motion (JS);
+     this is the belt to that suspender */
+  .mui-pad-ghost { animation: none; opacity: 0; }
+}
+
+/* ============================================================
+   FORK — compiled routing. An ink junction: one line entering left,
+   fanning to 2–3 path lines right, path names at the ends, a round ink
+   LEAN handle on a short arc across the fan. The favored path draws at
+   full ink weight, the others faint — the control pictures its value.
+   ============================================================ */
+
+.mui-fork .mui-body { flex-direction: column; align-items: stretch; }
+.mui-fork-well {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: var(--mui-r-card);
+  cursor: ns-resize;
+  touch-action: none;
+  overflow: hidden;
+}
+.mui-fork-svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.mui-fork-svg .enter {
+  stroke: var(--mui-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.mui-fork-svg .path {
+  stroke: var(--mui-line);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  transition: stroke .12s ease, stroke-width .12s ease;
+}
+/* the favored path — full ink weight; the others stay faint */
+.mui-fork-svg .path.is-fav { stroke: var(--mui-ink); stroke-width: 2.4; }
+.mui-fork-svg .path-lbl {
+  font-family: var(--mui-mono);
+  font-size: var(--mui-fs-micro);
+  letter-spacing: var(--mui-ls);
+  text-transform: uppercase;
+  fill: var(--mui-ink-faint);
+}
+.mui-fork-svg .path-lbl.is-fav { fill: var(--mui-ink); }
+.mui-fork-svg .lean-arc { fill: none; stroke: var(--mui-dot); stroke-width: 1.2; }
+.mui-fork-svg .lean-handle {
+  fill: var(--mui-ink);
+  transition: fill .1s ease;
+}
+.mui-fork.is-dragging .mui-fork-svg .lean-handle { fill: var(--accent); }
+.mui-fork-well:focus-visible { outline: 1.5px solid var(--accent); outline-offset: 2px; }
+.mui-fork.sz-sm .mui-fork-svg .path-lbl,
+.mui-fork.sz-xs .mui-fork-svg .path-lbl { display: none; }
+
+/* ============================================================
+   REVISE — compiled feedback, small. A count capsule (− n +) with n
+   small nested arcs above it (the value's own picture). Passes 0–3,
+   0 = silent. NO threshold/score numbers on the face — only passes.
+   ============================================================ */
+
+.mui-revise .mui-body {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  overflow: hidden;                /* clip rather than overlap the foot */
+}
+.mui-revise-arcs {
+  flex: none;
+  width: 100%;
+  height: 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.mui-revise-svg { width: 56px; height: 22px; display: block; overflow: visible; }
+.mui-revise-svg .arc {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.mui-revise-pill { flex: none; width: auto; min-width: 92px; max-width: 140px; height: 28px; align-self: center; }
+.mui-revise-pill .mui-count-val { letter-spacing: 0.1em; }
+.mui-revise-pill .mui-count-btn { width: 28px; }
+.mui-revise .mui-readout { display: none; }
+.mui-revise .mui-foot { margin-top: 5px; }
+/* the 2×1 minimum: head collapses (xs), arcs shrink, capsule slims —
+   arcs / capsule / strictness chip all clear of one another */
+.mui-revise.sz-xs .mui-body { gap: 3px; }
+.mui-revise.sz-xs .mui-revise-arcs { height: 13px; }
+.mui-revise.sz-xs .mui-revise-svg { width: 42px; height: 13px; }
+.mui-revise.sz-xs .mui-revise-pill { height: 24px; min-width: 84px; }
+.mui-revise.sz-xs .mui-foot { margin-top: 3px; }
+.mui-revise.sz-xs:hover .mui-hoverchip {
+  display: block;
+  opacity: 1;
+  transition: opacity .12s ease;
+  @starting-style { opacity: 0; }
+}
+
+/* ============================================================
+   STEP — the transformer body, the third UI class. Panel chip, verb
+   label + identity dot, prose frame, artifact-in ▣ (left) / artifact-out
+   ▣ (right) in the second cable family, signal inputs below artifact-in,
+   fidelity foot chip. Verb registry + artifact contents are engine-surface.
+   ============================================================ */
+
+.mui-step {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: var(--mui-panel);
+  border: 1px solid var(--mui-line);
+  border-radius: var(--mui-r-card);
+  padding: 10px 12px;
+  font-family: var(--mui-mono);
+  color: var(--mui-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  min-width: 0;
+  min-height: 0;
+}
+.mui-step * { box-sizing: border-box; }
+.mui-step .mui-head { margin-bottom: 8px; }
+/* the step's identity dot — a small solid accent square (the verb's
+   family mark), echoing the square artifact family it lives among */
+.mui-step-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.mui-step .mui-label { color: var(--mui-ink); font-weight: 500; }
+.mui-step-body { flex: 1 1 auto; display: flex; align-items: center; min-width: 0; min-height: 0; }
+.mui-step-prose {
+  font-size: 12px;
+  line-height: 1.45;
+  letter-spacing: .01em;
+  color: var(--mui-ink-soft);
+}
+.mui-step:hover .mui-chrome { opacity: 1; }
+/* artifact-in top-left, artifact-out right-center (the overhang rule) */
+.mui-step-in { top: 22px; transform: none; }
+.mui-step-out { top: 50%; }
+/* signal inputs — a left-edge column below artifact-in */
+.mui-step-signals {
+  position: absolute;
+  left: -8px;
+  top: 46px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 8;
+}
+.mui-step-signal { position: relative; right: auto; left: auto; top: auto; transform: none; }
+.mui-step-foot { margin-top: 8px; }
+
+/* ============================================================
+   SHARED UTILITIES for hosts (boards, dot fields)
+   ============================================================ */
+
+.mui-dotfield {
+  background-color: var(--mui-ground);
+  background-image: radial-gradient(circle 1px at 1px 1px, rgba(35,32,25,.11) 98%, transparent);
+  background-size: 18px 18px;
+}

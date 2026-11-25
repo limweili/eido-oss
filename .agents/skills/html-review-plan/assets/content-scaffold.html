@@ -1,0 +1,173 @@
+<main id="founder-review"
+      data-report-id="{{REPORT_ID}}"
+      data-comment-schema="founder-review-comments/v1">
+  <header id="executive-summary" class="report-header" data-review-anchor data-anchor-label="Executive summary">
+    <p class="kicker">Founder review · {{EPIC_LABEL}} · {{SOURCE_STATE}} · generated {{GENERATED_AT}}</p>
+    <h1>{{TITLE}}</h1>
+    <p class="section-label">Executive summary</p>
+    <p class="lede">[[TODO: State the outcome, why it matters, and the delivered-versus-future boundary.]]</p>
+    <div class="two-col">
+      <div class="plain-group">
+        <h3>What changed now</h3>
+        <p>[[TODO: State the present impact.]]</p>
+      </div>
+      <div class="plain-group">
+        <h3>What users or the business receive later</h3>
+        <p>[[TODO: State the enabled or expected impact and its gate.]]</p>
+      </div>
+    </div>
+    <div class="summary-grid" aria-label="Executive measures">
+      <div class="card stat"><span class="muted">[[TODO: Name the measure.]]</span><strong>[[TODO: Add the value.]]</strong><span>[[TODO: Explain why it matters.]]</span></div>
+      <div class="card stat"><span class="muted">[[TODO: Name the measure.]]</span><strong>[[TODO: Add the value.]]</strong><span>[[TODO: Explain why it matters.]]</span></div>
+      <div class="card stat"><span class="muted">[[TODO: Name the measure.]]</span><strong>[[TODO: Add the value.]]</strong><span>[[TODO: Explain why it matters.]]</span></div>
+    </div>
+    <div class="callout decision"><strong>Most important boundary:</strong> [[TODO: State the claim most likely to be misunderstood.]]</div>
+    <div class="callout"><strong>Founder review focus:</strong> [[TODO: State the decisions or questions that need attention.]]</div>
+  </header>
+
+  <nav class="toc" aria-label="Report contents">
+    <ol>
+      <li><a href="#executive-summary">Executive summary</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#work-delivered">Work delivered</a></li>
+      <li><a href="#technical-teaching">Technical teaching</a></li>
+      <li><a href="#retro">Retro and collaboration</a></li>
+      <li><a href="#comment-workbench">Comment and return</a></li>
+    </ol>
+  </nav>
+
+  <section id="review-workflow" class="card review-instructions" data-review-anchor data-anchor-label="How to review and comment">
+    <h2>How to review and return comments</h2>
+    <ol>
+      <li>Skim the executive summary and impact first; open technical disclosures only when useful.</li>
+      <li>Highlight exact wording and press the nearby <strong>Comment here</strong> button, or comment on a whole section.</li>
+      <li>Add, edit, resolve, or delete comments. Each one is marked as founder feedback requiring an agent response.</li>
+      <li>Press <strong>Save commented HTML</strong> and return the downloaded file.</li>
+    </ol>
+  </section>
+
+  <section id="impact" data-review-anchor data-anchor-label="Impact">
+    <h2>Impact — what changed and why it matters</h2>
+    <p class="area-intro">[[TODO: State the impact thesis and distinguish delivered, enabled, expected, and not yet proven.]]</p>
+    <div class="impact-chain" role="img" aria-label="Impact chain from evidence to user or business value">
+      <div class="impact-node"><strong>Evidence</strong><span>[[TODO: State what became known.]]</span><small>MEASURED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Decision or delivery change</strong><span>[[TODO: State what changed now.]]</span><small>DECIDED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node"><strong>Enabled capability</strong><span>[[TODO: State what can happen next.]]</span><small>ENABLED</small></div>
+      <span class="impact-arrow" aria-hidden="true">→</span>
+      <div class="impact-node pending"><strong>User or business effect</strong><span>[[TODO: State the expected effect and its gate.]]</span><small>EXPECTED / NOT YET PROVEN</small></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Impact layer</th><th>Improvement</th><th>Evidence</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr><td data-label="Layer">[[TODO: Name the impact layer.]]</td><td data-label="Improvement">[[TODO: Describe the change.]]</td><td data-label="Evidence">[[TODO: Cite the source.]]</td><td data-label="Confidence">[[TODO: Choose MEASURED, DECIDED, ENABLED, EXPECTED, or NOT YET PROVEN.]]</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warning"><strong>Honest impact boundary:</strong> [[TODO: State what cannot yet be claimed.]]</div>
+  </section>
+
+  <section id="work-delivered" data-review-anchor data-anchor-label="Work delivered">
+    <h2>Area 1 — Work delivered</h2>
+    <p class="area-intro">[[TODO: Summarize the coherent outcomes and the completion boundary.]]</p>
+    <article id="completion-boundary" data-review-anchor data-anchor-label="Completion boundary">
+      <h3>Delivered versus intentionally excluded</h3>
+      <div class="two-col">
+        <div class="plain-group"><h4>Delivered</h4><ul><li>[[TODO: Add a delivered outcome.]]</li></ul></div>
+        <div class="plain-group"><h4>Not delivered</h4><ul><li>[[TODO: Add an explicit exclusion or future gate.]]</li></ul></div>
+      </div>
+    </article>
+    <article id="selected-decision" data-review-anchor data-anchor-label="Selected decision or architecture">
+      <h3>Selected decision or architecture</h3>
+      <p>[[TODO: Explain the selected approach, rejected alternatives, trade-offs, and product meaning.]]</p>
+    </article>
+    <article id="delivery-ledger" data-review-anchor data-anchor-label="Delivery ledger">
+      <h3>Detailed delivery ledger</h3>
+      <details><summary>Open issue, PR, CI, release, and artifact detail</summary><p>[[TODO: Insert the source-grounded ledger.]]</p></details>
+    </article>
+    <article id="next-sequence" data-review-anchor data-anchor-label="Next sequence">
+      <h3>What happens next</h3>
+      <p>[[TODO: Explain dependencies, gates, rollback, rollout, and owners.]]</p>
+    </article>
+  </section>
+
+  <section id="technical-teaching" data-review-anchor data-anchor-label="Technical teaching">
+    <h2>Area 2 — Technical teaching</h2>
+    <div class="callout decision"><strong>Technical story in one minute:</strong> [[TODO: Explain the mechanism and trade-off in plain language.]]</div>
+    <article id="technical-mechanism" data-review-anchor data-anchor-label="How it works">
+      <h3>How it works</h3>
+      <p>[[TODO: Connect mechanism → trade-off → product meaning → validation gate.]]</p>
+    </article>
+    <article id="technical-diagram" data-review-anchor data-anchor-label="Technical diagram">
+      <h3>Relationship or sequence</h3>
+      <div class="diagram-placeholder">[[TODO: Add an accessible SVG, Mermaid rendering, table, or concise flow only when it improves understanding.]]</div>
+    </article>
+    <article id="technical-limitations" data-review-anchor data-anchor-label="Technical limitations">
+      <h3>Limitations and open gates</h3>
+      <ul><li>[[TODO: Add a limitation and its owner or gate.]]</li></ul>
+    </article>
+  </section>
+
+  <section id="retro" data-review-anchor data-anchor-label="Retro and collaboration">
+    <h2>Area 3 — Retro and how to work better together</h2>
+    <div class="callout decision"><strong>One-minute verdict:</strong> [[TODO: State the strongest outcome, principal avoidable delay, and most effective correction.]]</div>
+    <div class="summary-grid">
+      <div class="card stat"><span class="muted">Principal bottleneck</span><strong>[[TODO: Name the bottleneck.]]</strong><span>[[TODO: Cite the evidence.]]</span></div>
+      <div class="card stat"><span class="muted">Most effective unblock</span><strong>[[TODO: Name the correction.]]</strong><span>[[TODO: State its effect.]]</span></div>
+      <div class="card stat"><span class="muted">Future rule</span><strong>[[TODO: State the rule.]]</strong><span>[[TODO: Explain why.]]</span></div>
+    </div>
+    <article id="retro-friction" data-review-anchor data-anchor-label="Friction and bottlenecks">
+      <h3>Friction, bottlenecks, and how they were unblocked</h3>
+      <p>[[TODO: Describe actual versus suspected constraints, failed loops, and corrective evidence.]]</p>
+    </article>
+    <article id="retro-interventions" data-review-anchor data-anchor-label="Founder interventions">
+      <h3>Founder interventions</h3>
+      <p>[[TODO: Explain what improved, what disruption occurred, and how timing or framing could improve.]]</p>
+    </article>
+    <article id="retro-accountability" data-review-anchor data-anchor-label="Agent accountability">
+      <h3>Agent and team accountability</h3>
+      <p>[[TODO: State what the team should have recognized or changed sooner.]]</p>
+    </article>
+    <article id="retro-actions" data-review-anchor data-anchor-label="Future operating model">
+      <h3>Keep / Stop / Start / Change</h3>
+      <div class="two-col"><div class="plain-group"><h4>Keep / Start</h4><ul><li>[[TODO: Add an action to keep or start.]]</li></ul></div><div class="plain-group"><h4>Stop / Change</h4><ul><li>[[TODO: Add an action to stop or change.]]</li></ul></div></div>
+    </article>
+    <details><summary>Open forensic retro evidence</summary><p>[[TODO: Insert detailed timeline, metrics, incidents, or source references.]]</p></details>
+  </section>
+
+  <section id="sources" data-review-anchor data-anchor-label="Sources and provenance">
+    <h2>Sources, evidence, and provenance</h2>
+    <p>[[TODO: List canonical specification, code/PR, architecture, measurement, CI/release, and retro sources.]]</p>
+  </section>
+
+  <section id="comment-workbench" class="card comment-workbench" data-review-anchor data-anchor-label="Comment workbench">
+    <p class="kicker">Standalone founder review workflow</p>
+    <h2>Comment directly in this review</h2>
+    <p>Comments are embedded into the saved HTML and explicitly marked for agent response.</p>
+    <div class="comment-grid">
+      <div>
+        <label for="founder-comment-anchor">Anchor section</label>
+        <select id="founder-comment-anchor"></select>
+        <label for="founder-comment-type">Comment type</label>
+        <select id="founder-comment-type"><option>Question</option><option>Change request</option><option>Concern</option><option>Approval</option></select>
+        <label for="founder-comment-body">Your comment</label>
+        <textarea id="founder-comment-body" rows="7" placeholder="Write the question or change you want addressed."></textarea>
+        <div class="actions"><button id="founder-comment-save" class="primary" type="button">Add founder comment</button><button id="founder-comment-cancel" type="button" hidden>Cancel edit</button></div>
+      </div>
+      <div>
+        <label>Selected quote</label>
+        <blockquote id="founder-comment-quote">No text selected. Highlight wording to use Comment here.</blockquote>
+        <div class="actions"><button id="founder-comment-use-selection" type="button">Use selected text</button><button id="founder-comment-clear-quote" type="button">Clear quote</button></div>
+        <div class="actions"><button id="founder-comments-save-html" class="primary" type="button">Save commented HTML</button><button id="founder-comments-export-json" type="button">Export comments JSON</button></div>
+        <p id="founder-comments-state" class="muted" aria-live="polite">No founder comments yet.</p>
+      </div>
+    </div>
+    <h3>Founder comment index <span id="founder-comment-count" class="badge">0</span></h3>
+    <div id="founder-comment-index" class="comment-index" aria-live="polite"></div>
+  </section>
+
+  <script id="founder-comments-data" type="application/json">{"schemaVersion":"founder-review-comments/v1","reportId":"{{REPORT_ID}}","comments":[],"deletedIds":[]}</script>
+  <footer><p>{{EPIC_LABEL}} · {{SOURCE_STATE}} · generated {{GENERATED_AT}}</p></footer>
+</main>
