@@ -1993,7 +1993,7 @@ test('proof-reuse resolution accepts an exact successful workflow dispatch on ma
   const api = (route) => {
     if (route.includes('/runs?')) {
       runRequests.push(route)
-      assert.match(route, /event=(?:push|workflow_dispatch)&branch=main&status=success&per_page=100$/)
+      assert.match(route, /event=(?:push|workflow_dispatch)&branch=main&per_page=100$/)
       return route.includes('event=workflow_dispatch') ? runs : { workflow_runs: [] }
     }
     if (route.endsWith('/jobs?per_page=100')) {
@@ -2053,13 +2053,13 @@ test('proof-reuse resolution deduplicates and bounds the newest allowed-event wi
     if (route.includes('/runs?')) {
       const event = route.match(/event=([^&]+)/)?.[1]
       requestedEvents.push(event)
-      assert.match(route, /branch=main&status=success&per_page=3$/)
+      assert.match(route, /branch=main&per_page=3$/)
       return event === 'push'
         ? {
             workflow_runs: [
+              { ...run(1002, 'push', sha6), conclusion: 'failure' },
               run(9, 'push', sha9),
               run(7, 'push', sha7),
-              run(1000, 'pull_request', sha6),
             ],
           }
         : {

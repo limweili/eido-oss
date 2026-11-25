@@ -8,8 +8,8 @@
 // forked between branches, and it blocked pull requests on bookkeeping.
 //
 // This module resolves the same claim from the thing that actually proves it.
-// It asks GitHub for successful `Native desktop proof` runs on `main`, finds
-// the run whose tree fingerprint is the tree under certification, confirms both
+// It lists recent `Native desktop proof` runs on `main`, finds a successful run
+// whose tree fingerprint matches the tree under certification, confirms both
 // native gate jobs concluded success, and returns a machine-written record. The
 // record is sealed into every platform evidence packet, so the audit question
 // "what evidence justified reusing #527 for this build?" is answered by the
@@ -78,9 +78,10 @@ export function resolveProofRevalidation({
   const treeSha256 = computeFingerprint(sourceSha, { cwd })
   const runsById = new Map()
   for (const event of NATIVE_DESKTOP_PROOF_ALLOWED_EVENTS) {
+    // GitHub's status filter can omit a completed run visible in its event list.
     const listed = api(
       `repos/{repo}/actions/workflows/${NATIVE_DESKTOP_PROOF_WORKFLOW_FILE}/runs`
-        + `?event=${event}&branch=main&status=success&per_page=${window}`,
+        + `?event=${event}&branch=main&per_page=${window}`,
     )
     for (const run of listed.workflow_runs ?? []) {
       if (
@@ -105,7 +106,7 @@ export function resolveProofRevalidation({
 
   throw new Error(
     `No successful ${NATIVE_DESKTOP_PROOF_WORKFLOW} run on main covers the runtime tree of ${sourceSha} `
-      + `(fingerprint ${treeSha256}) within the last ${window} successful runs. `
+      + `(fingerprint ${treeSha256}) in the search of up to ${window} recent runs per allowed event. `
       + 'Land the change on main, or dispatch Native desktop proof on this SHA, before certifying '
       + '(see docs/agents/packaged-certification.md).',
   )
